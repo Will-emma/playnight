@@ -1,5 +1,6 @@
+// Ce fichier ne contient que des variables : il est importé par les composants (@use "theme"),
+// il ne doit donc générer aucun CSS. Le thème Material est appliqué une seule fois dans styles.scss.
 @use "@angular/material" as mat;
-@include mat.core();
 
 $dark-purple-palette: (
   50: #6a0f59,
@@ -45,8 +46,6 @@ $my-theme: mat.define-light-theme(
     ),
   )
 );
-
-@include mat.all-component-colors($my-theme);
 
 $common-purple: mat.get-color-from-palette($dark-purple-palette, 500);
 $common-red: mat.get-color-from-palette(mat.$red-palette, A700);
