@@ -117,4 +117,5 @@ Les tâches sont suivies dans les [Issues](https://github.com/Will-emma/playnigh
 ## Documentation
 
 - [Modèle de données](docs/modele-donnees.md)
+- [Format des DTO (JSON échangé entre le back et le front)](docs/format-dto.md)
 - [Guide d'installation fourni par l'école](INSTALLATION-ECOLE.md) (IntelliJ, Docker, captures d'écran)
