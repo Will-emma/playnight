@@ -1,0 +1,62 @@
+# Vérifie à chaque Pull Request (et à chaque push sur main) que le back et le front compilent.
+# Les jobs "backend" et "frontend" doivent réussir pour pouvoir merger une PR sur main.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back-skeleton
+    # Base PostgreSQL de test, initialisée avec les scripts de initdb/
+    services:
+      database:
+        image: postgres
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_USER: ci
+      DATABASE_PASSWORD: ci
+      DATABASE_NAME: ci
+      PGPASSWORD: ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Initialiser la base avec initdb/
+        run: for f in initdb/*.sql; do psql -h localhost -U ci -d ci -v ON_ERROR_STOP=1 -f "$f"; done
+      - name: Compiler et lancer les tests
+        run: mvn -B verify
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front-skeleton
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: front-skeleton/package-lock.json
+      - run: npm ci
+      - name: Build de production
+        run: npx ng build
