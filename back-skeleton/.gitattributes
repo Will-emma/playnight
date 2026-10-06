@@ -1,0 +1,3 @@
+# Garde les bonnes fins de ligne pour les scripts du wrapper Maven
+mvnw text eol=lf
+*.cmd text eol=crlf
