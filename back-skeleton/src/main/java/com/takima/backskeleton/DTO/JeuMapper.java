@@ -1,8 +1,13 @@
+
 package com.takima.backskeleton.DTO;
 
 import com.takima.backskeleton.models.Jeu;
 
 public class JeuMapper {
+
+    private JeuMapper() {
+    }
+
     public static Jeu fromDto(JeuDto dto, Long id) {
         return new Jeu.Builder()
                 .id(id)
@@ -25,5 +30,14 @@ public class JeuMapper {
                 .nbJoueursMax(jeu.getNbJoueursMax())
                 .image(jeu.getImage())
                 .build();
+    }
+
+    public static JeuResumeDto toResumeDto(Jeu jeu) {
+        return new JeuResumeDto(
+                jeu.getId(),
+                jeu.getNom(),
+                jeu.getType(),
+                jeu.getImage()
+        );
     }
 }

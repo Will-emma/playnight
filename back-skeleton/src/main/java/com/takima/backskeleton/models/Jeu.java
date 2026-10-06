@@ -1,3 +1,4 @@
+
 package com.takima.backskeleton.models;
 
 import jakarta.persistence.Column;
@@ -12,22 +13,32 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "jeux")
 public class Jeu {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String nom;
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "type", nullable = false, length = 20)
     private TypeJeu type;
+
     @Column(columnDefinition = "TEXT")
     private String plateforme;
+
     @Column(name = "nb_joueurs_min", nullable = false)
     private Integer nbJoueursMin;
+
     @Column(name = "nb_joueurs_max", nullable = false)
     private Integer nbJoueursMax;
+
     @Column(columnDefinition = "TEXT")
     private String image;
+
+    public Jeu() {
+    }
 
     private Jeu(Builder builder) {
         this.id = builder.id;
@@ -37,9 +48,6 @@ public class Jeu {
         this.nbJoueursMin = builder.nbJoueursMin;
         this.nbJoueursMax = builder.nbJoueursMax;
         this.image = builder.image;
-    }
-
-    public Jeu() {
     }
 
     public Long getId() {

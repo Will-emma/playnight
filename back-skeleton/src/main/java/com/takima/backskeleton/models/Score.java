@@ -21,8 +21,9 @@ public class Score {
     private Integer rang;
     @Column(name = "numero_equipe")
     private Integer numeroEquipe;
-    @Column(name = "partie_id", nullable = false)
-    private Long partieId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "partie_id", nullable = false)
+    private Partie partie;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "joueur_id", nullable = false)
     private Joueur joueur;
@@ -46,8 +47,8 @@ public class Score {
         return numeroEquipe;
     }
 
-    public Long getPartieId() {
-        return partieId;
+    public Partie getPartie() {
+        return partie;
     }
 
     public Joueur getJoueur() {
