@@ -108,11 +108,11 @@ Les tâches sont suivies dans les [Issues](https://github.com/Will-emma/playnigh
 |---|---|
 | Le frontend s'affiche, mais les listes sont vides | Le backend n'est pas lancé : voir le terminal 1. |
 | `password authentication failed for user "${DATABASE_USER}"` | Le fichier `back-skeleton/.env` est absent : voir [Installation](#installation). |
-| `password authentication failed for user "playnight"` | Le `.env` a été modifié après la création de la base. Recréer la base : `docker compose down -v` puis `docker compose up -d`. |
+| `password authentication failed for user "playnight"` | Le `.env` a été modifié après la création de la base. Les identifiants PostgreSQL sont conservés dans le volume existant ; ne le supprimez qu'après avoir sauvegardé les données et décidé explicitement de recréer la base. |
 | `Port 8080 was already in use` | Un autre backend tourne déjà : l'arrêter avec `Ctrl + C`. |
-| La base ne reflète pas les scripts de `initdb/` | Les scripts ne s'exécutent qu'à la création de la base. Recréer la base : `docker compose down -v` puis `docker compose up -d`. |
+| La base ne reflète pas les scripts de `initdb/` | Les scripts ne s'exécutent qu'à la création de la base. Il faut recréer le volume PostgreSQL pour les rejouer, ce qui supprime les données locales : sauvegardez-les et confirmez cette suppression avant d'exécuter `docker compose down -v`. |
 
-> `docker compose down -v` supprime toutes les données de la base locale, qui est ensuite recréée à partir des scripts de `initdb/`.
+> Attention : `docker compose down -v` supprime le volume PostgreSQL et toutes les données locales. Ne lancez cette commande qu'après sauvegarde et confirmation explicite que ces données peuvent être détruites.
 
 ## Documentation
 
