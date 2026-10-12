@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(JoueurController.class)
@@ -65,6 +67,30 @@ class JoueurControllerTest {
                 .andExpect(jsonPath("$.id").value(2))
                 .andExpect(jsonPath("$.pseudo").value("Max"))
                 .andExpect(jsonPath("$.avatar").value("https://example.com/avatar.png"));
+    }
+
+    @Test
+    void malformedJsonReturnsJsonBadRequest() throws Exception {
+        mockMvc.perform(post("/joueurs")
+                        .contentType("application/json")
+                        .content("{invalid json"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("La requête est invalide."));
+    }
+
+    @Test
+    void uniquenessConflictReturnsConflictWithoutDatabaseDetails() throws Exception {
+        when(joueurService.addJoueur(any(JoueurDto.class)))
+                .thenThrow(new DataIntegrityViolationException("duplicate pseudo detail"));
+
+        mockMvc.perform(post("/joueurs")
+                        .contentType("application/json")
+                        .content("{\"pseudo\":\"Max\",\"avatar\":null}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message")
+                        .value("La requête entre en conflit avec les données existantes."))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("duplicate pseudo detail"))));
     }
 
     @Test
