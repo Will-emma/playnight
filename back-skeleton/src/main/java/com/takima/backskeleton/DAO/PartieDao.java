@@ -21,6 +21,17 @@ public interface PartieDao extends JpaRepository<Partie, Long> {
             """)
     List<Partie> findDetailsBySoireeId(@Param("soireeId") Long soireeId);
 
+    @Query("""
+            SELECT DISTINCT p
+            FROM Partie p
+            JOIN FETCH p.soiree soiree
+            LEFT JOIN FETCH p.scores score
+            LEFT JOIN FETCH score.joueur
+            WHERE p.jeu.id = :jeuId
+            ORDER BY soiree.date DESC, p.id DESC
+            """)
+    List<Partie> findDetailsByJeuId(@Param("jeuId") Long jeuId);
+
     // Requête générée par Spring à partir du nom : supprime toutes les parties d'une soirée
     void deleteBySoireeId(Long soireeId);
 }

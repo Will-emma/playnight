@@ -1,6 +1,10 @@
 package com.takima.backskeleton.controllers;
 
+import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.JeuDto;
+import com.takima.backskeleton.DTO.JoueurResumeDto;
+import com.takima.backskeleton.DTO.MeilleurJoueurDto;
+import com.takima.backskeleton.DTO.PartieJoueeDto;
 import com.takima.backskeleton.models.TypeJeu;
 import com.takima.backskeleton.services.JeuService;
 import org.junit.jupiter.api.Test;
@@ -9,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -122,6 +127,40 @@ class JeuControllerTest {
 
         mockMvc.perform(delete("/jeux/4"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getFicheJeuReturnsJsonWithContractFieldNames() throws Exception {
+        FicheJeuDto fiche = new FicheJeuDto(
+                jeuDto(1L, "Catan", TypeJeu.SOCIETE),
+                1L,
+                List.of(new MeilleurJoueurDto(new JoueurResumeDto(1L, "Léa", "https://example.com/lea.png"), 1L)),
+                List.of(new PartieJoueeDto(7L, LocalDateTime.of(2026, 9, 12, 20, 0), 75, List.of("Léa"))));
+        when(jeuService.getFiche(1L)).thenReturn(fiche);
+
+        mockMvc.perform(get("/jeux/1/fiche"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.jeu.id").value(1))
+                .andExpect(jsonPath("$.jeu.nom").value("Catan"))
+                .andExpect(jsonPath("$.nbParties").value(1))
+                .andExpect(jsonPath("$.meilleursJoueurs[0].joueur.id").value(1))
+                .andExpect(jsonPath("$.meilleursJoueurs[0].joueur.pseudo").value("Léa"))
+                .andExpect(jsonPath("$.meilleursJoueurs[0].joueur.avatar").value("https://example.com/lea.png"))
+                .andExpect(jsonPath("$.meilleursJoueurs[0].nbVictoires").value(1))
+                .andExpect(jsonPath("$.parties[0].partieId").value(7))
+                .andExpect(jsonPath("$.parties[0].date").value("2026-09-12T20:00:00"))
+                .andExpect(jsonPath("$.parties[0].duree").value(75))
+                .andExpect(jsonPath("$.parties[0].vainqueurs[0]").value("Léa"));
+    }
+
+    @Test
+    void getFicheJeuReturns404WhenMissing() throws Exception {
+        when(jeuService.getFiche(404L))
+                .thenThrow(new NoSuchElementException("Le jeu 404 n'existe pas"));
+
+        mockMvc.perform(get("/jeux/404/fiche"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Le jeu 404 n'existe pas"));
     }
 
     private JeuDto jeuDto(Long id, String nom, TypeJeu type) {
