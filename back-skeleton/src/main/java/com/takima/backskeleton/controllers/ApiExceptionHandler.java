@@ -34,6 +34,12 @@ public class ApiExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, "La requête est invalide.");
     }
 
+    // Règle métier non respectée (ex. : un score pour un joueur absent) : 400 avec le message du service
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleRegleMetier(IllegalArgumentException exception) {
+        return error(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleConflict(DataIntegrityViolationException exception) {
         return error(HttpStatus.CONFLICT, "La requête entre en conflit avec les données existantes.");
