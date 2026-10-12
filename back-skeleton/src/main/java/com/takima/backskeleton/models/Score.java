@@ -31,6 +31,14 @@ public class Score {
     public Score() {
     }
 
+    private Score(Builder builder) {
+        this.points = builder.points;
+        this.rang = builder.rang;
+        this.numeroEquipe = builder.numeroEquipe;
+        this.partie = builder.partie;
+        this.joueur = builder.joueur;
+    }
+
     public Long getId() {
         return id;
     }
@@ -53,5 +61,42 @@ public class Score {
 
     public Joueur getJoueur() {
         return joueur;
+    }
+
+    public static class Builder {
+        private Integer points;
+        private Integer rang;
+        private Integer numeroEquipe;
+        private Partie partie;
+        private Joueur joueur;
+
+        public Builder points(Integer points) {
+            this.points = points;
+            return this;
+        }
+
+        public Builder rang(Integer rang) {
+            this.rang = rang;
+            return this;
+        }
+
+        public Builder numeroEquipe(Integer numeroEquipe) {
+            this.numeroEquipe = numeroEquipe;
+            return this;
+        }
+
+        public Builder partie(Partie partie) {
+            this.partie = partie;
+            return this;
+        }
+
+        public Builder joueur(Joueur joueur) {
+            this.joueur = joueur;
+            return this;
+        }
+
+        public Score build() {
+            return new Score(this);
+        }
     }
 }

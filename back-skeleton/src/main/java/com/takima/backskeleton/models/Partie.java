@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,6 +32,13 @@ public class Partie {
     public Partie() {
     }
 
+    private Partie(Builder builder) {
+        this.duree = builder.duree;
+        this.soiree = builder.soiree;
+        this.jeu = builder.jeu;
+        this.scores = new ArrayList<>(); // les scores sont ajoutés une fois la partie enregistrée
+    }
+
     public Long getId() {
         return id;
     }
@@ -49,5 +57,30 @@ public class Partie {
 
     public List<Score> getScores() {
         return scores;
+    }
+
+    public static class Builder {
+        private Integer duree;
+        private Soiree soiree;
+        private Jeu jeu;
+
+        public Builder duree(Integer duree) {
+            this.duree = duree;
+            return this;
+        }
+
+        public Builder soiree(Soiree soiree) {
+            this.soiree = soiree;
+            return this;
+        }
+
+        public Builder jeu(Jeu jeu) {
+            this.jeu = jeu;
+            return this;
+        }
+
+        public Partie build() {
+            return new Partie(this);
+        }
     }
 }

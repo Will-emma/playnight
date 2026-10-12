@@ -20,4 +20,7 @@ public interface PartieDao extends JpaRepository<Partie, Long> {
             ORDER BY p.id
             """)
     List<Partie> findDetailsBySoireeId(@Param("soireeId") Long soireeId);
+
+    // Requête générée par Spring à partir du nom : supprime toutes les parties d'une soirée
+    void deleteBySoireeId(Long soireeId);
 }

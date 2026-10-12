@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,6 +37,22 @@ public class Soiree {
     public Soiree() {
     }
 
+    private Soiree(Builder builder) {
+        this.date = builder.date;
+        this.lieu = builder.lieu;
+        this.joueurs = builder.joueurs;
+        this.parties = new ArrayList<>(); // les parties sont ajoutées une fois la soirée enregistrée
+    }
+
+    // Utilisé par PUT /soirees/{id} : remplace les infos de la soirée.
+    // Les anciennes parties sont supprimées par le service, on repart donc d'une liste vide.
+    public void modifier(LocalDateTime date, String lieu, List<Joueur> joueurs) {
+        this.date = date;
+        this.lieu = lieu;
+        this.joueurs = joueurs;
+        this.parties = new ArrayList<>();
+    }
+
     public Long getId() {
         return id;
     }
@@ -54,5 +71,30 @@ public class Soiree {
 
     public List<Partie> getParties() {
         return parties;
+    }
+
+    public static class Builder {
+        private LocalDateTime date;
+        private String lieu;
+        private List<Joueur> joueurs;
+
+        public Builder date(LocalDateTime date) {
+            this.date = date;
+            return this;
+        }
+
+        public Builder lieu(String lieu) {
+            this.lieu = lieu;
+            return this;
+        }
+
+        public Builder joueurs(List<Joueur> joueurs) {
+            this.joueurs = joueurs;
+            return this;
+        }
+
+        public Soiree build() {
+            return new Soiree(this);
+        }
     }
 }
