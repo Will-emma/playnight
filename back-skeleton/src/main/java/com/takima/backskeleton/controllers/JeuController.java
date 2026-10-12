@@ -1,5 +1,6 @@
 package com.takima.backskeleton.controllers;
 
+import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.JeuDto;
 import com.takima.backskeleton.models.TypeJeu;
 import com.takima.backskeleton.services.JeuService;
@@ -36,6 +37,11 @@ public class JeuController {
     @GetMapping("/{id}")
     public JeuDto getJeuById(@PathVariable Long id) {
         return jeuService.getById(id);
+    }
+
+    @GetMapping("/{id}/fiche")
+    public FicheJeuDto getFicheJeu(@PathVariable Long id) {
+        return jeuService.getFiche(id);
     }
 
     @PostMapping("")

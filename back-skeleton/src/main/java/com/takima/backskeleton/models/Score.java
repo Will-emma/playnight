@@ -63,6 +63,11 @@ public class Score {
         return joueur;
     }
 
+    // Le ou les joueurs classés premiers gagnent la partie (plusieurs en cas d'ex aequo ou d'équipe)
+    public boolean estVainqueur() {
+        return rang != null && rang == 1;
+    }
+
     public static class Builder {
         private Integer points;
         private Integer rang;

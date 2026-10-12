@@ -1,8 +1,15 @@
 package com.takima.backskeleton.services;
 
 import com.takima.backskeleton.DAO.JeuDao;
+import com.takima.backskeleton.DAO.PartieDao;
+import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.JeuDto;
+import com.takima.backskeleton.DTO.MeilleurJoueurDto;
 import com.takima.backskeleton.models.Jeu;
+import com.takima.backskeleton.models.Joueur;
+import com.takima.backskeleton.models.Partie;
+import com.takima.backskeleton.models.Score;
+import com.takima.backskeleton.models.Soiree;
 import com.takima.backskeleton.models.TypeJeu;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -18,6 +26,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,6 +36,9 @@ import static org.mockito.Mockito.when;
 class JeuServiceTest {
     @Mock
     private JeuDao jeuDao;
+
+    @Mock
+    private PartieDao partieDao;
 
     @InjectMocks
     private JeuService jeuService;
@@ -135,6 +147,93 @@ class JeuServiceTest {
         jeuService.deleteById(4L);
 
         verify(jeuDao).deleteById(4L);
+    }
+
+    @Test
+    void getFicheCountsGamesAndListsWinnersOfEachGame() {
+        Joueur lea = joueur(1L, "Léa");
+        Joueur tom = joueur(2L, "Tom");
+        Partie recente = partie(LocalDateTime.of(2026, 10, 3, 20, 0), 60);
+        ajouterScore(recente, tom, 1);
+        ajouterScore(recente, lea, 2);
+        Partie ancienne = partie(LocalDateTime.of(2026, 9, 12, 20, 0), 75);
+        ajouterScore(ancienne, lea, 1);
+        ajouterScore(ancienne, tom, 2);
+        when(jeuDao.findById(1L)).thenReturn(Optional.of(jeu(1L, "Catan", TypeJeu.SOCIETE)));
+        when(partieDao.findDetailsByJeuId(1L)).thenReturn(List.of(recente, ancienne));
+
+        FicheJeuDto fiche = jeuService.getFiche(1L);
+
+        assertEquals("Catan", fiche.getJeu().getNom());
+        assertEquals(2L, fiche.getNbParties());
+        assertEquals(LocalDateTime.of(2026, 10, 3, 20, 0), fiche.getParties().get(0).getDate());
+        assertEquals(60, fiche.getParties().get(0).getDuree());
+        assertEquals(List.of("Tom"), fiche.getParties().get(0).getVainqueurs());
+        assertEquals(List.of("Léa"), fiche.getParties().get(1).getVainqueurs());
+    }
+
+    @Test
+    void getFicheRanksPlayersByWinsThenByPseudo() {
+        Joueur lea = joueur(1L, "Léa");
+        Joueur tom = joueur(2L, "Tom");
+        Joueur alex = joueur(3L, "Alex");
+        Partie partie1 = partie(LocalDateTime.of(2026, 10, 3, 20, 0), 30);
+        ajouterScore(partie1, tom, 1);
+        Partie partie2 = partie(LocalDateTime.of(2026, 10, 3, 21, 0), 30);
+        ajouterScore(partie2, tom, 1);
+        ajouterScore(partie2, lea, 2);
+        Partie partie3 = partie(LocalDateTime.of(2026, 10, 4, 20, 0), 30);
+        ajouterScore(partie3, lea, 1);
+        ajouterScore(partie3, alex, 1); // ex aequo : les deux gagnent
+        when(jeuDao.findById(1L)).thenReturn(Optional.of(jeu(1L, "Catan", TypeJeu.SOCIETE)));
+        when(partieDao.findDetailsByJeuId(1L)).thenReturn(List.of(partie1, partie2, partie3));
+
+        FicheJeuDto fiche = jeuService.getFiche(1L);
+
+        List<MeilleurJoueurDto> classement = fiche.getMeilleursJoueurs();
+        assertEquals(3, classement.size());
+        assertEquals("Tom", classement.get(0).getJoueur().getPseudo());
+        assertEquals(2L, classement.get(0).getNbVictoires());
+        // Alex et Léa ont 1 victoire chacun : départagés par ordre alphabétique
+        assertEquals("Alex", classement.get(1).getJoueur().getPseudo());
+        assertEquals("Léa", classement.get(2).getJoueur().getPseudo());
+        assertEquals(List.of("Alex", "Léa"), fiche.getParties().get(2).getVainqueurs());
+    }
+
+    @Test
+    void getFicheOfGameNeverPlayedReturnsEmptyLists() {
+        when(jeuDao.findById(1L)).thenReturn(Optional.of(jeu(1L, "Catan", TypeJeu.SOCIETE)));
+        when(partieDao.findDetailsByJeuId(1L)).thenReturn(List.of());
+
+        FicheJeuDto fiche = jeuService.getFiche(1L);
+
+        assertEquals(0L, fiche.getNbParties());
+        assertTrue(fiche.getParties().isEmpty());
+        assertTrue(fiche.getMeilleursJoueurs().isEmpty());
+    }
+
+    @Test
+    void getFicheThrowsWhenGameDoesNotExist() {
+        when(jeuDao.findById(404L)).thenReturn(Optional.empty());
+
+        NoSuchElementException exception = assertThrows(
+                NoSuchElementException.class,
+                () -> jeuService.getFiche(404L));
+        assertEquals("Le jeu 404 n'existe pas", exception.getMessage());
+        verify(partieDao, never()).findDetailsByJeuId(any());
+    }
+
+    private Partie partie(LocalDateTime date, int duree) {
+        Soiree soiree = new Soiree.Builder().date(date).build();
+        return new Partie.Builder().soiree(soiree).duree(duree).build();
+    }
+
+    private void ajouterScore(Partie partie, Joueur joueur, int rang) {
+        partie.getScores().add(new Score.Builder().partie(partie).joueur(joueur).rang(rang).build());
+    }
+
+    private Joueur joueur(Long id, String pseudo) {
+        return new Joueur.Builder().id(id).pseudo(pseudo).build();
     }
 
     private Jeu jeu(Long id, String nom, TypeJeu type) {
