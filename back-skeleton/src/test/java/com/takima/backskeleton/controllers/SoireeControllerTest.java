@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SoireeController.class)
@@ -65,6 +66,25 @@ class SoireeControllerTest {
         mockMvc.perform(get("/soirees/404"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("La soirée 404 n'existe pas"));
+    }
+
+    @Test
+    void malformedIdReturnsJsonBadRequest() throws Exception {
+        mockMvc.perform(get("/soirees/not-a-number"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("La requête est invalide."));
+    }
+
+    @Test
+    void unexpectedErrorReturnsGenericJsonWithoutInternalDetails() throws Exception {
+        when(soireeService.getById(1L))
+                .thenThrow(new IllegalStateException("sensitive SQL details"));
+
+        mockMvc.perform(get("/soirees/1"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Une erreur interne est survenue."))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("sensitive SQL details"))));
     }
 
     @Test
