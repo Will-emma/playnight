@@ -2,7 +2,8 @@
 
 nav {
   height: 80px;
-  background: linear-gradient(to right, theme.$common-purple, theme.$common-red);
+  background: #11131f;
+  border-bottom: 1px solid #252a3a;
 
   div {
     height: 100%;
@@ -37,4 +38,16 @@ mat-nav-list {
       transform: scale(1.2);
     }
   }
+}
+
+mat-nav-list a.active span {
+  color: #f8b83f;
+}
+
+@media (max-width: 600px) {
+  nav { height: 70px; }
+  nav div img { margin-left: 12px; height: 48px; }
+  mat-nav-list { margin-left: 12px; width: auto; flex: 1; overflow-x: auto; }
+  mat-nav-list a { min-width: max-content; }
+  mat-nav-list span { font-size: .9rem; }
 }

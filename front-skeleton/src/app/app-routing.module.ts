@@ -9,9 +9,16 @@ import { MajorsComponent } from "majors/majors.component"
 import { MajorsResolver } from "majors/majors.resolver"
 import { MajorStudentsResolver } from "majors/major-students/major-students.resolver"
 import { MajorStudentsComponent } from "majors/major-students/major-students.component"
+import { JeuxComponent } from "jeux/jeux.component"
+import { JeuxResolver } from "jeux/jeux.resolver"
 
 const routes: Routes = [
   { path: "", component: HomeComponent },
+  {
+    path: "jeux",
+    component: JeuxComponent,
+    resolve: { jeuxPage: JeuxResolver },
+  },
   {
     path: "etudiants",
     component: StudentsComponent,
