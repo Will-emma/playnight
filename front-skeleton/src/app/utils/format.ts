@@ -19,3 +19,10 @@ export function formaterDate(date: string): string {
 export function pluriel(nombre: number, mot: string): string {
   return `${nombre} ${mot}${nombre > 1 ? "s" : ""}`
 }
+
+// 75 → "1 h 15", 60 → "1 h", 45 → "45 min"
+export function formaterDuree(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`
+  const reste = minutes % 60
+  return `${Math.floor(minutes / 60)} h${reste > 0 ? " " + String(reste).padStart(2, "0") : ""}`
+}

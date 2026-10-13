@@ -32,7 +32,7 @@ table {
 
 // Palette commune des pages PlayNight (introduite par la Ludothèque), en mode sombre.
 // Une nouvelle page ajoute son sélecteur ici.
-app-jeux, app-nouvelle-soiree, app-fiche-jeu, app-profil-joueur {
+app-jeux, app-nouvelle-soiree, app-fiche-jeu, app-profil-joueur, app-detail-soiree {
   --library-bg: #11131f;
   --library-surface: #151827;
   --library-card: #1c2032;
@@ -324,4 +324,60 @@ app-profil-joueur {
     .entete { gap: 20px; }
     .entete__avatar { width: 96px; height: 96px; }
   }
+}
+
+
+// Détail d'une soirée : mêmes couleurs que la Ludothèque, via la palette commune
+app-detail-soiree {
+  display: block;
+  min-height: calc(100vh - 80px);
+  color: var(--library-text);
+  background: var(--library-bg);
+
+  .detail-soiree { max-width: 1100px; margin: auto; padding: 32px clamp(16px, 5vw, 64px) 72px; }
+  .retour { margin-bottom: 24px; padding: 0; border: none; color: var(--library-muted); background: none; font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; }
+  .retour:hover { color: var(--library-accent); }
+  a { color: inherit; font-weight: 700; text-decoration: none; }
+  a:hover { color: var(--library-accent); text-decoration: underline; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
+
+  // En-tête : date, lieu et joueurs présents
+  .entete { margin-bottom: 32px; }
+  .entete__date { margin: 0 0 8px; color: var(--library-accent); font-size: .85rem; font-weight: 700; letter-spacing: .04em; }
+  .entete__date::first-letter { text-transform: uppercase; }
+  // .detail-soiree devant h1 : sinon la typographie Material (.mat-typography h1) l'emporte
+  .detail-soiree h1 { margin: 0 0 8px; font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 750; line-height: 1.05; letter-spacing: -.05em; }
+  .entete__resume { margin: 0 0 18px; color: var(--library-muted); }
+  .presents { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .present { display: flex; align-items: center; gap: 9px; border: 1px solid var(--library-line); border-radius: 999px; padding: 6px 14px 6px 6px; background: var(--library-surface); font-size: .9rem; }
+  .present:hover { border-color: var(--library-accent-border); text-decoration: none; }
+  .present img, .present__initiale { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: var(--library-accent); background: var(--library-art-bg); font-weight: 800; }
+
+  // Une carte par partie
+  .parties { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 20px; }
+  .partie { padding: 20px 22px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); }
+  .partie__entete { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .detail-soiree .partie h2 { display: grid; gap: 2px; margin: 0; font-size: 1.15rem; font-weight: 700; }
+  .partie__numero { color: var(--library-muted); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .partie__duree { flex: none; border-radius: 99px; padding: 3px 10px; color: var(--library-secondary); background: var(--library-card); font-size: .8rem; font-weight: 700; }
+
+  // Classement d'une partie (chacun pour soi ou par équipe)
+  .classement { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .classement__ligne { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid transparent; border-radius: 12px; background: var(--library-card); }
+  .classement__ligne--premier { border-color: var(--library-accent-border-soft); background: var(--library-accent-soft); }
+  .classement__rang { flex: none; min-width: 34px; color: var(--library-muted); font-size: .85rem; font-weight: 800; }
+  .classement__ligne--premier .classement__rang { color: var(--library-accent); }
+  .classement__joueur { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .classement__equipe { display: grid; flex: 1; gap: 2px; min-width: 0; }
+  .classement__nom-equipe { color: var(--library-muted); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .classement__ligne--premier .classement__nom-equipe { color: var(--library-accent); }
+  .classement__points-membre { color: var(--library-muted); font-weight: 600; }
+  .classement__points { flex: none; color: var(--library-secondary); font-size: .85rem; white-space: nowrap; }
+
+  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 10px; padding: 10px 18px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; cursor: pointer; }
+  .bouton--principal, .bouton--principal:hover { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); text-decoration: none; }
+
+  .state-panel { display: grid; justify-items: center; gap: 10px; padding: 40px 24px; border: 1px solid var(--library-line); border-radius: 18px; text-align: center; background: var(--library-surface); }
+  .state-panel h2 { margin: 0; font-size: 1.3rem; }
+  .state-panel p { margin: 0 0 8px; color: var(--library-muted); }
 }

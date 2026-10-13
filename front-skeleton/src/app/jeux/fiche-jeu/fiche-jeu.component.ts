@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
 import { FicheJeu, Jeu, MeilleurJoueur, TypeJeu } from "models/jeu.model"
-import { formaterDate, pluriel } from "utils/format"
+import { formaterDate, formaterDuree, pluriel } from "utils/format"
 import { FicheJeuPageData } from "./fiche-jeu.resolver"
 
 @Component({
@@ -57,14 +57,9 @@ export class FicheJeuComponent implements OnInit {
   }
 
   readonly formaterDate = formaterDate
+  readonly formaterDuree = formaterDuree
   readonly pluriel = pluriel
 
-  // 75 → "1 h 15", 45 → "45 min"
-  formaterDuree(minutes: number): string {
-    if (minutes < 60) return `${minutes} min`
-    const reste = minutes % 60
-    return `${Math.floor(minutes / 60)} h${reste > 0 ? " " + String(reste).padStart(2, "0") : ""}`
-  }
 
   // ["Alex", "Léa", "Max"] → "Alex, Léa et Max"
   formaterVainqueurs(vainqueurs: string[]): string {

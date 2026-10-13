@@ -20,6 +20,7 @@ import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
 import { ProfilJoueurComponent } from "joueurs/profil-joueur/profil-joueur.component"
 import { MatStepperModule } from "@angular/material/stepper"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
+import { DetailSoireeComponent } from "soirees/detail-soiree/detail-soiree.component"
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree
     NouvelleSoireeComponent,
     FicheJeuComponent,
     ProfilJoueurComponent,
+    DetailSoireeComponent,
   ],
   imports: [
     BrowserModule,

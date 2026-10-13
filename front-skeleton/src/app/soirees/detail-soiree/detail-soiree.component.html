@@ -1,0 +1,91 @@
+<main class="detail-soiree">
+  <button type="button" class="retour" (click)="retour()">← Retour</button>
+
+  @if (erreur === "introuvable") {
+    <section class="state-panel" role="alert">
+      <h2>Cette soirée n'existe pas</h2>
+      <p>Elle a peut-être été supprimée.</p>
+      <a class="bouton bouton--principal" routerLink="/soirees/nouvelle">Créer une soirée</a>
+    </section>
+  } @else if (erreur === "indisponible" || !soiree) {
+    <section class="state-panel" role="alert">
+      <h2>La soirée est momentanément indisponible</h2>
+      <p>Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
+    </section>
+  } @else {
+    <!-- En-tête : quand, où, et qui était là -->
+    <section class="entete" aria-labelledby="lieu-soiree">
+      <p class="entete__date">{{ formaterDate(soiree.date) }}</p>
+      <h1 id="lieu-soiree">{{ soiree.lieu }}</h1>
+      <p class="entete__resume">{{ pluriel(soiree.parties.length, "partie") }} · {{ pluriel(soiree.joueurs.length, "joueur") }}</p>
+
+      <ul class="presents" aria-label="Joueurs présents">
+        @for (joueur of soiree.joueurs; track joueur.id) {
+          <li>
+            <a class="present" [routerLink]="['/joueurs', joueur.id]">
+              @if (joueur.avatar) {
+                <img [src]="joueur.avatar" alt="" />
+              } @else {
+                <span class="present__initiale" aria-hidden="true">{{ initiale(joueur.pseudo) }}</span>
+              }
+              {{ joueur.pseudo }}
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+
+    @if (soiree.parties.length === 0) {
+      <section class="state-panel">
+        <h2>Aucune partie enregistrée</h2>
+        <p>Cette soirée n'a pas encore de partie.</p>
+      </section>
+    } @else {
+      <!-- Une carte par partie, dans l'ordre où elles ont été jouées -->
+      <div class="parties">
+        @for (partie of soiree.parties; track partie.id; let i = $index) {
+          <section class="partie" [attr.aria-labelledby]="'partie-' + partie.id">
+            <header class="partie__entete">
+              <h2 [id]="'partie-' + partie.id">
+                <span class="partie__numero">Partie {{ i + 1 }}</span>
+                <a [routerLink]="['/jeux', partie.jeu.id]">{{ partie.jeu.nom }}</a>
+              </h2>
+              <span class="partie__duree">{{ formaterDuree(partie.duree) }}</span>
+            </header>
+
+            @if (equipesParPartie.get(partie.id); as equipes) {
+              <!-- Partie en équipe : une ligne par équipe, avec ses membres -->
+              <ol class="classement">
+                @for (ligne of equipes; track $index) {
+                  <li class="classement__ligne classement__ligne--equipe" [class.classement__ligne--premier]="ligne.rang === 1">
+                    <span class="classement__rang">{{ formaterRang(ligne.rang) }}</span>
+                    <span class="classement__equipe">
+                      <span class="classement__nom-equipe">{{ ligne.numeroEquipe !== null ? "Équipe " + ligne.numeroEquipe : "Sans équipe" }}</span>
+                      <span class="classement__membres">
+                        @for (membre of ligne.membres; track membre.id; let dernier = $last) {
+                          <a [routerLink]="['/joueurs', membre.joueur.id]">{{ membre.joueur.pseudo }}</a>@if (pointsIndividuels(ligne) && membre.points !== null) {<span class="classement__points-membre"> ({{ membre.points }})</span>}@if (!dernier) {<span>, </span>}
+                        }
+                      </span>
+                    </span>
+                    <span class="classement__points">{{ ligne.points !== null ? pluriel(ligne.points, "point") : "" }}</span>
+                  </li>
+                }
+              </ol>
+            } @else {
+              <!-- Chacun pour soi : les scores arrivent déjà triés par rang -->
+              <ol class="classement">
+                @for (score of partie.scores; track score.id) {
+                  <li class="classement__ligne" [class.classement__ligne--premier]="score.rang === 1">
+                    <span class="classement__rang">{{ formaterRang(score.rang) }}</span>
+                    <a class="classement__joueur" [routerLink]="['/joueurs', score.joueur.id]">{{ score.joueur.pseudo }}</a>
+                    <span class="classement__points">{{ score.points !== null ? pluriel(score.points, "point") : "" }}</span>
+                  </li>
+                }
+              </ol>
+            }
+          </section>
+        }
+      </div>
+    }
+  }
+</main>

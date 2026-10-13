@@ -6,13 +6,6 @@
       <h2>Impossible de préparer le formulaire</h2>
       <p>Les joueurs ou les jeux n'ont pas pu être chargés. Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
     </section>
-  } @else if (soireeCreeeId !== null) {
-    <!-- Affiché seulement tant que la page détail d'une soirée (#13) n'existe pas -->
-    <section class="state-panel" role="status">
-      <h2>Soirée enregistrée</h2>
-      <p>La soirée n°{{ soireeCreeeId }} a bien été créée avec ses parties et ses scores.</p>
-      <button type="button" class="bouton bouton--principal" (click)="recommencer()">Créer une autre soirée</button>
-    </section>
   } @else {
     <mat-stepper linear>
       <mat-step [stepControl]="infos" label="Soirée et joueurs présents">

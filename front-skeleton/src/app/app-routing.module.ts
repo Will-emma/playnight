@@ -17,6 +17,8 @@ import { ProfilJoueurComponent } from "joueurs/profil-joueur/profil-joueur.compo
 import { ProfilJoueurResolver } from "joueurs/profil-joueur/profil-joueur.resolver"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
 import { NouvelleSoireeResolver } from "soirees/nouvelle-soiree/nouvelle-soiree.resolver"
+import { DetailSoireeComponent } from "soirees/detail-soiree/detail-soiree.component"
+import { DetailSoireeResolver } from "soirees/detail-soiree/detail-soiree.resolver"
 
 const routes: Routes = [
   { path: "", component: HomeComponent },
@@ -36,10 +38,15 @@ const routes: Routes = [
     resolve: { profilJoueurPage: ProfilJoueurResolver },
   },
   {
-    // À garder avant une future route "soirees/:id", sinon "nouvelle" serait lu comme un id
+    // À garder avant "soirees/:id", sinon "nouvelle" serait lu comme un id
     path: "soirees/nouvelle",
     component: NouvelleSoireeComponent,
     resolve: { nouvelleSoireePage: NouvelleSoireeResolver },
+  },
+  {
+    path: "soirees/:id",
+    component: DetailSoireeComponent,
+    resolve: { detailSoireePage: DetailSoireeResolver },
   },
   {
     path: "etudiants",

@@ -76,7 +76,6 @@ export class NouvelleSoireeComponent implements OnInit {
 
   envoiEnCours = false
   erreurEnvoi: string | null = null
-  soireeCreeeId: number | null = null
 
   constructor(
     private route: ActivatedRoute,
@@ -190,15 +189,6 @@ export class NouvelleSoireeComponent implements OnInit {
     })
   }
 
-  // Le stepper est masqué pendant le message de succès : en réapparaissant, il repart de la première étape
-  recommencer(): void {
-    this.infos.reset()
-    this.parties.clear()
-    this.ajouterPartie()
-    this.erreurEnvoi = null
-    this.soireeCreeeId = null
-  }
-
   // Formulaire → JSON attendu par POST /soirees (voir docs/format-dto.md)
   private construireSoiree(): SoireeCreation {
     const infos = this.infos.getRawValue()
@@ -224,12 +214,10 @@ export class NouvelleSoireeComponent implements OnInit {
     }
   }
 
-  // Le détail d'une soirée est la page #13 : tant que sa route n'existe pas, on affiche un message de succès ici
+  // replaceUrl : le formulaire est remplacé dans l'historique, "Retour" depuis la soirée créée
+  // ne ramène donc pas à un formulaire vide
   private allerAuDetail(id: number): void {
-    this.router.navigate(["/soirees", id]).catch(() => {
-      this.envoiEnCours = false
-      this.soireeCreeeId = id
-    })
+    this.router.navigate(["/soirees", id], { replaceUrl: true })
   }
 
   private messageErreur(erreur: HttpErrorResponse): string {
