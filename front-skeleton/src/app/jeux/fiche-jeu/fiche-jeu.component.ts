@@ -1,17 +1,8 @@
 import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
 import { FicheJeu, Jeu, MeilleurJoueur, TypeJeu } from "models/jeu.model"
+import { formaterDate, pluriel } from "utils/format"
 import { FicheJeuPageData } from "./fiche-jeu.resolver"
-
-// Format fourni par le navigateur : "samedi 12 septembre 2026 à 20:00" (la locale française d'Angular n'est pas activée)
-const FORMAT_DATE = new Intl.DateTimeFormat("fr-FR", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-})
 
 @Component({
   selector: "app-fiche-jeu",
@@ -65,10 +56,8 @@ export class FicheJeuComponent implements OnInit {
     return jeu.nom.trim().charAt(0).toLocaleUpperCase("fr-FR")
   }
 
-  // "2026-09-12T20:00:00" → "samedi 12 septembre 2026 à 20:00"
-  formaterDate(date: string): string {
-    return FORMAT_DATE.format(new Date(date))
-  }
+  readonly formaterDate = formaterDate
+  readonly pluriel = pluriel
 
   // 75 → "1 h 15", 45 → "45 min"
   formaterDuree(minutes: number): string {
@@ -82,9 +71,5 @@ export class FicheJeuComponent implements OnInit {
     if (vainqueurs.length === 0) return "Aucun vainqueur enregistré"
     if (vainqueurs.length === 1) return vainqueurs[0]
     return `${vainqueurs.slice(0, -1).join(", ")} et ${vainqueurs[vainqueurs.length - 1]}`
-  }
-
-  pluriel(nombre: number, mot: string): string {
-    return `${nombre} ${mot}${nombre > 1 ? "s" : ""}`
   }
 }

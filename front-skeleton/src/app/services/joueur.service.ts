@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 import { Observable } from "rxjs"
-import { Joueur } from "models/joueur.model"
+import { Joueur, ProfilJoueur } from "models/joueur.model"
 
 @Injectable({
   providedIn: "root",
@@ -13,5 +13,9 @@ export class JoueurService {
 
   findAll(): Observable<Joueur[]> {
     return this.http.get<Joueur[]>(this.joueursUrl)
+  }
+
+  getProfil(id: number): Observable<ProfilJoueur> {
+    return this.http.get<ProfilJoueur>(`${this.joueursUrl}/${id}/profil`)
   }
 }

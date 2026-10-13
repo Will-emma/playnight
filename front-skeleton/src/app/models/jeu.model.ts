@@ -15,6 +15,9 @@ export interface Jeu {
   image: string | null
 }
 
+// Résumé d'un jeu, renvoyé quand un jeu est lié à autre chose (profil d'un joueur…)
+export type JeuResume = Pick<Jeu, "id" | "nom" | "type" | "image">
+
 // Fiche d'un jeu : GET /jeux/{id}/fiche (voir docs/format-dto.md)
 export interface FicheJeu {
   jeu: Jeu

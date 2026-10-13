@@ -63,7 +63,7 @@
                   @if (meilleur.joueur.avatar) {
                     <img class="classement__avatar" [src]="meilleur.joueur.avatar" alt="" />
                   }
-                  <span class="classement__pseudo">{{ meilleur.joueur.pseudo }}</span>
+                  <a class="classement__pseudo" [routerLink]="['/joueurs', meilleur.joueur.id]">{{ meilleur.joueur.pseudo }}</a>
                   <span class="classement__victoires">{{ pluriel(meilleur.nbVictoires, "victoire") }}</span>
                 </li>
               }
