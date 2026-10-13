@@ -11,6 +11,8 @@ import { MajorStudentsResolver } from "majors/major-students/major-students.reso
 import { MajorStudentsComponent } from "majors/major-students/major-students.component"
 import { JeuxComponent } from "jeux/jeux.component"
 import { JeuxResolver } from "jeux/jeux.resolver"
+import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
+import { FicheJeuResolver } from "jeux/fiche-jeu/fiche-jeu.resolver"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
 import { NouvelleSoireeResolver } from "soirees/nouvelle-soiree/nouvelle-soiree.resolver"
 
@@ -20,6 +22,11 @@ const routes: Routes = [
     path: "jeux",
     component: JeuxComponent,
     resolve: { jeuxPage: JeuxResolver },
+  },
+  {
+    path: "jeux/:id",
+    component: FicheJeuComponent,
+    resolve: { ficheJeuPage: FicheJeuResolver },
   },
   {
     // À garder avant une future route "soirees/:id", sinon "nouvelle" serait lu comme un id

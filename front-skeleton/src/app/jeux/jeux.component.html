@@ -78,7 +78,10 @@
           </div>
           <div class="game-card__content">
             <div class="game-card__heading">
-              <h2>{{ jeu.nom }}</h2>
+              <h2>
+                <!-- Lien "étiré" sur toute la carte (voir .game-card__lien dans styles.scss) -->
+                <a class="game-card__lien" [routerLink]="['/jeux', jeu.id]">{{ jeu.nom }}</a>
+              </h2>
               <span class="game-id">#{{ jeu.id }}</span>
             </div>
             <p class="platform">{{ jeu.plateforme || (jeu.type === "SOCIETE" ? "Jeu de plateau" : "Plateforme non renseignée") }}</p>

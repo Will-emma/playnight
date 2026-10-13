@@ -16,6 +16,7 @@ import { MajorsComponent } from "majors/majors.component"
 import { MajorStudentsComponent } from "majors/major-students/major-students.component"
 import { HttpClientModule } from "@angular/common/http"
 import { JeuxComponent } from "jeux/jeux.component"
+import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
 import { MatStepperModule } from "@angular/material/stepper"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
 
@@ -30,6 +31,7 @@ import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree
     MajorStudentsComponent,
     JeuxComponent,
     NouvelleSoireeComponent,
+    FicheJeuComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,98 @@
+<main class="fiche-jeu">
+  <a class="retour" routerLink="/jeux">← Ludothèque</a>
+
+  @if (erreur === "introuvable") {
+    <section class="state-panel" role="alert">
+      <h2>Ce jeu n'existe pas</h2>
+      <p>Il a peut-être été supprimé. Retrouvez tous les jeux disponibles dans la ludothèque.</p>
+      <a class="bouton bouton--principal" routerLink="/jeux">Voir la ludothèque</a>
+    </section>
+  } @else if (erreur === "indisponible" || !fiche) {
+    <section class="state-panel" role="alert">
+      <h2>La fiche du jeu est momentanément indisponible</h2>
+      <p>Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
+    </section>
+  } @else {
+    <!-- En-tête : le jeu et ses informations -->
+    <section class="entete" aria-labelledby="nom-jeu">
+      <div class="entete__image" role="img" [attr.aria-label]="'Illustration de ' + fiche.jeu.nom">
+        @if (fiche.jeu.image && !imageIndisponible) {
+          <img [src]="fiche.jeu.image" alt="" (error)="imageIndisponible = true" />
+        } @else {
+          <span class="entete__initiale" aria-hidden="true">{{ initiale(fiche.jeu) }}</span>
+        }
+      </div>
+
+      <div class="entete__infos">
+        <span class="badge" [class.badge--video]="fiche.jeu.type === 'JEU_VIDEO'">{{ labelType(fiche.jeu.type) }}</span>
+        <h1 id="nom-jeu">{{ fiche.jeu.nom }}</h1>
+        <dl class="caracteristiques">
+          <div>
+            <dt>Plateforme</dt>
+            <dd>{{ fiche.jeu.plateforme || (fiche.jeu.type === "SOCIETE" ? "Jeu de plateau" : "Non renseignée") }}</dd>
+          </div>
+          <div>
+            <dt>Joueurs</dt>
+            <dd>{{ nombreJoueurs(fiche.jeu) }}</dd>
+          </div>
+          <div>
+            <dt>Parties jouées</dt>
+            <dd>{{ fiche.nbParties }}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    @if (fiche.nbParties === 0) {
+      <section class="state-panel">
+        <h2>Aucune partie pour l'instant</h2>
+        <p>Les parties de {{ fiche.jeu.nom }} enregistrées lors des soirées apparaîtront ici, avec le classement des joueurs.</p>
+      </section>
+    } @else {
+      <div class="colonnes">
+        <!-- Meilleurs joueurs : top 5, ou tout le classement à la demande -->
+        <section class="bloc" aria-labelledby="titre-classement">
+          <h2 id="titre-classement">Meilleurs joueurs</h2>
+          @if (fiche.meilleursJoueurs.length === 0) {
+            <p class="vide">Aucun vainqueur enregistré pour ce jeu.</p>
+          } @else {
+            <ol class="classement">
+              @for (meilleur of meilleursJoueursAffiches; track meilleur.joueur.id) {
+                <li class="classement__ligne">
+                  <span class="classement__place" [class.classement__place--premier]="place(meilleur) === 1">{{ place(meilleur) }}</span>
+                  @if (meilleur.joueur.avatar) {
+                    <img class="classement__avatar" [src]="meilleur.joueur.avatar" alt="" />
+                  }
+                  <span class="classement__pseudo">{{ meilleur.joueur.pseudo }}</span>
+                  <span class="classement__victoires">{{ pluriel(meilleur.nbVictoires, "victoire") }}</span>
+                </li>
+              }
+            </ol>
+            @if (fiche.meilleursJoueurs.length > nbMeilleursJoueursAffiches) {
+              <button type="button" class="bouton bouton--discret" (click)="toutLeClassement = !toutLeClassement">
+                {{ toutLeClassement ? "Voir seulement le top " + nbMeilleursJoueursAffiches : "Voir tout le classement (" + fiche.meilleursJoueurs.length + ")" }}
+              </button>
+            }
+          }
+        </section>
+
+        <!-- Parties jouées, de la plus récente à la plus ancienne -->
+        <section class="bloc" aria-labelledby="titre-parties">
+          <h2 id="titre-parties">Parties jouées</h2>
+          <ul class="parties">
+            @for (partie of fiche.parties; track partie.partieId) {
+              <li class="parties__ligne">
+                <span class="parties__date">{{ formaterDate(partie.date) }}</span>
+                <span class="parties__duree">{{ formaterDuree(partie.duree) }}</span>
+                <span class="parties__vainqueurs">
+                  <span class="parties__label">{{ partie.vainqueurs.length > 1 ? "Vainqueurs" : "Vainqueur" }} :</span>
+                  {{ formaterVainqueurs(partie.vainqueurs) }}
+                </span>
+              </li>
+            }
+          </ul>
+        </section>
+      </div>
+    }
+  }
+</main>
