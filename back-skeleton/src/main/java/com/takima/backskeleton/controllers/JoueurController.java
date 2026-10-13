@@ -1,6 +1,7 @@
 package com.takima.backskeleton.controllers;
 
 import com.takima.backskeleton.DTO.JoueurDto;
+import com.takima.backskeleton.DTO.ProfilJoueurDto;
 import com.takima.backskeleton.services.JoueurService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,6 +35,11 @@ public class JoueurController {
     @GetMapping("/{id}")
     public JoueurDto getJoueurById(@PathVariable Long id) {
         return joueurService.getById(id);
+    }
+
+    @GetMapping("/{id}/profil")
+    public ProfilJoueurDto getProfilJoueur(@PathVariable Long id) {
+        return joueurService.getProfil(id);
     }
 
     @PostMapping("")

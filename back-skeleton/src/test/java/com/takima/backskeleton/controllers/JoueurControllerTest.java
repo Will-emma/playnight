@@ -1,6 +1,12 @@
 package com.takima.backskeleton.controllers;
 
+import com.takima.backskeleton.DTO.JeuFavoriDto;
+import com.takima.backskeleton.DTO.JeuResumeDto;
 import com.takima.backskeleton.DTO.JoueurDto;
+import com.takima.backskeleton.DTO.JoueurResumeDto;
+import com.takima.backskeleton.DTO.PartieHistoriqueDto;
+import com.takima.backskeleton.DTO.ProfilJoueurDto;
+import com.takima.backskeleton.models.TypeJeu;
 import com.takima.backskeleton.services.JoueurService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -49,6 +56,45 @@ class JoueurControllerTest {
                 .thenThrow(new NoSuchElementException("Le joueur 404 n'existe pas"));
 
         mockMvc.perform(get("/joueurs/404"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Le joueur 404 n'existe pas"));
+    }
+
+    @Test
+    void getProfilJoueurReturnsProfileJson() throws Exception {
+        JeuResumeDto codenames = new JeuResumeDto(3L, "Codenames", TypeJeu.SOCIETE, "https://example.com/codenames.png");
+        ProfilJoueurDto profil = new ProfilJoueurDto(
+                new JoueurResumeDto(1L, "Léa", "https://example.com/lea.png"),
+                5L,
+                2L,
+                List.of(new JeuFavoriDto(codenames, 3L)),
+                List.of(new PartieHistoriqueDto(7L, LocalDateTime.of(2026, 9, 12, 20, 0), codenames, 1, 9)));
+        when(joueurService.getProfil(1L)).thenReturn(profil);
+
+        mockMvc.perform(get("/joueurs/1/profil"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.joueur.id").value(1))
+                .andExpect(jsonPath("$.joueur.pseudo").value("Léa"))
+                .andExpect(jsonPath("$.joueur.avatar").value("https://example.com/lea.png"))
+                .andExpect(jsonPath("$.nbParties").value(5))
+                .andExpect(jsonPath("$.nbVictoires").value(2))
+                .andExpect(jsonPath("$.jeuxFavoris[0].jeu.id").value(3))
+                .andExpect(jsonPath("$.jeuxFavoris[0].jeu.nom").value("Codenames"))
+                .andExpect(jsonPath("$.jeuxFavoris[0].jeu.type").value("SOCIETE"))
+                .andExpect(jsonPath("$.jeuxFavoris[0].nbParties").value(3))
+                .andExpect(jsonPath("$.historique[0].partieId").value(7))
+                .andExpect(jsonPath("$.historique[0].date").value("2026-09-12T20:00:00"))
+                .andExpect(jsonPath("$.historique[0].jeu.nom").value("Codenames"))
+                .andExpect(jsonPath("$.historique[0].rang").value(1))
+                .andExpect(jsonPath("$.historique[0].points").value(9));
+    }
+
+    @Test
+    void getProfilJoueurReturns404WhenMissing() throws Exception {
+        when(joueurService.getProfil(404L))
+                .thenThrow(new NoSuchElementException("Le joueur 404 n'existe pas"));
+
+        mockMvc.perform(get("/joueurs/404/profil"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Le joueur 404 n'existe pas"));
     }
