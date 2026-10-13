@@ -91,14 +91,4 @@
       }
     </section>
   }
-  <button
-    class="theme-toggle"
-    type="button"
-    [attr.aria-pressed]="!darkMode"
-    [attr.aria-label]="darkMode ? 'Passer au mode clair' : 'Passer au mode sombre'"
-    (click)="basculerTheme()"
-  >
-    <span class="theme-toggle__icon" aria-hidden="true">{{ darkMode ? "☼" : "☾" }}</span>
-    <span>{{ darkMode ? "Mode clair" : "Mode sombre" }}</span>
-  </button>
 </main>

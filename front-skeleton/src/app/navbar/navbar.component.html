@@ -8,5 +8,15 @@
       </a>
       }
     </mat-nav-list>
+    <button
+      class="theme-toggle"
+      type="button"
+      [attr.aria-pressed]="!themeService.darkMode"
+      [attr.aria-label]="themeService.darkMode ? 'Passer au mode clair' : 'Passer au mode sombre'"
+      (click)="themeService.basculer()"
+    >
+      <span class="theme-toggle__icon" aria-hidden="true">{{ themeService.darkMode ? "☼" : "☾" }}</span>
+      <span class="theme-toggle__label">{{ themeService.darkMode ? "Mode clair" : "Mode sombre" }}</span>
+    </button>
   </div>
 </nav>
