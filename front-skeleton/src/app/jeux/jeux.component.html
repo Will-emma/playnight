@@ -1,0 +1,104 @@
+<main class="library">
+  <section class="library__intro" aria-labelledby="library-title">
+    <div>
+      <p class="eyebrow"><span class="eyebrow__dot"></span> PLAYNIGHT · VOTRE COLLECTION</p>
+      <h1 id="library-title">La ludothèque</h1>
+      <p class="intro-copy">Retrouvez les jeux qui réunissent tout le monde autour de la table ou de l’écran.</p>
+    </div>
+    <div class="collection-count" aria-live="polite">
+      <strong>{{ jeuxFiltres.length }}</strong>
+      <span>{{ jeuxFiltres.length > 1 ? "jeux affichés" : "jeu affiché" }}</span>
+    </div>
+  </section>
+
+  <section class="library__toolbar" aria-label="Filtres des jeux">
+    <div class="filters" role="group" aria-label="Filtrer par type">
+      @for (option of filtres; track option.valeur) {
+        <button
+          type="button"
+          class="filter-button"
+          [class.filter-button--active]="filtre === option.valeur"
+          [attr.aria-pressed]="filtre === option.valeur"
+          (click)="choisirFiltre(option.valeur)"
+        >
+          {{ option.libelle }}
+        </button>
+      }
+    </div>
+    <span class="toolbar-note"><span class="status-dot"></span> La prochaine partie commence ici</span>
+  </section>
+
+  @if (loading) {
+    <section class="state-panel" aria-live="polite">
+      <span class="loader" aria-hidden="true"></span>
+      <h2>On prépare la collection…</h2>
+      <p>Chargement des jeux disponibles.</p>
+    </section>
+  } @else if (error) {
+    <section class="state-panel state-panel--error" role="alert">
+      <span class="state-icon" aria-hidden="true">!</span>
+      <h2>La ludothèque est momentanément indisponible</h2>
+      <p>Vérifiez que l’API PlayNight est lancée, puis réessayez.</p>
+      <button class="retry-button" type="button" (click)="recharger()">Réessayer</button>
+    </section>
+  } @else if (jeuxFiltres.length === 0) {
+    <section class="state-panel">
+      <span class="state-icon" aria-hidden="true">✦</span>
+      @if (jeux.length === 0) {
+        <h2>Votre ludothèque attend ses premiers jeux</h2>
+        <p>Les jeux ajoutés apparaîtront ici.</p>
+      } @else {
+        <h2>Aucun jeu dans cette catégorie</h2>
+        <p>Essayez un autre filtre pour parcourir votre collection.</p>
+      }
+    </section>
+  } @else {
+    <section class="game-grid" aria-label="Jeux de la ludothèque">
+      @for (jeu of jeuxFiltres; track jeu.id) {
+        <article class="game-card">
+          <div
+            class="game-card__art"
+            role="img"
+            [attr.aria-label]="'Illustration de ' + jeu.nom"
+            [style.--cover-color]="couleurCouverture(jeu)"
+          >
+            @if (jeu.image && !imagesIndisponibles.has(jeu.id)) {
+              <img
+                class="game-card__cover-image"
+                [src]="jeu.image"
+                alt=""
+                loading="lazy"
+                (error)="marquerImageIndisponible(jeu)"
+              />
+            }
+            <span class="cover-initial" aria-hidden="true">{{ initiale(jeu) }}</span>
+            <span class="type-badge" [class.type-badge--video]="jeu.type === 'JEU_VIDEO'">
+              {{ labelType(jeu.type) }}
+            </span>
+          </div>
+          <div class="game-card__content">
+            <div class="game-card__heading">
+              <h2>{{ jeu.nom }}</h2>
+              <span class="game-id">#{{ jeu.id }}</span>
+            </div>
+            <p class="platform">{{ jeu.plateforme || (jeu.type === "SOCIETE" ? "Jeu de plateau" : "Plateforme non renseignée") }}</p>
+            <div class="game-card__meta">
+              <span class="meta-icon" aria-hidden="true">♟</span>
+              <span>{{ nombreJoueurs(jeu) }}</span>
+            </div>
+          </div>
+        </article>
+      }
+    </section>
+  }
+  <button
+    class="theme-toggle"
+    type="button"
+    [attr.aria-pressed]="!darkMode"
+    [attr.aria-label]="darkMode ? 'Passer au mode clair' : 'Passer au mode sombre'"
+    (click)="basculerTheme()"
+  >
+    <span class="theme-toggle__icon" aria-hidden="true">{{ darkMode ? "☼" : "☾" }}</span>
+    <span>{{ darkMode ? "Mode clair" : "Mode sombre" }}</span>
+  </button>
+</main>

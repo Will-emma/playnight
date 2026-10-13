@@ -1,0 +1,30 @@
+:host { display: block; }
+
+.route-loading {
+  position: fixed;
+  z-index: 20;
+  top: 88px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  padding: 10px 15px;
+  border: 1px solid #55dfbd55;
+  border-radius: 999px;
+  color: #d9fff5;
+  background: #142b2af2;
+  box-shadow: 0 8px 24px #0005;
+  font-size: .84rem;
+}
+
+.route-loading__spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid #55736c;
+  border-top-color: #55dfbd;
+  border-radius: 50%;
+  animation: route-spin .7s linear infinite;
+}
+
+@keyframes route-spin { to { transform: rotate(360deg); } }
