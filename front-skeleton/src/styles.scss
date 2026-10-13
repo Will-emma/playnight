@@ -30,8 +30,8 @@ table {
 
 }
 
-// Palette commune des pages PlayNight (introduite par la Ludothèque) : mode sombre par défaut,
-// mode clair Takima quand ThemeService pose "light-theme" sur <body>. Une nouvelle page ajoute son sélecteur ici.
+// Palette commune des pages PlayNight (introduite par la Ludothèque), en mode sombre.
+// Une nouvelle page ajoute son sélecteur ici.
 app-jeux, app-nouvelle-soiree {
   --library-bg: #11131f;
   --library-surface: #151827;
@@ -50,26 +50,6 @@ app-jeux, app-nouvelle-soiree {
   --library-badge-bg: #f8b83f;
   --library-badge-text: #161824;
   --library-secondary: #c5c9d9;
-}
-
-.light-theme :is(app-jeux, app-nouvelle-soiree) {
-  --library-bg: #f7f4f9;
-  --library-surface: #ffffff;
-  --library-card: #ffffff;
-  --library-line: #e4dcea;
-  --library-text: #24112f;
-  --library-muted: #6d6177;
-  --library-accent: #4a0a67;
-  --library-accent-soft: #f1e6f7;
-  --library-accent-border: #4a0a6770;
-  --library-accent-border-soft: #4a0a6745;
-  --library-accent-glow: #96164470;
-  --library-art-bg: #efe8f4;
-  --library-fallback-glow: #f3dce8;
-  --library-fallback-bg: #f5f0f8;
-  --library-badge-bg: #4a0a67;
-  --library-badge-text: #ffffff;
-  --library-secondary: #4f4259;
 }
 
 // Page Ludothèque : styles isolés sous son propre composant, prêts à recevoir un thème global.
@@ -119,14 +99,6 @@ app-jeux {
   .state-icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; color: var(--library-accent); background: var(--library-accent-soft); font-size: 1.3rem; font-weight: 800; }
   .loader { width: 32px; height: 32px; border: 3px solid var(--library-line); border-top-color: var(--library-accent); border-radius: 50%; animation: library-spin .8s linear infinite; }
   .retry-button { margin-top: 18px; border: 1px solid var(--library-accent-border-soft); border-radius: 9px; padding: 10px 16px; color: var(--library-accent); background: var(--library-accent-soft); font: inherit; font-weight: 700; cursor: pointer; }
-  // Mode clair (classe "light-theme" posée sur <body> par ThemeService) : couleurs Takima, violet et rouge
-  .light-theme & {
-    .eyebrow__dot, .status-dot { background: #961644; }
-    .type-badge--video { color: #ffffff; border-color: #96164455; background: #961644; }
-    .game-card:hover { box-shadow: 0 14px 34px #4a0a671f; }
-    .game-id, .image-fallback small { color: var(--library-muted); }
-    .state-panel--error .state-icon { color: #b71c32; background: #fbe4e8; }
-  }
   @keyframes library-spin { to { transform: rotate(360deg); } }
 
   @media (max-width: 1100px) { .game-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -209,13 +181,6 @@ app-nouvelle-soiree {
   .state-panel h2 { margin: 0; font-size: 1.3rem; }
   .state-panel p { margin: 0 0 8px; color: var(--library-muted); }
 
-  .light-theme & {
-    color-scheme: light;
-    [aria-invalid="true"] { border-color: #b71c32; }
-    .erreur, .bouton--discret:hover { color: #b71c32; }
-    .erreur--envoi { border-color: #b71c3240; background: #fbe4e8; }
-    .partie { background: var(--library-bg); }
-  }
 
   @media (max-width: 760px) {
     .champs { grid-template-columns: 1fr 1fr; }

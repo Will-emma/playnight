@@ -1,6 +1,5 @@
 import { Component } from "@angular/core"
 import { Link } from "models/links.model"
-import { ThemeService } from "services/theme.service"
 
 @Component({
   selector: "navbar",
@@ -10,7 +9,7 @@ import { ThemeService } from "services/theme.service"
 export class NavbarComponent {
   links: Link[] = []
 
-  constructor(public themeService: ThemeService) {
+  constructor() {
     this.links.push({ name: "Étudiants", href: "etudiants" })
     this.links.push({ name: "Filières", href: "filieres" })
     this.links.push({ name: "Ludothèque", href: "jeux" })
