@@ -44,57 +44,10 @@ mat-nav-list a.active span {
   color: #f8b83f;
 }
 
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 20px 0 auto;
-  border: 1px solid #f8b83f70;
-  border-radius: 999px;
-  padding: 8px 14px;
-  color: #f8b83f;
-  background: #151827;
-  font: inherit;
-  font-size: .82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform .18s;
-
-  &:hover { transform: translateY(-2px); }
-  &:focus-visible { outline: 3px solid #f8b83f; outline-offset: 3px; }
-}
-
-.theme-toggle__icon { font-size: 1.1rem; line-height: 1; }
-
-// Mode clair : on retrouve le dégradé Takima d'origine (classe "light-theme" posée sur <body> par ThemeService)
-:host-context(body.light-theme) {
-  nav {
-    background: linear-gradient(to right, theme.$common-purple, theme.$common-red);
-    border-bottom-color: transparent;
-  }
-
-  mat-nav-list a.active span {
-    color: theme.$white;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 6px;
-  }
-
-  .theme-toggle {
-    border-color: #ffffff80;
-    color: theme.$white;
-    background: #ffffff26;
-
-    &:focus-visible { outline-color: theme.$white; }
-  }
-}
-
 @media (max-width: 600px) {
   nav { height: 70px; }
   nav div img { margin-left: 12px; height: 48px; }
   mat-nav-list { margin-left: 12px; width: auto; flex: 1; overflow-x: auto; }
   mat-nav-list a { min-width: max-content; }
   mat-nav-list span { font-size: .9rem; }
-  .theme-toggle { margin: 0 12px 0 8px; padding: 8px 10px; }
-  .theme-toggle__label { display: none; }
 }
