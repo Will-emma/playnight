@@ -94,31 +94,30 @@ app-jeux {
   .state-icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; color: var(--library-accent); background: var(--library-accent-soft); font-size: 1.3rem; font-weight: 800; }
   .loader { width: 32px; height: 32px; border: 3px solid var(--library-line); border-top-color: var(--library-accent); border-radius: 50%; animation: library-spin .8s linear infinite; }
   .retry-button { margin-top: 18px; border: 1px solid var(--library-accent-border-soft); border-radius: 9px; padding: 10px 16px; color: var(--library-accent); background: var(--library-accent-soft); font: inherit; font-weight: 700; cursor: pointer; }
-  .theme-toggle { position: fixed; z-index: 10; right: clamp(16px, 4vw, 46px); bottom: max(18px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 9px; border: 1px solid var(--library-accent-border); border-radius: 999px; padding: 10px 15px; color: var(--library-accent); background: var(--library-surface); box-shadow: 0 8px 26px #0005; font: inherit; font-size: .82rem; font-weight: 700; cursor: pointer; }
-  .theme-toggle:hover { transform: translateY(-2px); }
-  .theme-toggle:focus-visible { outline: 3px solid var(--library-accent); outline-offset: 3px; }
-  .theme-toggle__icon { font-size: 1.1rem; line-height: 1; }
-  &.light-theme {
-    --library-bg: #f1f6f4;
+  // Mode clair (classe "light-theme" posée sur <body> par ThemeService) : couleurs Takima, violet et rouge
+  .light-theme & {
+    --library-bg: #f7f4f9;
     --library-surface: #ffffff;
     --library-card: #ffffff;
-    --library-line: #d9e5e0;
-    --library-text: #18312d;
-    --library-muted: #647873;
-    --library-accent: #087d64;
-    --library-accent-soft: #e0f3ed;
-    --library-accent-border: #087d6470;
-    --library-accent-border-soft: #087d6450;
-    --library-accent-glow: #087d6470;
-    --library-art-bg: #e4eeea;
-    --library-fallback-glow: #d6eee5;
-    --library-fallback-bg: #eaf1ee;
-    --library-badge-bg: #e1f3ed;
-    --library-badge-text: #145d4d;
-    --library-secondary: #405a53;
-    .type-badge--video { color: #55439a; border-color: #7963c655; background: #eeeaff; }
-    .state-panel--error .state-icon { color: #a83e39; background: #fae4e1; }
-    .theme-toggle { box-shadow: 0 8px 26px #18312d1c; }
+    --library-line: #e4dcea;
+    --library-text: #24112f;
+    --library-muted: #6d6177;
+    --library-accent: #4a0a67;
+    --library-accent-soft: #f1e6f7;
+    --library-accent-border: #4a0a6770;
+    --library-accent-border-soft: #4a0a6745;
+    --library-accent-glow: #96164470;
+    --library-art-bg: #efe8f4;
+    --library-fallback-glow: #f3dce8;
+    --library-fallback-bg: #f5f0f8;
+    --library-badge-bg: #4a0a67;
+    --library-badge-text: #ffffff;
+    --library-secondary: #4f4259;
+    .eyebrow__dot, .status-dot { background: #961644; }
+    .type-badge--video { color: #ffffff; border-color: #96164455; background: #961644; }
+    .game-card:hover { box-shadow: 0 14px 34px #4a0a671f; }
+    .game-id, .image-fallback small { color: var(--library-muted); }
+    .state-panel--error .state-icon { color: #b71c32; background: #fbe4e8; }
   }
   @keyframes library-spin { to { transform: rotate(360deg); } }
 

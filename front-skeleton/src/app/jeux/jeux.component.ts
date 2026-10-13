@@ -1,4 +1,4 @@
-import { Component, HostBinding, OnInit } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
 import { Jeu, TypeJeu } from "models/jeu.model"
 import { JeuService } from "services/jeu.service"
@@ -24,7 +24,6 @@ export class JeuxComponent implements OnInit {
   filtre: FiltreJeu = "TOUS"
   loading = true
   error = false
-  darkMode = true
   readonly imagesIndisponibles = new Set<number>()
   readonly filtres: { valeur: FiltreJeu; libelle: string }[] = [
     { valeur: "TOUS", libelle: "Tous les jeux" },
@@ -38,21 +37,10 @@ export class JeuxComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.darkMode = localStorage.getItem("playnight-library-theme") !== "light"
     const data = this.route.snapshot.data["jeuxPage"]
     this.jeux = data.jeux
     this.error = data.error
     this.loading = false
-  }
-
-  @HostBinding("class.light-theme")
-  get isLightTheme(): boolean {
-    return !this.darkMode
-  }
-
-  basculerTheme(): void {
-    this.darkMode = !this.darkMode
-    localStorage.setItem("playnight-library-theme", this.darkMode ? "dark" : "light")
   }
 
   get jeuxFiltres(): Jeu[] {
