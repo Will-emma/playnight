@@ -13,6 +13,8 @@ import { JeuxComponent } from "jeux/jeux.component"
 import { JeuxResolver } from "jeux/jeux.resolver"
 import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
 import { FicheJeuResolver } from "jeux/fiche-jeu/fiche-jeu.resolver"
+import { ProfilJoueurComponent } from "joueurs/profil-joueur/profil-joueur.component"
+import { ProfilJoueurResolver } from "joueurs/profil-joueur/profil-joueur.resolver"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
 import { NouvelleSoireeResolver } from "soirees/nouvelle-soiree/nouvelle-soiree.resolver"
 
@@ -27,6 +29,11 @@ const routes: Routes = [
     path: "jeux/:id",
     component: FicheJeuComponent,
     resolve: { ficheJeuPage: FicheJeuResolver },
+  },
+  {
+    path: "joueurs/:id",
+    component: ProfilJoueurComponent,
+    resolve: { profilJoueurPage: ProfilJoueurResolver },
   },
   {
     // À garder avant une future route "soirees/:id", sinon "nouvelle" serait lu comme un id

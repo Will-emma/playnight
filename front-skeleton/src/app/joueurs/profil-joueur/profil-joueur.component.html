@@ -1,0 +1,104 @@
+<main class="profil-joueur">
+  <button type="button" class="retour" (click)="retour()">← Retour</button>
+
+  @if (erreur === "introuvable") {
+    <section class="state-panel" role="alert">
+      <h2>Ce joueur n'existe pas</h2>
+      <p>Il a peut-être été supprimé. Retrouvez les jeux et leurs meilleurs joueurs dans la ludothèque.</p>
+      <a class="bouton bouton--principal" routerLink="/jeux">Voir la ludothèque</a>
+    </section>
+  } @else if (erreur === "indisponible" || !profil) {
+    <section class="state-panel" role="alert">
+      <h2>Le profil du joueur est momentanément indisponible</h2>
+      <p>Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
+    </section>
+  } @else {
+    <!-- En-tête : le joueur et ses statistiques -->
+    <section class="entete" aria-labelledby="pseudo-joueur">
+      <div class="entete__avatar">
+        @if (profil.joueur.avatar) {
+          <img [src]="profil.joueur.avatar" alt="" />
+        } @else {
+          <span aria-hidden="true">{{ profil.joueur.pseudo.charAt(0).toUpperCase() }}</span>
+        }
+      </div>
+      <div>
+        <h1 id="pseudo-joueur">{{ profil.joueur.pseudo }}</h1>
+        <dl class="statistiques">
+          <div>
+            <dt>Parties jouées</dt>
+            <dd>{{ profil.nbParties }}</dd>
+          </div>
+          <div>
+            <dt>Victoires</dt>
+            <dd>{{ profil.nbVictoires }}</dd>
+          </div>
+          <div>
+            <dt>Taux de victoire</dt>
+            <dd>{{ profil.nbParties > 0 ? tauxVictoire + " %" : "–" }}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    @if (profil.nbParties === 0) {
+      <section class="state-panel">
+        <h2>Aucune partie pour l'instant</h2>
+        <p>Les parties de {{ profil.joueur.pseudo }} enregistrées lors des soirées apparaîtront ici, avec ses jeux favoris.</p>
+      </section>
+    } @else {
+      <div class="colonnes">
+        <!-- Jeux favoris : top 3, ou tous les jeux joués à la demande -->
+        <section class="bloc" aria-labelledby="titre-favoris">
+          <h2 id="titre-favoris">Jeux favoris</h2>
+          <ol class="favoris">
+            @for (favori of jeuxFavorisAffiches; track favori.jeu.id) {
+              <li class="favoris__ligne">
+                <span class="favoris__image" aria-hidden="true">
+                  @if (afficherImage(favori.jeu)) {
+                    <img [src]="favori.jeu.image" alt="" (error)="imagesIndisponibles.add(favori.jeu.id)" />
+                  } @else {
+                    {{ initiale(favori.jeu) }}
+                  }
+                </span>
+                <a class="favoris__nom" [routerLink]="['/jeux', favori.jeu.id]">{{ favori.jeu.nom }}</a>
+                <span class="favoris__parties">{{ pluriel(favori.nbParties, "partie") }}</span>
+              </li>
+            }
+          </ol>
+          @if (profil.jeuxFavoris.length > nbJeuxFavorisAffiches) {
+            <button type="button" class="bouton bouton--discret" (click)="tousLesFavoris = !tousLesFavoris">
+              {{ tousLesFavoris ? "Voir seulement le top " + nbJeuxFavorisAffiches : "Voir tous les jeux joués (" + profil.jeuxFavoris.length + ")" }}
+            </button>
+          }
+        </section>
+
+        <!-- Historique : de la partie la plus récente à la plus ancienne -->
+        <section class="bloc" aria-labelledby="titre-historique">
+          <h2 id="titre-historique">Historique des parties</h2>
+          <ul class="historique">
+            @for (partie of historiqueAffiche; track partie.partieId) {
+              <li class="historique__ligne">
+                <span class="historique__date">{{ formaterDate(partie.date) }}</span>
+                <span class="historique__rang" [class.historique__rang--victoire]="partie.rang === 1">
+                  {{ partie.rang === 1 ? "Victoire" : formaterRang(partie.rang) }}
+                </span>
+                <span class="historique__detail">
+                  <a [routerLink]="['/jeux', partie.jeu.id]">{{ partie.jeu.nom }}</a>
+                  @if (partie.points !== null) {
+                    · {{ pluriel(partie.points, "point") }}
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+          @if (profil.historique.length > nbPartiesAffichees) {
+            <button type="button" class="bouton bouton--discret" (click)="toutLHistorique = !toutLHistorique">
+              {{ toutLHistorique ? "Voir seulement les " + nbPartiesAffichees + " dernières" : "Voir tout l'historique (" + profil.historique.length + ")" }}
+            </button>
+          }
+        </section>
+      </div>
+    }
+  }
+</main>
