@@ -30,8 +30,9 @@ table {
 
 }
 
-// Page Ludothèque : styles isolés sous son propre composant, prêts à recevoir un thème global.
-app-jeux {
+// Palette commune des pages PlayNight (introduite par la Ludothèque) : mode sombre par défaut,
+// mode clair Takima quand ThemeService pose "light-theme" sur <body>. Une nouvelle page ajoute son sélecteur ici.
+app-jeux, app-nouvelle-soiree {
   --library-bg: #11131f;
   --library-surface: #151827;
   --library-card: #1c2032;
@@ -49,6 +50,30 @@ app-jeux {
   --library-badge-bg: #f8b83f;
   --library-badge-text: #161824;
   --library-secondary: #c5c9d9;
+}
+
+.light-theme :is(app-jeux, app-nouvelle-soiree) {
+  --library-bg: #f7f4f9;
+  --library-surface: #ffffff;
+  --library-card: #ffffff;
+  --library-line: #e4dcea;
+  --library-text: #24112f;
+  --library-muted: #6d6177;
+  --library-accent: #4a0a67;
+  --library-accent-soft: #f1e6f7;
+  --library-accent-border: #4a0a6770;
+  --library-accent-border-soft: #4a0a6745;
+  --library-accent-glow: #96164470;
+  --library-art-bg: #efe8f4;
+  --library-fallback-glow: #f3dce8;
+  --library-fallback-bg: #f5f0f8;
+  --library-badge-bg: #4a0a67;
+  --library-badge-text: #ffffff;
+  --library-secondary: #4f4259;
+}
+
+// Page Ludothèque : styles isolés sous son propre composant, prêts à recevoir un thème global.
+app-jeux {
   display: block;
   min-height: calc(100vh - 80px);
   color: var(--library-text);
@@ -96,23 +121,6 @@ app-jeux {
   .retry-button { margin-top: 18px; border: 1px solid var(--library-accent-border-soft); border-radius: 9px; padding: 10px 16px; color: var(--library-accent); background: var(--library-accent-soft); font: inherit; font-weight: 700; cursor: pointer; }
   // Mode clair (classe "light-theme" posée sur <body> par ThemeService) : couleurs Takima, violet et rouge
   .light-theme & {
-    --library-bg: #f7f4f9;
-    --library-surface: #ffffff;
-    --library-card: #ffffff;
-    --library-line: #e4dcea;
-    --library-text: #24112f;
-    --library-muted: #6d6177;
-    --library-accent: #4a0a67;
-    --library-accent-soft: #f1e6f7;
-    --library-accent-border: #4a0a6770;
-    --library-accent-border-soft: #4a0a6745;
-    --library-accent-glow: #96164470;
-    --library-art-bg: #efe8f4;
-    --library-fallback-glow: #f3dce8;
-    --library-fallback-bg: #f5f0f8;
-    --library-badge-bg: #4a0a67;
-    --library-badge-text: #ffffff;
-    --library-secondary: #4f4259;
     .eyebrow__dot, .status-dot { background: #961644; }
     .type-badge--video { color: #ffffff; border-color: #96164455; background: #961644; }
     .game-card:hover { box-shadow: 0 14px 34px #4a0a671f; }
@@ -125,4 +133,95 @@ app-jeux {
   @media (max-width: 760px) { .library { padding-top: 38px; } .game-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; } .game-card__art { height: 134px; } .library__toolbar { align-items: flex-start; flex-direction: column; } .toolbar-note { padding: 0 5px 3px; } }
   @media (max-width: 480px) { .library { padding: 30px 16px 52px; } .library__intro { align-items: flex-start; } .collection-count { padding-top: 3px; } .collection-count span { max-width: 72px; text-align: right; } .intro-copy { font-size: .92rem; } .filters { width: 100%; } .filter-button { flex: 1 1 auto; padding-inline: 9px; font-size: .77rem; } .game-grid { grid-template-columns: 1fr; } .game-card { display: grid; grid-template-columns: 42% 1fr; } .game-card__art { height: 100%; min-height: 165px; } .game-card__content { align-self: center; min-width: 0; padding: 14px 12px; } .game-card h2 { font-size: .98rem; } .platform { margin-bottom: 13px; font-size: .75rem; } .game-card__meta { font-size: .72rem; } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+}
+
+
+// Page Nouvelle soirée (formulaire en étapes) : mêmes couleurs que la Ludothèque, via la palette commune
+app-nouvelle-soiree {
+  display: block;
+  min-height: calc(100vh - 80px);
+  color: var(--library-text);
+  background: var(--library-bg);
+  color-scheme: dark; // icônes du calendrier et de l'horloge lisibles sur fond sombre
+
+  .nouvelle-soiree { max-width: 1100px; margin: auto; padding: 48px clamp(16px, 5vw, 64px) 72px; }
+  // .nouvelle-soiree devant h1 : sinon la typographie Material (.mat-typography h1) l'emporte
+  .nouvelle-soiree h1 { margin: 0 0 28px; font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 750; line-height: 1.1; letter-spacing: -.05em; }
+
+  // Stepper Angular Material : il suit le thème Material clair, on le recolore avec la palette
+  .mat-stepper-horizontal { background: transparent; }
+  .mat-horizontal-stepper-header-container { margin-bottom: 8px; border: 1px solid var(--library-line); border-radius: 16px; background: var(--library-surface); }
+  .mat-horizontal-content-container { padding: 0; }
+  .mat-stepper-horizontal-line { border-top-color: var(--library-line); }
+  .mat-step-header { border-radius: 14px; }
+  .mat-step-header:hover:not([aria-disabled]), .mat-step-header.cdk-keyboard-focused, .mat-step-header.cdk-program-focused { background: var(--library-accent-soft); }
+  .mat-step-header .mat-step-label { color: var(--library-muted); font-weight: 600; }
+  .mat-step-header .mat-step-label.mat-step-label-active { color: var(--library-text); }
+  .mat-step-header .mat-step-icon { color: var(--library-text); background: var(--library-line); }
+  .mat-step-header .mat-step-icon-selected, .mat-step-header .mat-step-icon-state-done, .mat-step-header .mat-step-icon-state-edit { color: var(--library-badge-text); background: var(--library-accent); }
+
+  .etape { display: grid; gap: 18px; padding: 24px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); }
+  .aide { margin: 0; color: var(--library-muted); font-size: .9rem; line-height: 1.55; }
+
+  // Champs
+  .champs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .champ { display: grid; align-content: start; gap: 7px; font-size: .82rem; font-weight: 600; color: var(--library-secondary); }
+  .champ--large { grid-column: span 2; }
+  input, select { width: 100%; box-sizing: border-box; border: 1px solid var(--library-line); border-radius: 10px; padding: 10px 12px; color: var(--library-text); background: var(--library-card); font: inherit; font-size: .95rem; font-weight: 500; }
+  input[type="checkbox"] { width: 20px; height: 20px; padding: 0; accent-color: var(--library-accent); cursor: pointer; }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
+  [aria-invalid="true"] { border-color: #ff9a93; }
+  .erreur { display: block; color: #ff9a93; font-size: .78rem; font-weight: 600; }
+  .erreur--envoi { margin: 0; padding: 12px 14px; border: 1px solid #ff9a9355; border-radius: 12px; background: #472b2d; font-size: .88rem; }
+
+  // Joueurs présents (même principe que les filtres de la Ludothèque)
+  fieldset { min-width: 0; margin: 0; border: 1px solid var(--library-line); border-radius: 16px; padding: 16px 18px 18px; }
+  legend { padding: 0 8px; font-size: 1rem; font-weight: 700; color: var(--library-text); }
+  .joueurs__liste { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+  .joueur { display: flex; align-items: center; gap: 9px; border: 1px solid var(--library-line); border-radius: 999px; padding: 6px 14px 6px 6px; color: var(--library-muted); background: transparent; font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; transition: color .18s, background .18s, border-color .18s; }
+  .joueur img { width: 30px; height: 30px; border-radius: 50%; background: var(--library-art-bg); }
+  .joueur:hover { color: var(--library-text); }
+  .joueur--present { color: var(--library-accent); border-color: var(--library-accent-border); background: var(--library-accent-soft); }
+
+  // Parties et scores
+  .partie { overflow-x: auto; background: var(--library-card); }
+  .partie__champs { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto; align-items: start; gap: 16px; }
+  .partie__champs .champ--large { grid-column: auto; }
+  .partie__champs > .bouton--discret { margin-top: 22px; } // aligné sur les champs, sous leur libellé
+  .scores { width: 100%; min-width: 520px; border-collapse: collapse; font-size: .9rem; }
+  .scores th, .scores td { padding: 8px 10px; border-bottom: 1px solid var(--library-line); text-align: left; vertical-align: middle; }
+  .scores thead th { color: var(--library-muted); font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .scores tbody th { font-weight: 700; }
+  .scores input[type="number"] { max-width: 110px; }
+  .scores .absent { color: var(--library-muted); font-style: italic; }
+
+  // Boutons
+  .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding-top: 6px; }
+  .bouton { border: 1px solid var(--library-line); border-radius: 10px; padding: 10px 18px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; cursor: pointer; transition: transform .18s, background .18s; }
+  .bouton:hover:not(:disabled) { transform: translateY(-1px); }
+  .bouton:disabled { opacity: .6; cursor: progress; }
+  .bouton--principal { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); }
+  .bouton--secondaire { justify-self: start; border-color: var(--library-accent-border-soft); color: var(--library-accent); background: var(--library-accent-soft); }
+  .bouton--discret { border-color: transparent; color: var(--library-muted); }
+  .bouton--discret:hover { color: #ff9a93; }
+
+  .state-panel { display: grid; justify-items: center; gap: 10px; padding: 40px 24px; border: 1px solid var(--library-line); border-radius: 18px; text-align: center; background: var(--library-surface); }
+  .state-panel h2 { margin: 0; font-size: 1.3rem; }
+  .state-panel p { margin: 0 0 8px; color: var(--library-muted); }
+
+  .light-theme & {
+    color-scheme: light;
+    [aria-invalid="true"] { border-color: #b71c32; }
+    .erreur, .bouton--discret:hover { color: #b71c32; }
+    .erreur--envoi { border-color: #b71c3240; background: #fbe4e8; }
+    .partie { background: var(--library-bg); }
+  }
+
+  @media (max-width: 760px) {
+    .champs { grid-template-columns: 1fr 1fr; }
+    .partie__champs { grid-template-columns: 1fr; align-items: stretch; }
+    .partie__champs > .bouton--discret { justify-self: end; margin-top: 0; }
+    .etape { padding: 16px; }
+    .mat-step-header .mat-step-label { display: none; } // seulement les numéros d'étape sur petit écran
+  }
 }

@@ -1,0 +1,204 @@
+<main class="nouvelle-soiree">
+  <h1>Nouvelle soirée</h1>
+
+  @if (error) {
+    <section class="state-panel" role="alert">
+      <h2>Impossible de préparer le formulaire</h2>
+      <p>Les joueurs ou les jeux n'ont pas pu être chargés. Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
+    </section>
+  } @else if (soireeCreeeId !== null) {
+    <!-- Affiché seulement tant que la page détail d'une soirée (#13) n'existe pas -->
+    <section class="state-panel" role="status">
+      <h2>Soirée enregistrée</h2>
+      <p>La soirée n°{{ soireeCreeeId }} a bien été créée avec ses parties et ses scores.</p>
+      <button type="button" class="bouton bouton--principal" (click)="recommencer()">Créer une autre soirée</button>
+    </section>
+  } @else {
+    <mat-stepper linear>
+      <mat-step [stepControl]="infos" label="Soirée et joueurs présents">
+        <form [formGroup]="infos" class="etape">
+          <div class="champs">
+            <label class="champ">
+              <span>Date</span>
+              <input type="date" formControlName="date" [attr.aria-invalid]="aUneErreur('date')" />
+              @if (aUneErreur("date")) {
+                <small class="erreur">La date est obligatoire.</small>
+              }
+            </label>
+
+            <label class="champ">
+              <span>Heure</span>
+              <input type="time" formControlName="heure" [attr.aria-invalid]="aUneErreur('heure')" />
+              @if (aUneErreur("heure")) {
+                <small class="erreur">L'heure est obligatoire.</small>
+              }
+            </label>
+
+            <label class="champ champ--large">
+              <span>Lieu</span>
+              <input type="text" formControlName="lieu" placeholder="Chez Léa, en ligne…" [attr.aria-invalid]="aUneErreur('lieu')" />
+              @if (aUneErreur("lieu")) {
+                <small class="erreur">Le lieu est obligatoire.</small>
+              }
+            </label>
+          </div>
+
+          <fieldset class="joueurs">
+            <legend>Joueurs présents ({{ infos.controls.joueurIds.value.length }})</legend>
+            <div class="joueurs__liste">
+              @for (joueur of joueurs; track joueur.id) {
+                <button
+                  type="button"
+                  class="joueur"
+                  [class.joueur--present]="estPresent(joueur)"
+                  [attr.aria-pressed]="estPresent(joueur)"
+                  (click)="basculerPresence(joueur)"
+                >
+                  @if (joueur.avatar) {
+                    <img [src]="joueur.avatar" alt="" />
+                  }
+                  {{ joueur.pseudo }}
+                </button>
+              }
+            </div>
+            @if (aUneErreur("joueurIds")) {
+              <small class="erreur">Sélectionnez au moins un joueur présent.</small>
+            }
+          </fieldset>
+
+          <div class="actions">
+            <button type="button" class="bouton bouton--principal" matStepperNext (click)="infos.markAllAsTouched()">Suivant</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- [completed] plutôt que [stepControl] : "parties" contient aussi les scores, qui se saisissent à l'étape 3 -->
+      <mat-step [completed]="etapePartiesValide" label="Parties jouées">
+        <div class="etape">
+          @for (partie of parties.controls; track partie; let i = $index) {
+            <fieldset class="partie" [formGroup]="partie">
+              <legend>Partie {{ i + 1 }}</legend>
+
+              <div class="partie__champs">
+                <label class="champ champ--large">
+                  <span>Jeu</span>
+                  <select formControlName="jeuId" [attr.aria-invalid]="aUneErreurPartie(partie, 'jeuId')">
+                    <option [ngValue]="null" disabled>Choisir un jeu</option>
+                    @for (jeu of jeux; track jeu.id) {
+                      <option [ngValue]="jeu.id">{{ jeu.nom }} ({{ nombreJoueurs(jeu) }})</option>
+                    }
+                  </select>
+                  @if (aUneErreurPartie(partie, "jeuId")) {
+                    <small class="erreur">Choisissez le jeu de cette partie.</small>
+                  }
+                </label>
+
+                <label class="champ">
+                  <span>Durée (minutes)</span>
+                  <input type="number" min="1" step="1" formControlName="duree" [attr.aria-invalid]="aUneErreurPartie(partie, 'duree')" />
+                  @if (aUneErreurPartie(partie, "duree")) {
+                    <small class="erreur">Indiquez une durée en minutes (nombre entier, au moins 1).</small>
+                  }
+                </label>
+
+                <button type="button" class="bouton bouton--discret" (click)="supprimerPartie(i)" [attr.aria-label]="'Supprimer la partie ' + (i + 1)">
+                  Supprimer
+                </button>
+              </div>
+            </fieldset>
+          }
+
+          @if (parties.length === 0) {
+            <small class="erreur">Ajoutez au moins une partie.</small>
+          }
+
+          <button type="button" class="bouton bouton--secondaire" (click)="ajouterPartie()">+ Ajouter une partie</button>
+
+          <div class="actions">
+            <button type="button" class="bouton" matStepperPrevious>Retour</button>
+            <button type="button" class="bouton bouton--principal" matStepperNext (click)="toucherEtapeParties()">Suivant</button>
+          </div>
+        </div>
+      </mat-step>
+
+      <mat-step [stepControl]="parties" label="Scores">
+        <div class="etape">
+          <p class="aide">
+            Décochez les joueurs qui n'ont pas joué une partie. Ex aequo : même rang.
+            Partie en équipe : même numéro d'équipe et même rang pour les coéquipiers.
+          </p>
+
+          @for (partie of parties.controls; track partie; let i = $index) {
+            <fieldset class="partie">
+              <legend>Partie {{ i + 1 }} · {{ jeuDe(partie)?.nom }}</legend>
+
+              <table class="scores">
+                <thead>
+                  <tr>
+                    <th scope="col">Joueur</th>
+                    <th scope="col">A joué</th>
+                    <th scope="col">Rang</th>
+                    <th scope="col">Points</th>
+                    <th scope="col">Équipe</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (score of partie.controls.scores.controls; track score) {
+                    <tr [formGroup]="score">
+                      <th scope="row">{{ pseudo(score.controls.joueurId.value) }}</th>
+                      <td>
+                        <input type="checkbox" formControlName="participe" [attr.aria-label]="pseudo(score.controls.joueurId.value) + ' a joué cette partie'" />
+                      </td>
+                      @if (score.controls.participe.value) {
+                        <td>
+                          <input type="number" min="1" step="1" formControlName="rang" aria-label="Rang" [attr.aria-invalid]="aUneErreurScore(score, 'rang')" />
+                          @if (aUneErreurScore(score, "rang")) {
+                            <small class="erreur">Rang obligatoire (entier, au moins 1).</small>
+                          }
+                        </td>
+                        <td>
+                          <input type="number" step="1" formControlName="points" aria-label="Points (facultatif)" [attr.aria-invalid]="aUneErreurScore(score, 'points')" />
+                          @if (aUneErreurScore(score, "points")) {
+                            <small class="erreur">Nombre entier.</small>
+                          }
+                        </td>
+                        <td>
+                          <input type="number" min="1" step="1" formControlName="numeroEquipe" aria-label="Numéro d'équipe (facultatif)" [attr.aria-invalid]="aUneErreurScore(score, 'numeroEquipe')" />
+                          @if (aUneErreurScore(score, "numeroEquipe")) {
+                            <small class="erreur">Entier, au moins 1.</small>
+                          }
+                        </td>
+                      } @else {
+                        <td colspan="3" class="absent">N'a pas joué</td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+
+              @if (partie.errors?.["aucunJoueur"]) {
+                <small class="erreur">Cochez au moins un joueur pour cette partie.</small>
+              }
+              @if (partie.errors?.["nbJoueurs"]; as limite) {
+                <small class="erreur">
+                  {{ jeuDe(partie)?.nom }} se joue de {{ limite.min }} à {{ limite.max }} joueurs : {{ limite.nb }} joueurs cochés.
+                </small>
+              }
+            </fieldset>
+          }
+
+          @if (erreurEnvoi) {
+            <p class="erreur erreur--envoi" role="alert">{{ erreurEnvoi }}</p>
+          }
+
+          <div class="actions">
+            <button type="button" class="bouton" matStepperPrevious [disabled]="envoiEnCours">Retour</button>
+            <button type="button" class="bouton bouton--principal" (click)="enregistrer()" [disabled]="envoiEnCours">
+              {{ envoiEnCours ? "Enregistrement…" : "Enregistrer la soirée" }}
+            </button>
+          </div>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  }
+</main>

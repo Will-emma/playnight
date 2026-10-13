@@ -9,13 +9,15 @@ import { MatListModule } from "@angular/material/list"
 import { HomeComponent } from "home/home.component"
 import { StudentsComponent } from "students/students.component"
 import { StudentDetailsComponent } from "students/student-details/student-details.component"
-import { FormsModule } from "@angular/forms"
+import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { MatIconModule } from "@angular/material/icon"
 import { MatButtonModule } from "@angular/material/button"
 import { MajorsComponent } from "majors/majors.component"
 import { MajorStudentsComponent } from "majors/major-students/major-students.component"
 import { HttpClientModule } from "@angular/common/http"
 import { JeuxComponent } from "jeux/jeux.component"
+import { MatStepperModule } from "@angular/material/stepper"
+import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
 
 @NgModule({
   declarations: [
@@ -27,6 +29,7 @@ import { JeuxComponent } from "jeux/jeux.component"
     MajorsComponent,
     MajorStudentsComponent,
     JeuxComponent,
+    NouvelleSoireeComponent,
   ],
   imports: [
     BrowserModule,
@@ -37,6 +40,8 @@ import { JeuxComponent } from "jeux/jeux.component"
     MatIconModule,
     MatButtonModule,
     HttpClientModule,
+    ReactiveFormsModule,
+    MatStepperModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
