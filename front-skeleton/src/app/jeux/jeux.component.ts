@@ -91,6 +91,11 @@ export class JeuxComponent implements OnInit {
     return `${minimum}–${maximum} joueurs`
   }
 
+  // Image renseignée et qui a bien chargé
+  aUneImage(jeu: Jeu): boolean {
+    return !!jeu.image && !this.imagesIndisponibles.has(jeu.id)
+  }
+
   marquerImageIndisponible(jeu: Jeu): void {
     this.imagesIndisponibles.add(jeu.id)
   }

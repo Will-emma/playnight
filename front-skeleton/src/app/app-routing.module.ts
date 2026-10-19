@@ -14,6 +14,7 @@ import { JeuxComponent } from "jeux/jeux.component"
 import { JeuxResolver } from "jeux/jeux.resolver"
 import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
 import { FicheJeuResolver } from "jeux/fiche-jeu/fiche-jeu.resolver"
+import { ImporterJeuComponent } from "jeux/importer-jeu/importer-jeu.component"
 import { ProfilJoueurComponent } from "joueurs/profil-joueur/profil-joueur.component"
 import { ProfilJoueurResolver } from "joueurs/profil-joueur/profil-joueur.resolver"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
@@ -33,6 +34,12 @@ const routes: Routes = [
     path: "jeux",
     component: JeuxComponent,
     resolve: { jeuxPage: JeuxResolver },
+  },
+  {
+    // À garder avant "jeux/:id", sinon "importer" serait lu comme un id
+    // Pas de resolver : la page ne charge rien avant que l'utilisateur lance une recherche
+    path: "jeux/importer",
+    component: ImporterJeuComponent,
   },
   {
     path: "jeux/:id",

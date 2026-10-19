@@ -26,6 +26,7 @@
       }
     </div>
     <span class="toolbar-note"><span class="status-dot"></span> La prochaine partie commence ici</span>
+    <a class="import-button" routerLink="/jeux/importer">+ Importer un jeu vidéo</a>
   </section>
 
   @if (loading) {
@@ -58,11 +59,13 @@
         <article class="game-card">
           <div
             class="game-card__art"
+            [class.game-card__art--image]="aUneImage(jeu)"
             role="img"
             [attr.aria-label]="'Illustration de ' + jeu.nom"
             [style.--cover-color]="couleurCouverture(jeu)"
           >
-            @if (jeu.image && !imagesIndisponibles.has(jeu.id)) {
+            <!-- Avec une image, elle s'affiche seule ; sinon, couverture colorée avec l'initiale et le nom en filigrane -->
+            @if (aUneImage(jeu)) {
               <img
                 class="game-card__cover-image"
                 [src]="jeu.image"
@@ -70,8 +73,10 @@
                 loading="lazy"
                 (error)="marquerImageIndisponible(jeu)"
               />
+            } @else {
+              <span class="cover-filigrane" aria-hidden="true">{{ jeu.nom }}</span>
+              <span class="cover-initial" aria-hidden="true">{{ initiale(jeu) }}</span>
             }
-            <span class="cover-initial" aria-hidden="true">{{ initiale(jeu) }}</span>
             <span class="type-badge" [class.type-badge--video]="jeu.type === 'JEU_VIDEO'">
               {{ labelType(jeu.type) }}
             </span>

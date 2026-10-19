@@ -6,6 +6,8 @@ import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.JeuDto;
 import com.takima.backskeleton.DTO.JeuMapper;
 import com.takima.backskeleton.DTO.MeilleurJoueurDto;
+import com.takima.backskeleton.DTO.RawgImportDto;
+import com.takima.backskeleton.DTO.RawgJeuDto;
 import com.takima.backskeleton.models.Jeu;
 import com.takima.backskeleton.models.Joueur;
 import com.takima.backskeleton.models.Partie;
@@ -23,10 +25,12 @@ import java.util.stream.Collectors;
 public class JeuService {
     private final JeuDao jeuDao;
     private final PartieDao partieDao;
+    private final RawgService rawgService;
 
-    public JeuService(JeuDao jeuDao, PartieDao partieDao) {
+    public JeuService(JeuDao jeuDao, PartieDao partieDao, RawgService rawgService) {
         this.jeuDao = jeuDao;
         this.partieDao = partieDao;
+        this.rawgService = rawgService;
     }
 
     public List<JeuDto> findAll(TypeJeu type) {
@@ -59,6 +63,36 @@ public class JeuService {
     public JeuDto updateJeu(JeuDto jeuDto, Long id) {
         findJeuById(id);
         Jeu jeu = JeuMapper.fromDto(jeuDto, id);
+        return JeuMapper.toDto(jeuDao.save(jeu));
+    }
+
+    public List<RawgJeuDto> rechercherSurRawg(String recherche) {
+        return rawgService.rechercher(recherche);
+    }
+
+    // Ajoute à la ludothèque un jeu vidéo trouvé sur RAWG, avec le nombre de joueurs saisi par l'utilisateur
+    @Transactional
+    public JeuDto importerDepuisRawg(Long idRawg, RawgImportDto importDto) {
+        Integer min = importDto.getNbJoueursMin();
+        Integer max = importDto.getNbJoueursMax();
+        // Mêmes règles que la table jeux (nb_joueurs_min >= 1, nb_joueurs_max >= nb_joueurs_min)
+        if (min == null || max == null || min < 1 || max < min) {
+            throw new IllegalArgumentException("Le nombre de joueurs est invalide : au moins 1, et le maximum ne peut pas être inférieur au minimum.");
+        }
+
+        RawgJeuDto jeuRawg = rawgService.getById(idRawg);
+        if (jeuDao.existsByNomIgnoreCase(jeuRawg.getNom())) {
+            throw new IllegalArgumentException("« " + jeuRawg.getNom() + " » est déjà dans la ludothèque.");
+        }
+
+        Jeu jeu = new Jeu.Builder()
+                .nom(jeuRawg.getNom())
+                .type(TypeJeu.JEU_VIDEO)
+                .plateforme(jeuRawg.getPlateforme())
+                .nbJoueursMin(min)
+                .nbJoueursMax(max)
+                .image(jeuRawg.getImage())
+                .build();
         return JeuMapper.toDto(jeuDao.save(jeu));
     }
 

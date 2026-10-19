@@ -5,6 +5,8 @@ import com.takima.backskeleton.DAO.PartieDao;
 import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.JeuDto;
 import com.takima.backskeleton.DTO.MeilleurJoueurDto;
+import com.takima.backskeleton.DTO.RawgImportDto;
+import com.takima.backskeleton.DTO.RawgJeuDto;
 import com.takima.backskeleton.models.Jeu;
 import com.takima.backskeleton.models.Joueur;
 import com.takima.backskeleton.models.Partie;
@@ -39,6 +41,9 @@ class JeuServiceTest {
 
     @Mock
     private PartieDao partieDao;
+
+    @Mock
+    private RawgService rawgService;
 
     @InjectMocks
     private JeuService jeuService;
@@ -114,6 +119,42 @@ class JeuServiceTest {
         assertNull(captor.getValue().getId());
         assertEquals(2L, created.getId());
         assertEquals("Dixit", created.getNom());
+    }
+
+    @Test
+    void importerDepuisRawgSavesVideoGameWithRawgDataAndChosenPlayerCount() {
+        when(rawgService.getById(3498L)).thenReturn(new RawgJeuDto(
+                3498L, "Grand Theft Auto V", "https://example.com/gta.jpg", "PC, PlayStation 5", "2013-09-17"));
+        when(jeuDao.existsByNomIgnoreCase("Grand Theft Auto V")).thenReturn(false);
+        when(jeuDao.save(any(Jeu.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        JeuDto importe = jeuService.importerDepuisRawg(3498L, importDto(1, 4));
+
+        assertEquals("Grand Theft Auto V", importe.getNom());
+        assertEquals(TypeJeu.JEU_VIDEO, importe.getType());
+        assertEquals("PC, PlayStation 5", importe.getPlateforme());
+        assertEquals("https://example.com/gta.jpg", importe.getImage());
+        assertEquals(1, importe.getNbJoueursMin());
+        assertEquals(4, importe.getNbJoueursMax());
+    }
+
+    @Test
+    void importerDepuisRawgRefusesGameAlreadyInLibrary() {
+        when(rawgService.getById(3498L)).thenReturn(new RawgJeuDto(3498L, "Rocket League", null, null, null));
+        when(jeuDao.existsByNomIgnoreCase("Rocket League")).thenReturn(true);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> jeuService.importerDepuisRawg(3498L, importDto(2, 8)));
+        verify(jeuDao, never()).save(any());
+    }
+
+    @Test
+    void importerDepuisRawgRefusesInvalidPlayerCountWithoutCallingRawg() {
+        assertThrows(IllegalArgumentException.class, () -> jeuService.importerDepuisRawg(1L, importDto(0, 4)));
+        assertThrows(IllegalArgumentException.class, () -> jeuService.importerDepuisRawg(1L, importDto(4, 2)));
+        assertThrows(IllegalArgumentException.class, () -> jeuService.importerDepuisRawg(1L, importDto(null, 4)));
+        verify(rawgService, never()).getById(any());
+        verify(jeuDao, never()).save(any());
     }
 
     @Test
@@ -234,6 +275,13 @@ class JeuServiceTest {
 
     private Joueur joueur(Long id, String pseudo) {
         return new Joueur.Builder().id(id).pseudo(pseudo).build();
+    }
+
+    private RawgImportDto importDto(Integer min, Integer max) {
+        RawgImportDto importDto = new RawgImportDto();
+        importDto.setNbJoueursMin(min);
+        importDto.setNbJoueursMax(max);
+        return importDto;
     }
 
     private Jeu jeu(Long id, String nom, TypeJeu type) {

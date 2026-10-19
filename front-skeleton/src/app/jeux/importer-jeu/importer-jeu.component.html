@@ -1,0 +1,86 @@
+<main class="importer-jeu">
+  <a class="retour" routerLink="/jeux">← Ludothèque</a>
+
+  <section class="entete" aria-labelledby="titre-import">
+    <p class="eyebrow"><span class="eyebrow__dot"></span> PLAYNIGHT · IMPORT RAWG</p>
+    <h1 id="titre-import">Importer un jeu vidéo</h1>
+    <p class="entete__texte">
+      Recherchez un jeu dans la base RAWG : son nom, son image et ses plateformes sont repris automatiquement.
+      Il ne reste qu'à indiquer le nombre de joueurs.
+    </p>
+  </section>
+
+  <form class="recherche" role="search" (ngSubmit)="rechercher()">
+    <label class="sr-only" for="recherche-rawg">Nom du jeu</label>
+    <input
+      id="recherche-rawg"
+      type="search"
+      name="recherche"
+      [(ngModel)]="recherche"
+      placeholder="Zelda, Mario Kart, FIFA…"
+      autocomplete="off"
+    />
+    <button type="submit" class="bouton bouton--principal" [disabled]="rechercheEnCours || !recherche.trim()">
+      {{ rechercheEnCours ? "Recherche…" : "Rechercher" }}
+    </button>
+  </form>
+
+  @if (erreurRecherche) {
+    <section class="state-panel" role="alert">
+      <h2>Recherche impossible</h2>
+      <p>{{ erreurRecherche }}</p>
+    </section>
+  } @else if (rechercheEnvoyee !== null && resultats.length === 0) {
+    <section class="state-panel">
+      <h2>Aucun jeu trouvé pour « {{ rechercheEnvoyee }} »</h2>
+      <p>Vérifiez l'orthographe ou essayez avec moins de mots.</p>
+    </section>
+  } @else if (resultats.length > 0) {
+    <ul class="resultats" aria-label="Résultats de la recherche">
+      @for (resultat of resultats; track resultat.jeu.idRawg) {
+        <li class="resultat">
+          <div class="resultat__image">
+            @if (resultat.jeu.image && !imagesIndisponibles.has(resultat.jeu.idRawg)) {
+              <img [src]="resultat.jeu.image" alt="" loading="lazy" (error)="marquerImageIndisponible(resultat.jeu)" />
+            } @else {
+              <span aria-hidden="true">{{ initiale(resultat.jeu) }}</span>
+            }
+          </div>
+
+          <div class="resultat__infos">
+            <h2>{{ resultat.jeu.nom }}</h2>
+            <p class="resultat__details">
+              @if (annee(resultat.jeu); as annee) {
+                <span>{{ annee }}</span> ·
+              }
+              {{ resultat.jeu.plateforme || "Plateformes non renseignées" }}
+            </p>
+          </div>
+
+          <div class="resultat__ajout">
+            <div class="joueurs" role="group" [attr.aria-label]="'Nombre de joueurs pour ' + resultat.jeu.nom">
+              <label>
+                Joueurs min
+                <input type="number" min="1" step="1" [name]="'min-' + resultat.jeu.idRawg" [(ngModel)]="resultat.nbJoueursMin" />
+              </label>
+              <label>
+                max
+                <input type="number" min="1" step="1" [name]="'max-' + resultat.jeu.idRawg" [(ngModel)]="resultat.nbJoueursMax" />
+              </label>
+            </div>
+            <button type="button" class="bouton bouton--principal" [disabled]="resultat.envoiEnCours" (click)="ajouter(resultat)">
+              {{ resultat.envoiEnCours ? "Ajout…" : "Ajouter" }}
+            </button>
+          </div>
+
+          @if (resultat.erreur) {
+            <p class="resultat__erreur" role="alert">{{ resultat.erreur }}</p>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  <!-- Mention demandée par les conditions d'utilisation de l'API RAWG -->
+  <p class="source">Données des jeux fournies par <a href="https://rawg.io" target="_blank" rel="noopener">RAWG</a></p>
+</main>

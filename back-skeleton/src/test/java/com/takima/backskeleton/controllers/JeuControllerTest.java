@@ -5,8 +5,11 @@ import com.takima.backskeleton.DTO.JeuDto;
 import com.takima.backskeleton.DTO.JoueurResumeDto;
 import com.takima.backskeleton.DTO.MeilleurJoueurDto;
 import com.takima.backskeleton.DTO.PartieJoueeDto;
+import com.takima.backskeleton.DTO.RawgImportDto;
+import com.takima.backskeleton.DTO.RawgJeuDto;
 import com.takima.backskeleton.models.TypeJeu;
 import com.takima.backskeleton.services.JeuService;
+import com.takima.backskeleton.services.RawgIndisponibleException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -161,6 +164,58 @@ class JeuControllerTest {
         mockMvc.perform(get("/jeux/404/fiche"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Le jeu 404 n'existe pas"));
+    }
+
+    @Test
+    void rechercherSurRawgReturnsResultsWithContractFieldNames() throws Exception {
+        when(jeuService.rechercherSurRawg("zelda")).thenReturn(List.of(new RawgJeuDto(
+                22511L, "The Legend of Zelda: Breath of the Wild", "https://example.com/zelda.jpg",
+                "Nintendo Switch, Wii U", "2017-03-03")));
+
+        mockMvc.perform(get("/jeux/rawg").param("recherche", "zelda"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].idRawg").value(22511))
+                .andExpect(jsonPath("$[0].nom").value("The Legend of Zelda: Breath of the Wild"))
+                .andExpect(jsonPath("$[0].image").value("https://example.com/zelda.jpg"))
+                .andExpect(jsonPath("$[0].plateforme").value("Nintendo Switch, Wii U"))
+                .andExpect(jsonPath("$[0].dateSortie").value("2017-03-03"));
+    }
+
+    @Test
+    void rechercherSurRawgReturns503WhenRawgIsUnavailable() throws Exception {
+        when(jeuService.rechercherSurRawg("zelda"))
+                .thenThrow(new RawgIndisponibleException("RAWG ne répond pas pour le moment, réessayez plus tard."));
+
+        mockMvc.perform(get("/jeux/rawg").param("recherche", "zelda"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.message").value("RAWG ne répond pas pour le moment, réessayez plus tard."));
+    }
+
+    @Test
+    void importerDepuisRawgReadsPlayerCountAndReturnsCreated() throws Exception {
+        when(jeuService.importerDepuisRawg(eq(22511L), any(RawgImportDto.class)))
+                .thenReturn(jeuDto(9L, "The Legend of Zelda: Breath of the Wild", TypeJeu.JEU_VIDEO));
+
+        mockMvc.perform(post("/jeux/rawg/22511")
+                        .contentType("application/json")
+                        .content("""
+                                {"nbJoueursMin":1,"nbJoueursMax":1}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(9))
+                .andExpect(jsonPath("$.type").value("JEU_VIDEO"));
+    }
+
+    @Test
+    void importerDepuisRawgReturns400WithMessageWhenGameAlreadyExists() throws Exception {
+        when(jeuService.importerDepuisRawg(eq(22511L), any(RawgImportDto.class)))
+                .thenThrow(new IllegalArgumentException("« Zelda » est déjà dans la ludothèque."));
+
+        mockMvc.perform(post("/jeux/rawg/22511")
+                        .contentType("application/json")
+                        .content("{\"nbJoueursMin\":1,\"nbJoueursMax\":1}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("« Zelda » est déjà dans la ludothèque."));
     }
 
     private JeuDto jeuDto(Long id, String nom, TypeJeu type) {
