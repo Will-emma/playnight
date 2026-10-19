@@ -69,16 +69,16 @@ Do $$
     INSERT INTO joueurs (pseudo, avatar) VALUES ('Noa', 'https://api.dicebear.com/9.x/pixel-art/svg?seed=Noa') RETURNING id INTO _NOA;
 
     -- Jeux de société
-    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Catan', 'SOCIETE', null, 3, 4, 'https://placehold.co/300x200?text=Catan') RETURNING id INTO _CATAN;
-    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Dixit', 'SOCIETE', null, 3, 8, 'https://placehold.co/300x200?text=Dixit') RETURNING id INTO _DIXIT;
-    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Codenames', 'SOCIETE', null, 4, 8, 'https://placehold.co/300x200?text=Codenames') RETURNING id INTO _CODENAMES;
-    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('7 Wonders', 'SOCIETE', null, 3, 7, 'https://placehold.co/300x200?text=7+Wonders') RETURNING id INTO _7_WONDERS;
+    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Catan', 'SOCIETE', null, 3, 4, null) RETURNING id INTO _CATAN;
+    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Dixit', 'SOCIETE', null, 3, 8, null) RETURNING id INTO _DIXIT;
+    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Codenames', 'SOCIETE', null, 4, 8, null) RETURNING id INTO _CODENAMES;
+    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('7 Wonders', 'SOCIETE', null, 3, 7, null) RETURNING id INTO _7_WONDERS;
 
     -- Jeux vidéo
-    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Mario Kart 8 Deluxe', 'JEU_VIDEO', 'Nintendo Switch', 1, 4, 'https://placehold.co/300x200?text=Mario+Kart') RETURNING id INTO _MARIO_KART;
-    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Super Smash Bros. Ultimate', 'JEU_VIDEO', 'Nintendo Switch', 2, 8, 'https://placehold.co/300x200?text=Smash+Bros') RETURNING id INTO _SMASH;
-    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Rocket League', 'JEU_VIDEO', 'PC', 2, 8, 'https://placehold.co/300x200?text=Rocket+League') RETURNING id INTO _ROCKET_LEAGUE;
-    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Street Fighter 6', 'JEU_VIDEO', 'PS5', 2, 2, 'https://placehold.co/300x200?text=Street+Fighter+6') RETURNING id INTO _STREET_FIGHTER;
+    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Mario Kart 8 Deluxe', 'JEU_VIDEO', 'Nintendo Switch', 1, 4, 'https://media.rawg.io/media/games/6f8/6f846e941c78cfbabe53cd67e55ced83.jpg') RETURNING id INTO _MARIO_KART;
+    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Super Smash Bros. Ultimate', 'JEU_VIDEO', 'Nintendo Switch', 2, 8, 'https://media.rawg.io/media/games/9f3/9f3c513b301d8d7250a64dd7e73c62df.jpg') RETURNING id INTO _SMASH;
+    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Rocket League', 'JEU_VIDEO', 'PC, Xbox One, PlayStation 4, Nintendo Switch', 2, 8, 'https://media.rawg.io/media/games/8cc/8cce7c0e99dcc43d66c8efd42f9d03e3.jpg') RETURNING id INTO _ROCKET_LEAGUE;
+    INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Street Fighter 6', 'JEU_VIDEO', 'PC, PlayStation 5, PlayStation 4, Xbox Series S/X', 2, 2, 'https://media.rawg.io/media/games/ce2/ce2463db40cec363f360c29ddcc56884.jpg') RETURNING id INTO _STREET_FIGHTER;
 
     -- ---------- Soirée 1 : jeux de société chez Léa ----------
     INSERT INTO soirees (date, lieu) VALUES ('2026-09-12 20:00', 'Chez Léa') RETURNING id INTO _SOIREE;

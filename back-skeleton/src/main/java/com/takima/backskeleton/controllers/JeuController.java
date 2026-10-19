@@ -2,6 +2,8 @@ package com.takima.backskeleton.controllers;
 
 import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.JeuDto;
+import com.takima.backskeleton.DTO.RawgImportDto;
+import com.takima.backskeleton.DTO.RawgJeuDto;
 import com.takima.backskeleton.models.TypeJeu;
 import com.takima.backskeleton.services.JeuService;
 import org.springframework.http.HttpStatus;
@@ -48,6 +50,19 @@ public class JeuController {
     @ResponseStatus(HttpStatus.CREATED)
     public JeuDto addJeu(@RequestBody JeuDto jeuDto) {
         return jeuService.addJeu(jeuDto);
+    }
+
+    // Recherche de jeux vidéo sur RAWG, pas encore dans la ludothèque : GET /jeux/rawg?recherche=zelda
+    @GetMapping("/rawg")
+    public List<RawgJeuDto> rechercherSurRawg(@RequestParam String recherche) {
+        return jeuService.rechercherSurRawg(recherche);
+    }
+
+    // Import d'un jeu RAWG dans la ludothèque, avec le nombre de joueurs en corps de requête
+    @PostMapping("/rawg/{idRawg}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public JeuDto importerDepuisRawg(@PathVariable Long idRawg, @RequestBody RawgImportDto importDto) {
+        return jeuService.importerDepuisRawg(idRawg, importDto);
     }
 
     @PutMapping("/{id}")

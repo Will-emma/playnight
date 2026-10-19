@@ -12,4 +12,7 @@ public interface JeuDao extends JpaRepository<Jeu, Long> {
     List<Jeu> findAllByOrderByNomAsc();
 
     List<Jeu> findByTypeOrderByNomAsc(TypeJeu type);
+
+    // "zelda" et "Zelda" sont considérés comme le même jeu
+    boolean existsByNomIgnoreCase(String nom);
 }

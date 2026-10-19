@@ -47,6 +47,14 @@ DATABASE_NAME=playnight
 
 Le fichier `.env` reste sur votre machine : il est exclu de Git.
 
+Facultatif : pour importer des jeux vidéo depuis RAWG (bonus), créer une clé gratuite sur [rawg.io/apidocs](https://rawg.io/apidocs) et l'ajouter dans le même fichier :
+
+```properties
+RAWG_API_KEY=votre_clé
+```
+
+Sans cette clé, l'appli fonctionne normalement ; seul l'import RAWG est indisponible.
+
 ## Lancement
 
 Le projet se lance dans **deux terminaux**, ouverts depuis la racine du projet et laissés ouverts pendant le développement.

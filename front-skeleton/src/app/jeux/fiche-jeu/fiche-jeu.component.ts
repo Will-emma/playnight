@@ -48,7 +48,7 @@ export class FicheJeuComponent implements OnInit {
 
   nombreJoueurs(jeu: Jeu): string {
     if (jeu.nbJoueursMin == null || jeu.nbJoueursMax == null) return "Nombre de joueurs non renseigné"
-    if (jeu.nbJoueursMin === jeu.nbJoueursMax) return `${jeu.nbJoueursMin} joueurs`
+    if (jeu.nbJoueursMin === jeu.nbJoueursMax) return pluriel(jeu.nbJoueursMin, "joueur") // "1 joueur", "2 joueurs"
     return `${jeu.nbJoueursMin} à ${jeu.nbJoueursMax} joueurs`
   }
 

@@ -15,6 +15,21 @@ export interface Jeu {
   image: string | null
 }
 
+// Un jeu vidéo trouvé sur RAWG, pas encore dans la ludothèque : GET /jeux/rawg?recherche=...
+export interface RawgJeu {
+  idRawg: number
+  nom: string
+  image: string | null
+  plateforme: string | null // jusqu'à 4 plateformes : "PC, PlayStation 5, Xbox One, Nintendo Switch"
+  dateSortie: string | null // "2017-03-03"
+}
+
+// Corps de POST /jeux/rawg/{idRawg} : RAWG ne donne pas le nombre de joueurs, l'utilisateur le saisit
+export interface RawgImport {
+  nbJoueursMin: number
+  nbJoueursMax: number
+}
+
 // Résumé d'un jeu, renvoyé quand un jeu est lié à autre chose (profil d'un joueur…)
 export type JeuResume = Pick<Jeu, "id" | "nom" | "type" | "image">
 

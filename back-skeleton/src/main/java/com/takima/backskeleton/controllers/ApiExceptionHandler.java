@@ -1,5 +1,6 @@
 package com.takima.backskeleton.controllers;
 
+import com.takima.backskeleton.services.RawgIndisponibleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -38,6 +39,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleRegleMetier(IllegalArgumentException exception) {
         return error(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    // RAWG inutilisable (clé absente ou refusée, API qui ne répond pas) : 503 avec un message explicite
+    @ExceptionHandler(RawgIndisponibleException.class)
+    public ResponseEntity<Map<String, String>> handleRawgIndisponible(RawgIndisponibleException exception) {
+        return error(HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
