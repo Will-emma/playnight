@@ -1,28 +1,91 @@
-<span class="title">Bonjour à vous !</span>
-<div>
-  <span class="welcome">Bienvenue sur ce super template de code Angular </span>
-  <img src="assets/sun.gif" height="100">
-</div>
-<span class="title">Qu'est ce que vous allez faire pendant ce cours ?</span>
-<div class="card-group">
-  <div class="card">
-    <img class="card-img-top" src="assets/img1.png" alt="Card image cap" />
-    <div class="card-body">
-      <p class="card-text">
-        Une merveilleuse web app from scratch JAVA Spring - Angular
-      </p>
+<main class="accueil">
+  <!-- Bandeau : présentation de PlayNight -->
+  <section class="bandeau" aria-labelledby="titre-accueil">
+    <p class="eyebrow"><span class="eyebrow__dot"></span> BIENVENUE SUR PLAYNIGHT</p>
+    <h1 id="titre-accueil">Vos soirées jeux,<br /><span class="bandeau__accent">au même endroit.</span></h1>
+    <p class="bandeau__texte">
+      Notez les parties de vos soirées entre amis, jeux de société comme jeux vidéo, et suivez qui gagne le plus souvent.
+    </p>
+    <div class="bandeau__actions">
+      <a class="bouton bouton--principal" routerLink="/soirees/nouvelle">+ Nouvelle soirée</a>
+      <a class="bouton" routerLink="/soirees">Voir les soirées</a>
     </div>
-  </div>
-  <div class="card">
-    <img class="card-img-top" src="assets/img2.png" alt="Card image cap" />
-    <div class="card-body">
-      <p class="card-text">Avec une super team de 3 ou 4 personnes</p>
+  </section>
+
+  @if (erreur === "indisponible") {
+    <section class="state-panel" role="alert">
+      <h2>Les chiffres et les dernières soirées sont momentanément indisponibles</h2>
+      <p>Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
+    </section>
+  } @else {
+    <!-- Chiffres clés -->
+    <ul class="chiffres" aria-label="PlayNight en chiffres">
+      <li class="chiffre">
+        <strong>{{ nbJeux }}</strong>
+        <span>{{ nbJeux > 1 ? "jeux dans la ludothèque" : "jeu dans la ludothèque" }}</span>
+      </li>
+      <li class="chiffre">
+        <strong>{{ nbSoirees }}</strong>
+        <span>{{ nbSoirees > 1 ? "soirées organisées" : "soirée organisée" }}</span>
+      </li>
+      <li class="chiffre">
+        <strong>{{ nbParties }}</strong>
+        <span>{{ nbParties > 1 ? "parties jouées" : "partie jouée" }}</span>
+      </li>
+    </ul>
+
+    <!-- Dernières soirées : mêmes cartes que la liste des soirées -->
+    <section class="section" aria-labelledby="titre-recentes">
+      <div class="section__entete">
+        <h2 id="titre-recentes">Dernières soirées</h2>
+        @if (nbSoirees > 0) {
+          <a class="lien-discret" routerLink="/soirees">Toutes les soirées →</a>
+        }
+      </div>
+
+      @if (soireesRecentes.length === 0) {
+        <div class="state-panel">
+          <p>Aucune soirée pour l'instant : créez la première !</p>
+          <a class="bouton bouton--principal" routerLink="/soirees/nouvelle">Créer une soirée</a>
+        </div>
+      } @else {
+        <ul class="liste">
+          @for (soiree of soireesRecentes; track soiree.id) {
+            <li class="carte">
+              <p class="carte__date">{{ formaterDate(soiree.date) }}</p>
+              <h3>
+                <!-- Lien "étiré" sur toute la carte (voir .carte__lien dans styles.scss) -->
+                <a class="carte__lien" [routerLink]="['/soirees', soiree.id]">{{ soiree.lieu }}</a>
+              </h3>
+              <p class="carte__resume">{{ pluriel(soiree.nbParties, "partie") }} · {{ pluriel(soiree.joueurs.length, "joueur") }}</p>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  <!-- Raccourcis vers les pages principales -->
+  <section class="section" aria-labelledby="titre-raccourcis">
+    <div class="section__entete">
+      <h2 id="titre-raccourcis">Par où commencer ?</h2>
     </div>
-  </div>
-  <div class="card">
-    <img class="card-img-top" src="assets/img3.png" alt="Card image cap" />
-    <div class="card-body">
-      <p class="card-text">Encadrés par un intervenant prêt à dégainer sa magie noire pour vous aider</p>
-    </div>
-  </div>
-</div>
+    <ul class="liste">
+      <li class="carte raccourci">
+        <span class="raccourci__icone" aria-hidden="true">♟</span>
+        <h3><a class="carte__lien" routerLink="/jeux">La ludothèque</a></h3>
+        <p class="carte__resume">Parcourez les jeux de société et jeux vidéo, et découvrez qui y brille.</p>
+      </li>
+      <li class="carte raccourci">
+        <span class="raccourci__icone" aria-hidden="true">✦</span>
+        <h3><a class="carte__lien" routerLink="/soirees">Les soirées</a></h3>
+        <p class="carte__resume">Revivez chaque soirée : les parties jouées, les classements et les scores.</p>
+      </li>
+      <li class="carte raccourci">
+        <span class="raccourci__icone" aria-hidden="true">+</span>
+        <h3><a class="carte__lien" routerLink="/soirees/nouvelle">Nouvelle soirée</a></h3>
+        <p class="carte__resume">Enregistrez une soirée en quelques étapes : joueurs, parties puis scores.</p>
+      </li>
+    </ul>
+  </section>
+</main>
