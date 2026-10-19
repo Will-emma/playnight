@@ -1,6 +1,15 @@
 import { JeuResume } from "./jeu.model"
 import { Joueur } from "./joueur.model"
 
+// Une soirée dans la liste : GET /soirees (de la plus récente à la plus ancienne)
+export interface SoireeResume {
+  id: number
+  date: string // format ISO sans fuseau : "2026-09-12T20:00:00"
+  lieu: string
+  joueurs: Joueur[] // joueurs présents
+  nbParties: number
+}
+
 // Création d'une soirée en une seule requête : POST /soirees (et PUT /soirees/{id})
 // En écriture, les objets liés sont désignés par leur id (voir docs/format-dto.md)
 export interface SoireeCreation {

@@ -19,6 +19,8 @@ import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree
 import { NouvelleSoireeResolver } from "soirees/nouvelle-soiree/nouvelle-soiree.resolver"
 import { DetailSoireeComponent } from "soirees/detail-soiree/detail-soiree.component"
 import { DetailSoireeResolver } from "soirees/detail-soiree/detail-soiree.resolver"
+import { SoireesComponent } from "soirees/soirees.component"
+import { SoireesResolver } from "soirees/soirees.resolver"
 
 const routes: Routes = [
   { path: "", component: HomeComponent },
@@ -36,6 +38,11 @@ const routes: Routes = [
     path: "joueurs/:id",
     component: ProfilJoueurComponent,
     resolve: { profilJoueurPage: ProfilJoueurResolver },
+  },
+  {
+    path: "soirees",
+    component: SoireesComponent,
+    resolve: { soireesPage: SoireesResolver },
   },
   {
     // À garder avant "soirees/:id", sinon "nouvelle" serait lu comme un id
