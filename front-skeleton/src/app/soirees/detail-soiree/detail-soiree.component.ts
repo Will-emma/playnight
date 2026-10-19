@@ -45,7 +45,7 @@ export class DetailSoireeComponent implements OnInit {
     })
   }
 
-  // La liste des soirées (#12) n'existe pas encore et on arrive ici depuis plusieurs pages : on revient à la précédente
+  // On arrive ici depuis plusieurs pages (liste des soirées, profil joueur…) : on revient à la précédente
   retour(): void {
     this.location.back()
   }

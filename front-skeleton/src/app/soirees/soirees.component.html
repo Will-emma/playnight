@@ -1,0 +1,57 @@
+<main class="soirees">
+  <section class="entete" aria-labelledby="titre-soirees">
+    <div>
+      <p class="eyebrow"><span class="eyebrow__dot"></span> PLAYNIGHT · VOS SOIRÉES</p>
+      <h1 id="titre-soirees">Les soirées</h1>
+      @if (!erreur) {
+        <p class="entete__resume">{{ soirees.length === 0 ? "Aucune soirée pour l'instant" : pluriel(soirees.length, "soirée") }}</p>
+      }
+    </div>
+    <a class="bouton bouton--principal" routerLink="/soirees/nouvelle">+ Nouvelle soirée</a>
+  </section>
+
+  @if (erreur === "indisponible") {
+    <section class="state-panel" role="alert">
+      <h2>Les soirées sont momentanément indisponibles</h2>
+      <p>Vérifiez que l'API PlayNight est lancée, puis réessayez.</p>
+      <button type="button" class="bouton" [disabled]="chargement" (click)="recharger()">
+        {{ chargement ? "Chargement…" : "Réessayer" }}
+      </button>
+    </section>
+  } @else if (soirees.length === 0) {
+    <section class="state-panel">
+      <h2>Aucune soirée enregistrée</h2>
+      <p>Créez votre première soirée pour garder la trace des parties et des scores.</p>
+      <a class="bouton bouton--principal" routerLink="/soirees/nouvelle">Créer une soirée</a>
+    </section>
+  } @else {
+    <!-- De la plus récente à la plus ancienne (ordre renvoyé par le back) -->
+    <ul class="liste">
+      @for (soiree of soirees; track soiree.id) {
+        <li class="carte">
+          <p class="carte__date">{{ formaterDate(soiree.date) }}</p>
+          <h2>
+            <!-- Lien "étiré" sur toute la carte (voir .carte__lien dans styles.scss) -->
+            <a class="carte__lien" [routerLink]="['/soirees', soiree.id]">{{ soiree.lieu }}</a>
+          </h2>
+          <p class="carte__resume">{{ pluriel(soiree.nbParties, "partie") }} · {{ pluriel(soiree.joueurs.length, "joueur") }}</p>
+
+          @if (soiree.joueurs.length > 0) {
+            <div class="avatars" role="img" [attr.aria-label]="'Joueurs présents : ' + listePseudos(soiree)">
+              @for (joueur of avatarsAffiches(soiree); track joueur.id) {
+                @if (joueur.avatar) {
+                  <img class="avatar" [src]="joueur.avatar" alt="" [title]="joueur.pseudo" />
+                } @else {
+                  <span class="avatar" [title]="joueur.pseudo">{{ initiale(joueur.pseudo) }}</span>
+                }
+              }
+              @if (nbJoueursMasques(soiree) > 0) {
+                <span class="avatar avatar--reste">+{{ nbJoueursMasques(soiree) }}</span>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</main>
