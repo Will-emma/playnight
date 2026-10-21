@@ -1,3 +1,4 @@
+
 import { NgModule } from "@angular/core"
 import { RouterModule, Routes } from "@angular/router"
 import { HomeComponent } from "home/home.component"
@@ -15,6 +16,8 @@ import { JeuxResolver } from "jeux/jeux.resolver"
 import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
 import { FicheJeuResolver } from "jeux/fiche-jeu/fiche-jeu.resolver"
 import { ImporterJeuComponent } from "jeux/importer-jeu/importer-jeu.component"
+import { JoueursComponent } from "joueurs/joueurs.component"
+import { JoueursResolver } from "joueurs/joueurs.resolver"
 import { ProfilJoueurComponent } from "joueurs/profil-joueur/profil-joueur.component"
 import { ProfilJoueurResolver } from "joueurs/profil-joueur/profil-joueur.resolver"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
@@ -45,6 +48,11 @@ const routes: Routes = [
     path: "jeux/:id",
     component: FicheJeuComponent,
     resolve: { ficheJeuPage: FicheJeuResolver },
+  },
+  {
+    path: "joueurs",
+    component: JoueursComponent,
+    resolve: { joueursPage: JoueursResolver },
   },
   {
     path: "joueurs/:id",

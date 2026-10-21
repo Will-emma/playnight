@@ -1,3 +1,4 @@
+
 import { HttpClient } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 import { Observable } from "rxjs"
@@ -13,6 +14,10 @@ export class JoueurService {
 
   findAll(): Observable<Joueur[]> {
     return this.http.get<Joueur[]>(this.joueursUrl)
+  }
+
+  create(joueur: Pick<Joueur, "pseudo" | "avatar">): Observable<Joueur> {
+    return this.http.post<Joueur>(this.joueursUrl, joueur)
   }
 
   getProfil(id: number): Observable<ProfilJoueur> {
