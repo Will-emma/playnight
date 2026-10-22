@@ -439,55 +439,129 @@ app-profil-joueur {
 app-detail-soiree {
   display: block;
   min-height: calc(100vh - 80px);
+  overflow-x: hidden; // le halo de l'en-tête ne doit pas créer de défilement horizontal
   color: var(--library-text);
   background: var(--library-bg);
 
-  .detail-soiree { max-width: 1100px; margin: auto; padding: 32px clamp(16px, 5vw, 64px) 72px; }
-  .retour { margin-bottom: 24px; padding: 0; border: none; color: var(--library-muted); background: none; font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; }
+  .detail-soiree { max-width: 1200px; margin: auto; padding: 32px clamp(16px, 5vw, 64px) 72px; }
+  .retour { position: relative; z-index: 1; margin-bottom: 24px; padding: 0; border: none; color: var(--library-muted); background: none; font: inherit; font-size: .88rem; font-weight: 700; cursor: pointer; }
   .retour:hover { color: var(--library-accent); }
   a { color: inherit; font-weight: 700; text-decoration: none; }
-  a:hover { color: var(--library-accent); text-decoration: underline; }
+  a:hover { color: var(--library-accent); }
   a:focus-visible, button:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
 
-  // En-tête : date, lieu et joueurs présents
-  .entete { margin-bottom: 32px; }
-  .entete__date { margin: 0 0 8px; color: var(--library-accent); font-size: .85rem; font-weight: 700; letter-spacing: .04em; }
-  .entete__date::first-letter { text-transform: uppercase; }
+  // Avatars : vraie image ou initiale sur la couleur du joueur
+  .avatar { display: grid; overflow: hidden; flex: none; width: 34px; height: 34px; place-items: center; border-radius: 50%; color: #11131f; font-size: .85rem; font-weight: 900; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar--petit { width: 28px; height: 28px; font-size: .75rem; }
+  .avatar--star { width: 68px; height: 68px; border: 3px solid var(--library-accent); box-shadow: 0 0 24px var(--library-accent-glow); font-size: 1.7rem; }
+  .couronne { flex: none; width: 22px; height: 16px; fill: var(--library-accent); }
+
+  // En-tête : date, lieu, résumé et star de la soirée
+  .entete { position: relative; margin-bottom: 48px; }
+  .entete__halo { position: absolute; top: -140px; left: 30%; width: min(520px, 100%); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #e9562e1c 0%, #f8b83f12 40%, transparent 70%); pointer-events: none; }
+  .entete__ligne { position: relative; display: flex; flex-wrap: wrap; align-items: stretch; gap: 24px; margin-bottom: 28px; }
+  .entete__principal { display: flex; flex: 1 1 520px; flex-wrap: wrap; align-items: center; gap: 24px; min-width: 0; }
+  .entete__texte { display: grid; gap: 14px; min-width: 0; }
+  .date { display: flex; flex: none; width: 104px; height: 116px; margin: 0; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--library-accent); border-radius: 22px; background: var(--library-card); box-shadow: 0 0 30px #f8b83f40; }
+  .date__jour { color: var(--library-muted); font-size: .8rem; font-weight: 700; letter-spacing: .08em; }
+  .date__numero { font-size: 2.8rem; font-weight: 900; line-height: 1; }
+  .date__mois { color: var(--library-accent); font-size: .8rem; font-weight: 700; letter-spacing: .08em; }
+  .eyebrow { display: flex; align-items: center; gap: 9px; margin: 0; color: var(--library-accent); font-size: .72rem; font-weight: 700; letter-spacing: .16em; }
+  .eyebrow__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--library-accent); box-shadow: 0 0 14px var(--library-accent-glow); }
   // .detail-soiree devant h1 : sinon la typographie Material (.mat-typography h1) l'emporte
-  .detail-soiree h1 { margin: 0 0 8px; font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 750; line-height: 1.05; letter-spacing: -.05em; }
-  .entete__resume { margin: 0 0 18px; color: var(--library-muted); }
-  .presents { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
-  .present { display: flex; align-items: center; gap: 9px; border: 1px solid var(--library-line); border-radius: 999px; padding: 6px 14px 6px 6px; background: var(--library-surface); font-size: .9rem; }
-  .present:hover { border-color: var(--library-accent-border); text-decoration: none; }
-  .present img, .present__initiale { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: var(--library-accent); background: var(--library-art-bg); font-weight: 800; }
+  .detail-soiree h1 { overflow-wrap: anywhere; margin: 0; font-size: clamp(2.4rem, 6vw, 3.8rem); font-weight: 900; line-height: 1; letter-spacing: -.05em; }
+  .pastilles { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .pastille { flex: none; padding: 6px 12px; border: 1px solid var(--library-line); border-radius: 12px; color: var(--library-secondary); background: var(--library-card); font-size: .85rem; white-space: nowrap; }
+  .pastille strong { color: var(--library-text); }
 
-  // Une carte par partie
-  .parties { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 20px; }
-  .partie { padding: 20px 22px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); }
-  .partie__entete { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-  .detail-soiree .partie h2 { display: grid; gap: 2px; margin: 0; font-size: 1.15rem; font-weight: 700; }
-  .partie__numero { color: var(--library-muted); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  .partie__duree { flex: none; border-radius: 99px; padding: 3px 10px; color: var(--library-secondary); background: var(--library-card); font-size: .8rem; font-weight: 700; }
+  // Star de la soirée : encart doré, cliquable vers le profil
+  .star { display: flex; flex: 0 1 320px; align-items: center; gap: 18px; min-width: 260px; padding: 22px 20px 20px; border: 1px solid var(--library-accent-border); border-radius: 22px; background: var(--library-accent-soft); transition: transform .2s ease, box-shadow .2s ease; }
+  .star:hover { color: inherit; transform: translateY(-3px); box-shadow: 0 14px 30px #0006; }
+  .star__avatar-bloc { position: relative; flex: none; }
+  .star__couronne { position: absolute; top: -18px; left: 50%; width: 28px; height: 20px; fill: var(--library-accent); transform: translateX(-50%); }
+  .star__texte { display: grid; gap: 2px; min-width: 0; }
+  .star__titre { color: var(--library-accent); font-size: .72rem; font-weight: 700; letter-spacing: .1em; }
+  .star__pseudo { overflow: hidden; font-size: 1.5rem; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+  .star__detail { color: #e0c48f; font-size: .85rem; font-weight: 400; }
 
-  // Classement d'une partie (chacun pour soi ou par équipe)
+  // Joueurs présents, avec leurs victoires de la soirée
+  .presents { position: relative; display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .present { display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border: 1px solid var(--library-line); border-radius: 999px; background: var(--library-card); font-size: .9rem; }
+  .present:hover { border-color: var(--library-accent-border); }
+  .present__victoires { color: var(--library-muted); font-size: .8rem; font-weight: 400; }
+
+  // Frise des parties : trait en pointillés et puce numérotée devant chaque partie
+  .detail-soiree .titre-section { margin: 0 0 22px; font-size: 1.7rem; font-weight: 900; }
+  .frise { display: grid; gap: 22px; margin: 0 0 0 17px; padding: 0 0 0 48px; border-left: 2px dashed var(--library-line); list-style: none; }
+  .partie { position: relative; display: flex; flex-wrap: wrap; gap: 22px; padding: 22px; border: 1px solid var(--library-line); border-radius: 22px; background: var(--library-surface); }
+  .partie__puce { position: absolute; top: 28px; left: -67px; display: grid; width: 34px; height: 34px; place-items: center; border: 2px solid var(--library-accent); border-radius: 50%; color: var(--library-accent); background: var(--library-bg); font-size: .85rem; font-weight: 900; }
+
+  // Couverture du jeu (vraie image ou couleur + initiale)
+  .couverture { position: relative; display: flex; overflow: hidden; flex: 0 0 150px; aspect-ratio: 3 / 4; flex-direction: column; justify-content: flex-end; padding: 12px; border-radius: 16px; color: #11131f; box-shadow: 0 12px 26px #0007; }
+  .couverture:hover { color: #11131f; }
+  .couverture__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .couverture__initiale { font-size: 4rem; font-weight: 900; line-height: .85; }
+  .couverture__type { position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 999px; color: var(--library-text); background: #11131fcc; font-size: .7rem; font-weight: 700; }
+  .couverture__nom { position: relative; font-size: .85rem; font-weight: 700; line-height: 1.2; }
+  // Sur une vraie image, le nom passe en clair sur un fond dégradé pour rester lisible
+  .couverture__image ~ .couverture__nom { margin: 0 -12px -12px; padding: 28px 12px 12px; color: var(--library-text); background: linear-gradient(transparent, #11131fe6); }
+
+  .partie__contenu { display: flex; flex: 1 1 380px; min-width: 0; flex-direction: column; gap: 12px; }
+  .partie__entete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .detail-soiree .partie h3 { display: grid; gap: 2px; margin: 0; font-size: 1.5rem; font-weight: 900; }
+  .partie__numero { color: var(--library-muted); font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+
+  // Chacun pour soi : bandeau doré du vainqueur, puis une ligne par joueur
   .classement { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-  .classement__ligne { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid transparent; border-radius: 12px; background: var(--library-card); }
-  .classement__ligne--premier { border-color: var(--library-accent-border-soft); background: var(--library-accent-soft); }
-  .classement__rang { flex: none; min-width: 34px; color: var(--library-muted); font-size: .85rem; font-weight: 800; }
-  .classement__ligne--premier .classement__rang { color: var(--library-accent); }
-  .classement__joueur { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .classement__equipe { display: grid; flex: 1; gap: 2px; min-width: 0; }
-  .classement__nom-equipe { color: var(--library-muted); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-  .classement__ligne--premier .classement__nom-equipe { color: var(--library-accent); }
-  .classement__points-membre { color: var(--library-muted); font-weight: 600; }
-  .classement__points { flex: none; color: var(--library-secondary); font-size: .85rem; white-space: nowrap; }
+  .vainqueur { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--library-accent-border); border-radius: 14px; background: var(--library-accent-soft); }
+  .vainqueur .avatar { width: 40px; height: 40px; font-size: 1rem; }
+  .vainqueur__texte { display: grid; flex: 1; min-width: 0; font-size: 1.05rem; }
+  .vainqueur__detail { color: #e0c48f; font-size: .8rem; }
+  .vainqueur__points { flex: none; color: var(--library-accent); font-size: 1.2rem; font-weight: 900; }
+  .ligne { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; background: var(--library-card); font-size: .9rem; }
+  .ligne__rang { flex: none; min-width: 32px; color: var(--library-muted); font-weight: 900; }
+  .ligne__rang--2 { color: #c5c9d9; }
+  .ligne__rang--3 { color: #d0956a; }
+  .ligne__joueur { overflow: hidden; flex: 1; min-width: 0; text-overflow: ellipsis; white-space: nowrap; }
+  .barre { overflow: hidden; flex: 0 1 140px; height: 6px; border-radius: 999px; background: #2a2f45; }
+  .barre span { display: block; height: 100%; border-radius: 999px; background: #5d6585; }
+  .ligne__points { flex: none; min-width: 70px; color: var(--library-muted); text-align: right; white-space: nowrap; }
 
-  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 10px; padding: 10px 18px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; cursor: pointer; }
-  .bouton--principal, .bouton--principal:hover { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); text-decoration: none; }
+  // En équipes : une carte par équipe, la gagnante en doré, "VS" entre deux équipes
+  .equipes { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .equipe { display: flex; flex: 1 1 220px; min-width: 0; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--library-line); border-radius: 14px; background: var(--library-card); }
+  .equipe--gagnante { border-color: var(--library-accent-border); background: var(--library-accent-soft); }
+  .equipe__entete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+  .equipe__nom { display: flex; align-items: center; gap: 8px; color: var(--library-secondary); font-weight: 900; }
+  .equipe--gagnante .equipe__nom, .equipe--gagnante .equipe__points { color: var(--library-accent); }
+  .equipe__points { color: var(--library-secondary); font-size: 1.1rem; font-weight: 900; }
+  .equipe__membres { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .membre { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border: 1px solid var(--library-line); border-radius: 999px; background: #11131f66; font-size: .85rem; }
+  .membre__points { color: var(--library-muted); font-weight: 400; }
+  .equipes__vs { display: grid; place-items: center; color: var(--library-muted); font-size: .85rem; font-weight: 900; }
 
-  .state-panel { display: grid; justify-items: center; gap: 10px; padding: 40px 24px; border: 1px solid var(--library-line); border-radius: 18px; text-align: center; background: var(--library-surface); }
+  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 12px; padding: 12px 22px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .bouton--principal, .bouton--principal:hover { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); }
+
+  .state-panel { display: grid; justify-items: center; gap: 10px; padding: 40px 24px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); text-align: center; }
   .state-panel h2 { margin: 0; font-size: 1.3rem; }
   .state-panel p { margin: 0 0 8px; color: var(--library-muted); }
+
+  // Petits écrans : plus de frise, la couverture passe au-dessus du contenu
+  @media (max-width: 600px) {
+    .frise { margin-left: 0; padding-left: 0; border-left: 0; }
+    .partie__puce { display: none; }
+    .partie { padding: 16px; }
+    .couverture { flex-basis: 100%; aspect-ratio: auto; height: 140px; }
+    .star { flex-basis: 100%; }
+    .barre { display: none; }
+  }
+
+  // Pas d'animation au survol pour les personnes qui les ont désactivées dans leur système
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+  }
 }
 
 // Page Liste des soirées
