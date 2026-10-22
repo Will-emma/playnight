@@ -89,6 +89,28 @@ class JoueurServiceTest {
     }
 
     @Test
+    void addJoueurWithoutAvatarGetsDiceBearAvatarFromPseudo() {
+        when(joueurDao.save(any(Joueur.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        joueurService.addJoueur(dto(null, "Léa la Rouge", "  "));
+
+        ArgumentCaptor<Joueur> captor = ArgumentCaptor.forClass(Joueur.class);
+        verify(joueurDao).save(captor.capture());
+        assertEquals("https://api.dicebear.com/9.x/adventurer/svg?seed=L%C3%A9a%20la%20Rouge", captor.getValue().getAvatar());
+    }
+
+    @Test
+    void addJoueurKeepsGivenAvatar() {
+        when(joueurDao.save(any(Joueur.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        joueurService.addJoueur(dto(null, "Max", "https://example.com/max.png"));
+
+        ArgumentCaptor<Joueur> captor = ArgumentCaptor.forClass(Joueur.class);
+        verify(joueurDao).save(captor.capture());
+        assertEquals("https://example.com/max.png", captor.getValue().getAvatar());
+    }
+
+    @Test
     void updateJoueurUsesPathIdInsteadOfRequestId() {
         when(joueurDao.findById(3L)).thenReturn(Optional.of(joueur(3L, "Ancien", null)));
         when(joueurDao.save(any(Joueur.class))).thenReturn(joueur(3L, "Sam", null));
