@@ -1,10 +1,15 @@
 import { Location } from "@angular/common"
 import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
-import { JeuResume } from "models/jeu.model"
 import { JeuFavori, PartieHistorique, ProfilJoueur } from "models/joueur.model"
 import { formaterDate, pluriel } from "utils/format"
 import { ProfilJoueurPageData } from "./profil-joueur.resolver"
+
+// Mêmes couleurs que les couvertures de la Ludothèque et les avatars de la page Joueurs
+const COULEURS = ["#e9562e", "#397df2", "#2fc0b5", "#f5b73e", "#9c5be1", "#ed3f70"]
+
+// Jauge du taux de victoire : cercle de rayon 26 (voir le gabarit), dont on remplit une part du périmètre
+const PERIMETRE_JAUGE = 2 * Math.PI * 26
 
 @Component({
   selector: "app-profil-joueur",
@@ -17,12 +22,14 @@ export class ProfilJoueurComponent implements OnInit {
   readonly nbPartiesAffichees = 10
   readonly formaterDate = formaterDate
   readonly pluriel = pluriel
+  readonly perimetreJauge = PERIMETRE_JAUGE
 
   profil: ProfilJoueur | null = null
   erreur: ProfilJoueurPageData["erreur"] = null
   tousLesFavoris = false
   toutLHistorique = false
-  readonly imagesIndisponibles = new Set<number>()
+  // Images qui n'ont pas pu être chargées (couvertures, avatar) : on affiche la couleur et l'initiale à la place
+  readonly imagesIndisponibles = new Set<string>()
 
   constructor(
     private route: ActivatedRoute,
@@ -51,6 +58,11 @@ export class ProfilJoueurComponent implements OnInit {
     return Math.round((this.profil.nbVictoires / this.profil.nbParties) * 100)
   }
 
+  // Longueur du trait de la jauge : la part du périmètre qui correspond au taux de victoire
+  get remplissageJauge(): string {
+    return `${(this.tauxVictoire / 100) * PERIMETRE_JAUGE} ${PERIMETRE_JAUGE}`
+  }
+
   get jeuxFavorisAffiches(): JeuFavori[] {
     const favoris = this.profil?.jeuxFavoris ?? []
     return this.tousLesFavoris ? favoris : favoris.slice(0, this.nbJeuxFavorisAffiches)
@@ -66,11 +78,19 @@ export class ProfilJoueurComponent implements OnInit {
     return rang === 1 ? "1er" : `${rang}e`
   }
 
-  initiale(jeu: JeuResume): string {
-    return jeu.nom.trim().charAt(0).toLocaleUpperCase("fr-FR")
+  aUneImage(url: string | null): boolean {
+    return !!url && !this.imagesIndisponibles.has(url)
   }
 
-  afficherImage(jeu: JeuResume): boolean {
-    return !!jeu.image && !this.imagesIndisponibles.has(jeu.id)
+  marquerIndisponible(url: string | null): void {
+    if (url) this.imagesIndisponibles.add(url)
+  }
+
+  couleur(id: number): string {
+    return COULEURS[Math.max(0, id - 1) % COULEURS.length]
+  }
+
+  initiale(texte: string): string {
+    return texte.trim().charAt(0).toLocaleUpperCase("fr-FR")
   }
 }
