@@ -1,6 +1,9 @@
 <nav>
   <div>
-    <img src="assets/takima-logo.png" routerLink="" />
+    <a class="brand" routerLink="">
+      <img src="assets/playnight-logo.svg" alt="" />
+      <span>PlayNight</span>
+    </a>
     <mat-nav-list>
       @for (link of links; track link) {
       <a mat-list-item routerLink="{{ link.href }}" routerLinkActive="active">

@@ -12,6 +12,6 @@ export class NavbarComponent {
   constructor() {
     this.links.push({ name: "Ludothèque", href: "jeux" })
     this.links.push({ name: "Joueurs", href: "joueurs" })
-    this.links.push({ name: "Filières", href: "filieres" })
+    this.links.push({ name: "Soirées", href: "soirees" })
   }
 }
