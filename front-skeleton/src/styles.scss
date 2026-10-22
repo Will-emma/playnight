@@ -309,63 +309,98 @@ app-nouvelle-soiree {
 app-fiche-jeu {
   display: block;
   min-height: calc(100vh - 80px);
+  overflow-x: hidden; // le fond flouté de l'en-tête ne doit pas créer de défilement horizontal
   color: var(--library-text);
   background: var(--library-bg);
 
-  .fiche-jeu { max-width: 1100px; margin: auto; padding: 32px clamp(16px, 5vw, 64px) 72px; }
-  .retour { display: inline-block; margin-bottom: 24px; color: var(--library-muted); font-size: .88rem; font-weight: 600; text-decoration: none; }
+  .fiche-jeu { max-width: 1200px; margin: auto; padding: 32px clamp(16px, 5vw, 64px) 72px; }
+  .retour { position: relative; z-index: 1; display: inline-block; margin-bottom: 24px; color: var(--library-muted); font-size: .88rem; font-weight: 700; text-decoration: none; }
   .retour:hover { color: var(--library-accent); }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
 
-  // En-tête : image et caractéristiques du jeu
-  .entete { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); align-items: center; gap: 32px; margin-bottom: 32px; }
-  .entete__image { display: grid; aspect-ratio: 3 / 2; place-items: center; overflow: hidden; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-art-bg); }
-  .entete__image img { width: 100%; height: 100%; object-fit: cover; }
-  .entete__initiale { color: var(--library-accent); font-size: 5rem; font-weight: 800; line-height: 1; }
-  .badge { display: inline-block; border-radius: 99px; padding: 6px 12px; color: var(--library-badge-text); background: var(--library-badge-bg); font-size: .72rem; font-weight: 700; }
+  .icone { flex: none; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .avatar { display: grid; overflow: hidden; flex: none; width: 34px; height: 34px; place-items: center; border-radius: 50%; color: #11131f; font-size: .85rem; font-weight: 900; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar--petit { width: 30px; height: 30px; font-size: .75rem; }
+
+  // En-tête : couverture et caractéristiques, sur un fond tiré de la couverture (image floutée ou couleur du jeu)
+  .entete { position: relative; display: flex; overflow: hidden; flex-wrap: wrap; align-items: center; gap: 36px; margin-bottom: 40px; padding: 32px; border: 1px solid var(--library-line); border-radius: 26px; background: radial-gradient(circle at 15% 30%, color-mix(in srgb, var(--cover-color) 30%, transparent), transparent 60%), var(--library-surface); }
+  .entete__fond { position: absolute; inset: 0; pointer-events: none; }
+  .entete__fond img { width: 100%; height: 100%; object-fit: cover; opacity: .28; filter: blur(36px) saturate(1.3); transform: scale(1.2); }
+  .entete__fond::after { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 20%, #11131fd9 75%); content: ""; }
+
+  .couverture { position: relative; display: flex; overflow: hidden; flex: 0 0 220px; aspect-ratio: 3 / 4; flex-direction: column; justify-content: flex-end; padding: 18px; border-radius: 20px; color: #11131f; background: var(--cover-color); box-shadow: 0 24px 50px #000a; transform: rotate(-2deg); }
+  .couverture__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .couverture__initiale { font-size: 6.5rem; font-weight: 900; line-height: .85; }
+  .couverture__nom { font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+
+  .entete__infos { position: relative; flex: 1 1 360px; min-width: 0; }
+  .badge { display: inline-block; border-radius: 99px; padding: 6px 12px; color: var(--library-badge-text); background: var(--library-accent); font-size: .75rem; font-weight: 700; }
   .badge--video { color: #e6e0ff; background: #282341; border: 1px solid #9b8cff66; }
   // .fiche-jeu devant h1 : sinon la typographie Material (.mat-typography h1) l'emporte
-  .fiche-jeu h1 { margin: 12px 0 20px; font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 750; line-height: 1.05; letter-spacing: -.05em; }
+  .fiche-jeu h1 { overflow-wrap: anywhere; margin: 14px 0 24px; font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 900; line-height: 1; letter-spacing: -.05em; }
   .caracteristiques { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; }
-  .caracteristiques div { min-width: 130px; padding: 12px 16px; border: 1px solid var(--library-line); border-radius: 14px; background: var(--library-surface); }
+  .caracteristique { display: flex; align-items: center; gap: 12px; min-width: 150px; padding: 14px 18px; border: 1px solid var(--library-line); border-radius: 16px; background: #11131fb3; }
+  .caracteristique .icone { color: var(--library-accent); }
   .caracteristiques dt { color: var(--library-muted); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
   .caracteristiques dd { margin: 4px 0 0; font-size: 1.05rem; font-weight: 700; }
 
   // Meilleurs joueurs et parties jouées, côte à côte
-  .colonnes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); align-items: start; gap: 20px; }
-  .bloc { padding: 22px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); }
-  .fiche-jeu .bloc h2 { margin: 0 0 16px; font-size: 1.15rem; font-weight: 700; }
+  .colonnes { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px; }
+  .bloc { flex: 1 1 380px; min-width: 0; padding: 26px; border: 1px solid var(--library-line); border-radius: 22px; background: var(--library-surface); }
+  .fiche-jeu .bloc h2 { margin: 0 0 22px; font-size: 1.5rem; font-weight: 900; }
   .vide { margin: 0; color: var(--library-muted); }
 
+  // Podium : le 1er au centre et plus haut ; or, argent, bronze
+  .podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 10px; margin: 0 0 16px; padding: 0; list-style: none; }
+  .podium__marche { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .podium__couronne { width: 28px; height: 20px; fill: var(--library-accent); }
+  .podium__joueur { display: flex; max-width: 100%; flex-direction: column; align-items: center; gap: 8px; color: var(--library-text); font-weight: 700; text-decoration: none; }
+  .podium__joueur:hover .podium__pseudo { color: var(--library-accent); text-decoration: underline; }
+  .podium__pseudo { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
+  .podium__avatar { width: 56px; height: 56px; border: 3px solid var(--podium-couleur); font-size: 1.4rem; }
+  .podium__victoires { color: var(--library-muted); font-size: .8rem; }
+  .podium__socle { display: grid; width: 100%; height: var(--podium-hauteur); place-items: center; border-radius: 12px 12px 0 0; color: var(--podium-couleur); background: var(--library-art-bg); font-size: 1.8rem; font-weight: 900; }
+  .podium__marche--1 { --podium-couleur: var(--library-accent); --podium-hauteur: 110px; }
+  .podium__marche--2 { --podium-couleur: #c5c9d9; --podium-hauteur: 78px; }
+  .podium__marche--3 { --podium-couleur: #d0956a; --podium-hauteur: 56px; }
+  .podium__marche--1 .podium__avatar { width: 68px; height: 68px; box-shadow: 0 0 24px var(--library-accent-glow); }
+  .podium__marche--1 .podium__socle { border: 1px solid var(--library-accent-border); border-bottom: 0; background: var(--library-accent-soft); font-size: 2.3rem; }
+
+  // Joueurs suivants (après le podium)
   .classement { display: grid; gap: 8px; margin: 0 0 8px; padding: 0; list-style: none; }
-  .classement__ligne { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--library-card); }
-  .classement__place { display: grid; flex: none; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: var(--library-text); background: var(--library-line); font-size: .85rem; font-weight: 800; }
-  .classement__place--premier { color: var(--library-badge-text); background: var(--library-accent); box-shadow: 0 0 14px var(--library-accent-glow); }
-  .classement__avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--library-art-bg); }
-  .classement__pseudo { flex: 1; overflow: hidden; color: inherit; font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+  .classement__ligne { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; background: var(--library-card); }
+  .classement__place { flex: none; min-width: 24px; color: var(--library-muted); font-weight: 900; text-align: center; }
+  .classement__pseudo { overflow: hidden; flex: 1; color: inherit; font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
   .classement__pseudo:hover { color: var(--library-accent); text-decoration: underline; }
   .classement__victoires { color: var(--library-muted); font-size: .85rem; white-space: nowrap; }
 
-  .parties { display: grid; margin: 0; padding: 0; list-style: none; }
-  .parties__ligne { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 12px 0; border-bottom: 1px solid var(--library-line); }
-  .parties__ligne:last-child { border-bottom: none; }
-  .parties__date { font-weight: 700; }
-  .parties__date::first-letter { text-transform: uppercase; }
-  .parties__duree { color: var(--library-muted); font-size: .88rem; }
-  .parties__vainqueurs { grid-column: 1 / -1; color: var(--library-secondary); font-size: .9rem; }
-  .parties__label { color: var(--library-accent); font-weight: 700; }
+  // Parties jouées : badge de date, jour complet, vainqueurs et durée
+  .parties { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .partie { display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 14px; background: var(--library-card); }
+  .partie__date { display: flex; flex: none; width: 52px; height: 56px; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--library-accent-border); border-radius: 14px; background: var(--library-surface); }
+  .partie__numero { font-size: 1.3rem; font-weight: 900; line-height: 1; }
+  .partie__mois { color: var(--library-accent); font-size: .65rem; font-weight: 700; letter-spacing: .06em; }
+  .partie__texte { display: grid; flex: 1; gap: 4px; min-width: 0; }
+  .partie__jour { color: var(--library-muted); font-size: .8rem; }
+  .partie__jour::first-letter { text-transform: uppercase; }
+  .partie__vainqueurs { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .partie__couronne { flex: none; width: 18px; height: 13px; fill: var(--library-accent); }
+  .pastille { flex: none; padding: 5px 10px; border: 1px solid var(--library-line); border-radius: 999px; color: var(--library-secondary); background: var(--library-surface); font-size: .8rem; white-space: nowrap; }
 
-  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 10px; padding: 10px 18px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 12px; padding: 12px 22px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
   .bouton--principal { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); }
   .bouton--discret { padding: 8px 4px; border-color: transparent; color: var(--library-accent); }
-  a:focus-visible, button:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
 
-  .state-panel { display: grid; justify-items: center; gap: 10px; padding: 40px 24px; border: 1px solid var(--library-line); border-radius: 18px; text-align: center; background: var(--library-surface); }
+  .state-panel { display: grid; justify-items: center; gap: 10px; padding: 40px 24px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); text-align: center; }
   .state-panel h2 { margin: 0; font-size: 1.3rem; }
   .state-panel p { margin: 0 0 8px; color: var(--library-muted); }
 
-  @media (max-width: 760px) {
-    .entete, .colonnes { grid-template-columns: 1fr; }
-    .entete { gap: 20px; }
+  // Petits écrans : la couverture rétrécit et se centre au-dessus des informations
+  @media (max-width: 600px) {
+    .entete { justify-content: center; padding: 22px; }
+    .couverture { flex-basis: 170px; }
+    .bloc { padding: 20px; }
   }
 }
 
