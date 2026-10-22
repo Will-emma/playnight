@@ -1,205 +1,172 @@
-<main class="players-page">
-  <header class="players-header">
-    <div>
-      <p class="players-eyebrow"><span></span> PLAYNIGHT · LA BANDE</p>
-      <h1>Joueurs</h1>
-      <p class="players-intro">Les personnes avec qui vous partagez vos soirées de jeu.</p>
+<main class="joueurs">
+  <!-- En-tête : titre, résumé et bouton d'ajout -->
+  <header class="entete">
+    <div class="entete__halo" aria-hidden="true"></div>
+    <div class="entete__texte">
+      <p class="eyebrow"><span class="eyebrow__dot"></span> PLAYNIGHT · LA BANDE</p>
+      <h1>Les joueurs</h1>
+      @if (!erreur) {
+        <p class="entete__resume">{{ pluriel(classement.length, "joueur") }} · {{ pluriel(nbVictoires, "victoire") }} à se partager</p>
+      }
     </div>
-    <div class="header-actions">
-      <div class="players-count" aria-live="polite">
-        <strong>{{ joueurs.length }}</strong>
-        <span>{{ joueurs.length > 1 ? "joueurs" : "joueur" }}</span>
-      </div>
-      <button
-        class="ranking-button"
-        type="button"
-        (click)="basculerClassement()"
-        [attr.aria-pressed]="afficherClassement"
-      >
-        <span aria-hidden="true">♛</span>
-        {{ afficherClassement ? "Voir les joueurs" : "Classement" }}
+    @if (!erreur) {
+      <button class="bouton bouton--principal" type="button" (click)="basculerFormulaire()" [attr.aria-expanded]="formulaireOuvert" aria-controls="formulaire-joueur">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        Ajouter un joueur
       </button>
-      <button class="add-player-button" type="button" (click)="ouvrirFormulaire()" [attr.aria-expanded]="afficherFormulaire">
-        <span aria-hidden="true">{{ afficherFormulaire ? "×" : "+" }}</span>
-        {{ afficherFormulaire ? "Fermer" : "Ajouter un joueur" }}
-      </button>
-    </div>
+    }
   </header>
 
-  @if (afficherFormulaire) {
-    <form class="player-form" (ngSubmit)="ajouterJoueur()" #formulaire="ngForm">
-      <div class="form-heading">
-        <span class="form-mark" aria-hidden="true">+</span>
+  <!-- Formulaire d'ajout, avec l'aperçu de l'avatar qu'aura le joueur -->
+  @if (formulaireOuvert) {
+    <form id="formulaire-joueur" class="formulaire" (ngSubmit)="ajouterJoueur()" #formulaire="ngForm">
+      <div class="formulaire__entete">
+        <span class="avatar" [style.background]="couleurApercu" [style.--couleur-joueur]="couleurApercu">
+          @if (aUneImage(avatar.trim())) {
+            <img [src]="avatar.trim()" alt="" (error)="marquerIndisponible(avatar.trim())" />
+          } @else {
+            <span aria-hidden="true">{{ initialeApercu }}</span>
+          }
+        </span>
         <div>
           <h2>Nouveau joueur</h2>
-          <p>Ajoutez une personne à votre groupe PlayNight.</p>
+          <p>Sans avatar, il aura son initiale sur une couleur, comme ici.</p>
         </div>
       </div>
-      <div class="form-fields">
-        <label>
-          <span>Pseudo <b aria-hidden="true">*</b></span>
-          <input
-            name="pseudo"
-            [(ngModel)]="pseudo"
-            required
-            autocomplete="nickname"
-            placeholder="Ex. Alex"
-          />
-        </label>
-        <label>
-          <span>URL de l’avatar <small>facultatif</small></span>
-          <input
-            name="avatar"
-            [(ngModel)]="avatar"
-            type="url"
-            placeholder="https://…"
-          />
-        </label>
-        <button class="submit-player-button" type="submit" [disabled]="!formulaire.valid || enregistrement">
-          {{ enregistrement ? "Ajout en cours…" : "Ajouter à la liste" }}
+      <label class="champ champ--pseudo">
+        <span>Pseudo <b aria-hidden="true">*</b></span>
+        <input name="pseudo" [(ngModel)]="pseudo" required autocomplete="nickname" placeholder="Ex. Alex" />
+      </label>
+      <label class="champ champ--avatar">
+        <span>URL de l’avatar <small>(facultatif)</small></span>
+        <input name="avatar" [(ngModel)]="avatar" type="url" placeholder="https://…" />
+      </label>
+      <div class="formulaire__actions">
+        <button class="bouton" type="button" (click)="basculerFormulaire()">Annuler</button>
+        <button class="bouton bouton--principal" type="submit" [disabled]="!formulaire.valid || enregistrement">
+          {{ enregistrement ? "Ajout en cours…" : "Ajouter" }}
         </button>
       </div>
       @if (messageErreurAjout) {
-        <p class="form-error" role="alert">{{ messageErreurAjout }}</p>
+        <p class="formulaire__erreur" role="alert">{{ messageErreurAjout }}</p>
       }
     </form>
   }
 
-  @if (afficherClassement) {
-    <section class="leaderboard" aria-labelledby="leaderboard-title">
-      <header class="leaderboard-heading">
-        <div>
-          <p class="players-eyebrow"><span></span> LES RÉSULTATS DU GROUPE</p>
-          <h2 id="leaderboard-title">Classement</h2>
-          <p>Les victoires départagent les joueurs, puis le nombre de parties jouées.</p>
-        </div>
-        <span class="leaderboard-mark" aria-hidden="true">♛</span>
-      </header>
-
-      @if (chargementClassement) {
-        <section class="players-state" aria-live="polite">
-          <span class="players-spinner" aria-hidden="true"></span>
-          <h2>Calcul du classement…</h2>
-        </section>
-      } @else if (erreurClassement) {
-        <section class="players-state" role="alert">
-          <span class="players-state-icon" aria-hidden="true">!</span>
-          <h2>Le classement n’a pas pu être chargé</h2>
-          <p>Les profils des joueurs sont momentanément indisponibles.</p>
-          <button class="retry-players" type="button" (click)="chargerClassement()">Réessayer</button>
-        </section>
-      } @else if (classement.length === 0) {
-        <section class="players-state">
-          <span class="players-state-icon" aria-hidden="true">✦</span>
-          <h2>Aucun joueur à classer</h2>
-          <p>Ajoutez des joueurs pour voir le classement du groupe.</p>
-        </section>
-      } @else {
-        <section class="podium" aria-label="Podium des trois premiers joueurs">
-          <div class="podium__players">
-            @for (entry of podium; track entry.joueur.id) {
-              <a
-                class="podium-player"
-                [routerLink]="['/joueurs', entry.joueur.id]"
-                [attr.aria-label]="'Voir le profil de ' + entry.joueur.pseudo"
-                [class.podium-player--first]="classement.indexOf(entry) === 0"
-                [class.podium-player--second]="classement.indexOf(entry) === 1"
-                [class.podium-player--third]="classement.indexOf(entry) === 2"
-              >
-                @if (classement.indexOf(entry) === 0) {
-                  <span class="podium-crown" aria-label="Première place">♛</span>
-                }
-                <div class="podium-avatar" [style.--avatar-color]="couleurAvatar(entry.joueur)">
-                  @if (entry.joueur.avatar && !avatarsIndisponibles.has(entry.joueur.id)) {
-                    <img [src]="entry.joueur.avatar" alt="" loading="lazy" (error)="marquerAvatarIndisponible(entry.joueur)" />
-                  } @else {
-                    <span aria-hidden="true">{{ initiale(entry.joueur) }}</span>
-                  }
-                </div>
-                <strong class="podium-name">{{ entry.joueur.pseudo }}</strong>
-                <span class="podium-wins">{{ entry.nbVictoires }} {{ entry.nbVictoires > 1 ? "victoires" : "victoire" }}</span>
-                <div class="podium-step">
-                  <span>{{ classement.indexOf(entry) + 1 }}</span>
-                </div>
-              </a>
-            }
-          </div>
-        </section>
-
-        @if (classement.length > 3) {
-          <div class="leaderboard-table" role="table" aria-label="Autres joueurs classés">
-            <div class="leaderboard-labels" role="row">
-              <span role="columnheader">Rang</span>
-              <span role="columnheader">Joueur</span>
-              <span role="columnheader">Victoires</span>
-              <span role="columnheader">Parties</span>
-            </div>
-            @for (entry of classement.slice(3); track entry.joueur.id; let rang = $index) {
-              <div class="leaderboard-row" role="row">
-                <span class="rank-position" role="cell">{{ rang + 4 }}</span>
-                <div class="rank-player" role="cell">
-                  <div class="rank-avatar" [style.--avatar-color]="couleurAvatar(entry.joueur)">
-                    @if (entry.joueur.avatar && !avatarsIndisponibles.has(entry.joueur.id)) {
-                      <img [src]="entry.joueur.avatar" alt="" loading="lazy" (error)="marquerAvatarIndisponible(entry.joueur)" />
-                    } @else {
-                      <span aria-hidden="true">{{ initiale(entry.joueur) }}</span>
-                    }
-                  </div>
-                  <span>
-                    <a
-                      class="player-profile-link"
-                      [routerLink]="['/joueurs', entry.joueur.id]"
-                      [attr.aria-label]="'Voir le profil de ' + entry.joueur.pseudo"
-                    >{{ entry.joueur.pseudo }}</a>
-                  </span>
-                </div>
-                <strong class="rank-stat" role="cell">{{ entry.nbVictoires }}</strong>
-                <span class="rank-stat rank-stat--muted" role="cell">{{ entry.nbParties }}</span>
-              </div>
-            }
-          </div>
-        }
-      }
-    </section>
-  } @else if (loading) {
-    <section class="players-state" aria-live="polite">
-      <span class="players-spinner" aria-hidden="true"></span>
-      <h2>Chargement des joueurs…</h2>
-    </section>
-  } @else if (error) {
-    <section class="players-state" role="alert">
-      <span class="players-state-icon" aria-hidden="true">!</span>
+  @if (erreur) {
+    <section class="state-panel" role="alert">
       <h2>La liste des joueurs est indisponible</h2>
-      <p>Vérifiez que l’API PlayNight est lancée, puis réessayez.</p>
-      <button class="retry-players" type="button" (click)="recharger()">Réessayer</button>
+      <p>Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
     </section>
-  } @else if (joueurs.length === 0) {
-    <section class="players-state">
-      <span class="players-state-icon" aria-hidden="true">✦</span>
+  } @else if (classement.length === 0) {
+    <section class="state-panel">
       <h2>Votre groupe commence ici</h2>
       <p>Ajoutez le premier joueur pour préparer votre prochaine soirée.</p>
-      <button class="retry-players" type="button" (click)="ouvrirFormulaire()">Ajouter un joueur</button>
+      @if (!formulaireOuvert) {
+        <button class="bouton bouton--principal" type="button" (click)="basculerFormulaire()">Ajouter un joueur</button>
+      }
     </section>
   } @else {
-    <section class="players-grid" aria-label="Liste des joueurs">
-      @for (joueur of joueurs; track joueur.id) {
-        <a class="player-card" [routerLink]="['/joueurs', joueur.id]" [attr.aria-label]="'Voir le profil de ' + joueur.pseudo">
-          <div class="player-avatar" [style.--avatar-color]="couleurAvatar(joueur)">
-            @if (joueur.avatar && !avatarsIndisponibles.has(joueur.id)) {
-              <img [src]="joueur.avatar" alt="" loading="lazy" (error)="marquerAvatarIndisponible(joueur)" />
-            } @else {
-              <span aria-hidden="true">{{ initiale(joueur) }}</span>
+    <!-- Classement : le podium, puis la suite -->
+    <section class="classement" aria-labelledby="titre-classement">
+      <div class="classement__podium">
+        <h2 id="titre-classement">Le classement</h2>
+        <p class="sous-titre">Le plus de victoires d’abord, puis le plus de parties jouées.</p>
+        <ol class="podium">
+          @for (marche of podium; track marche.classement.joueur.id) {
+            <li class="podium__marche podium__marche--{{ marche.rang }}">
+              @if (marche.rang === 1) {
+                <svg class="podium__couronne" viewBox="0 0 30 22" aria-hidden="true"><path d="M2 20h26L26 6l-6 5-5-9-5 9-6-5z" /></svg>
+              }
+              <a class="podium__joueur" [routerLink]="['/joueurs', marche.classement.joueur.id]">
+                <span class="podium__avatar" [style.background]="couleur(marche.classement.joueur.id)">
+                  @if (aUneImage(marche.classement.joueur.avatar)) {
+                    <img [src]="marche.classement.joueur.avatar" alt="" (error)="marquerIndisponible(marche.classement.joueur.avatar)" />
+                  } @else {
+                    <span aria-hidden="true">{{ initiale(marche.classement.joueur.pseudo) }}</span>
+                  }
+                </span>
+                <span class="podium__pseudo">{{ marche.classement.joueur.pseudo }}</span>
+              </a>
+              <span class="podium__stats">
+                {{ pluriel(marche.classement.nbVictoires, "victoire") }} · {{ pluriel(marche.classement.nbParties, "partie") }}
+              </span>
+              <span class="podium__socle"><span class="visually-hidden">Rang </span>{{ marche.rang }}</span>
+            </li>
+          }
+        </ol>
+      </div>
+
+      @if (suite.length > 0) {
+        <table class="suite">
+          <caption class="visually-hidden">Suite du classement</caption>
+          <thead>
+            <tr><th scope="col">Rang</th><th scope="col">Joueur</th><th scope="col">Victoires</th><th scope="col">Parties</th></tr>
+          </thead>
+          <tbody>
+            @for (ligne of suite; track ligne.classement.joueur.id) {
+              <tr>
+                <td><span class="suite__rang">{{ ligne.rang }}</span></td>
+                <td>
+                  <a class="suite__joueur" [routerLink]="['/joueurs', ligne.classement.joueur.id]">
+                    <span class="suite__avatar" [style.background]="couleur(ligne.classement.joueur.id)">
+                      @if (aUneImage(ligne.classement.joueur.avatar)) {
+                        <img [src]="ligne.classement.joueur.avatar" alt="" (error)="marquerIndisponible(ligne.classement.joueur.avatar)" />
+                      } @else {
+                        <span aria-hidden="true">{{ initiale(ligne.classement.joueur.pseudo) }}</span>
+                      }
+                    </span>
+                    <span class="suite__pseudo">{{ ligne.classement.joueur.pseudo }}</span>
+                  </a>
+                </td>
+                <td class="suite__victoires">{{ ligne.classement.nbVictoires }}</td>
+                <td class="suite__parties">{{ ligne.classement.nbParties }}</td>
+              </tr>
             }
-          </div>
-          <div class="player-info">
-            <span class="player-label">JOUEUR #{{ joueur.id }}</span>
-            <h2>{{ joueur.pseudo }}</h2>
-          </div>
-          <span class="player-status" aria-label="Joueur PlayNight">
-            <span aria-hidden="true"></span>
-          </span>
-        </a>
+          </tbody>
+        </table>
       }
+    </section>
+
+    <!-- Toute la bande : une carte par joueur, qui mène à son profil -->
+    <section class="bande" aria-labelledby="titre-bande">
+      <h2 id="titre-bande">Toute la bande</h2>
+      <p class="sous-titre">Cliquez sur un joueur pour ouvrir son profil.</p>
+      <ul class="bande__liste">
+        @for (carte of cartes; track carte.classement.joueur.id) {
+          <li class="carte" [class.carte--nouveau]="carte.classement.nbParties === 0">
+            <div class="carte__entete">
+              <span class="avatar" [style.background]="couleur(carte.classement.joueur.id)" [style.--couleur-joueur]="couleur(carte.classement.joueur.id)">
+                @if (aUneImage(carte.classement.joueur.avatar)) {
+                  <img [src]="carte.classement.joueur.avatar" alt="" (error)="marquerIndisponible(carte.classement.joueur.avatar)" />
+                } @else {
+                  <span aria-hidden="true">{{ initiale(carte.classement.joueur.pseudo) }}</span>
+                }
+              </span>
+              <div class="carte__nom">
+                <h3>
+                  <!-- Lien "étiré" sur toute la carte (voir .carte__lien) -->
+                  <a class="carte__lien" [routerLink]="['/joueurs', carte.classement.joueur.id]">{{ carte.classement.joueur.pseudo }}</a>
+                </h3>
+                <span>{{ resumeParties(carte.classement.nbParties) }}</span>
+              </div>
+              <span class="carte__rang carte__rang--{{ carte.rang }}"><span class="visually-hidden">Rang : </span>{{ libelleRang(carte.rang) }}</span>
+            </div>
+            @if (carte.classement.nbParties === 0) {
+              <p class="carte__invitation">Pas encore de partie : invitez-le à la prochaine soirée !</p>
+            } @else {
+              <div class="carte__taux">
+                <div class="carte__taux-texte"><span>Taux de victoire</span><strong>{{ carte.tauxVictoire }} %</strong></div>
+                <div class="jauge" aria-hidden="true"><span [style.width.%]="carte.tauxVictoire"></span></div>
+              </div>
+            }
+            <div class="carte__pied">
+              {{ pluriel(carte.classement.nbVictoires, "victoire") }}
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+            </div>
+          </li>
+        }
+      </ul>
     </section>
   }
 </main>
