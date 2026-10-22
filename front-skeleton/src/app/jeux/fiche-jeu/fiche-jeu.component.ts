@@ -1,7 +1,8 @@
 import { Component, OnInit } from "@angular/core"
-import { ActivatedRoute } from "@angular/router"
+import { ActivatedRoute, Router } from "@angular/router"
 import { ClassementElo, FicheJeu, Jeu, MeilleurJoueur, TypeJeu } from "models/jeu.model"
 import { Joueur } from "models/joueur.model"
+import { JeuService } from "services/jeu.service"
 import { formaterDate, formaterDuree, pluriel } from "utils/format"
 import { FicheJeuPageData } from "./fiche-jeu.resolver"
 
@@ -31,7 +32,11 @@ export class FicheJeuComponent implements OnInit {
   // Images qui n'ont pas pu être chargées (couverture du jeu, avatars) : on affiche la couleur et l'initiale à la place
   readonly imagesIndisponibles = new Set<string>()
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private jeuService: JeuService,
+  ) {}
 
   ngOnInit(): void {
     // data (et non snapshot.data) : la page se met à jour si on passe d'une fiche à une autre sans la quitter
@@ -43,6 +48,14 @@ export class FicheJeuComponent implements OnInit {
       this.erreur = page.erreur
       this.toutLeClassement = false
     })
+  }
+
+  // Fonction fléchée : la fenêtre de confirmation l'appelle sans connaître ce composant
+  supprimerJeu = () => this.jeuService.delete(this.fiche!.jeu.id)
+
+  // Le jeu n'existe plus : retour à la ludothèque (replaceUrl pour que « Précédent » ne ramène pas sur sa fiche)
+  apresSuppression(): void {
+    this.router.navigate(["/jeux"], { replaceUrl: true })
   }
 
   // Podium : le 1er au centre, comme sur une vraie marche (2e, 1er, 3e)

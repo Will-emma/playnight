@@ -1,9 +1,10 @@
 import { Location } from "@angular/common"
 import { Component, OnInit } from "@angular/core"
-import { ActivatedRoute } from "@angular/router"
+import { ActivatedRoute, Router } from "@angular/router"
 import { TypeJeu } from "models/jeu.model"
 import { Joueur } from "models/joueur.model"
 import { PartieDetail, ScoreDetail, SoireeDetail } from "models/soiree.model"
+import { SoireeService } from "services/soiree.service"
 import { formaterDate, formaterDuree, pluriel } from "utils/format"
 import { DetailSoireePageData } from "./detail-soiree.resolver"
 
@@ -57,6 +58,8 @@ export class DetailSoireeComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private location: Location,
+    private router: Router,
+    private soireeService: SoireeService,
   ) {}
 
   ngOnInit(): void {
@@ -101,6 +104,20 @@ export class DetailSoireeComponent implements OnInit {
   // On arrive ici depuis plusieurs pages (liste des soirées, profil joueur…) : on revient à la précédente
   retour(): void {
     this.location.back()
+  }
+
+  get messageSuppression(): string {
+    const nbParties = this.soiree?.parties.length ?? 0
+    const parties = nbParties > 0 ? `Ses ${pluriel(nbParties, "partie")} et leurs scores seront effacés, et ses victoires retirées des classements. ` : ""
+    return `${parties}Cette action est définitive.`
+  }
+
+  // Fonction fléchée : la fenêtre de confirmation l'appelle sans connaître ce composant
+  supprimerSoiree = () => this.soireeService.delete(this.soiree!.id)
+
+  // La soirée n'existe plus : retour à la liste (replaceUrl pour que « Précédent » ne ramène pas sur elle)
+  apresSuppression(): void {
+    this.router.navigate(["/soirees"], { replaceUrl: true })
   }
 
   // 1 → "1er", 2 → "2e"

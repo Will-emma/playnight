@@ -180,5 +180,17 @@
         </section>
       </div>
     }
+
+    <!-- Seul un jeu jamais joué peut être supprimé : l'API refuse sinon, pour ne pas effacer de parties -->
+    @if (fiche.nbParties === 0) {
+      <app-suppression
+        libelle="Supprimer le jeu"
+        [titre]="'Supprimer ' + fiche.jeu.nom + ' ?'"
+        message="Il disparaîtra de la ludothèque. Cette action est définitive."
+        messageConflit="Ce jeu a été joué entre-temps : il ne peut plus être supprimé. Rechargez la page."
+        [action]="supprimerJeu"
+        (supprime)="apresSuppression()"
+      />
+    }
   }
 </main>
