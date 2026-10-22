@@ -12,8 +12,6 @@ import com.takima.backskeleton.models.Score;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -52,9 +50,9 @@ public class JoueurService {
 
     @Transactional
     public JoueurDto addJoueur(JoueurDto joueurDto) {
-        // Sans avatar fourni, le joueur reçoit un personnage DiceBear généré à partir de son pseudo
-        if ((joueurDto.getAvatar() == null || joueurDto.getAvatar().isBlank()) && joueurDto.getPseudo() != null) {
-            joueurDto.setAvatar(avatarParDefaut(joueurDto.getPseudo()));
+        // Sans avatar fourni, le joueur reçoit un portrait de la galerie
+        if (joueurDto.getAvatar() == null || joueurDto.getAvatar().isBlank()) {
+            joueurDto.setAvatar(avatarParDefaut());
         }
         Joueur joueur = JoueurMapper.fromDto(joueurDto, null);
         return JoueurMapper.toDto(joueurDao.save(joueur));
@@ -73,11 +71,20 @@ public class JoueurService {
         joueurDao.deleteById(id);
     }
 
-    // Style "Adventurer" de DiceBear (CC BY 4.0, Lisa Wischofsky, voir README) : le même pseudo donne toujours le même personnage.
-    // Même URL que l'aperçu du formulaire côté front (avatarParDefaut dans joueurs.component.ts)
-    static String avatarParDefaut(String pseudo) {
-        String seed = URLEncoder.encode(pseudo.trim(), StandardCharsets.UTF_8).replace("+", "%20");
-        return "https://api.dicebear.com/9.x/adventurer/svg?seed=" + seed;
+    // Avatar de la galerie le moins porté (le plus petit numéro en cas d'égalité) : les joueurs gardent des portraits différents
+    // tant que c'est possible. Même règle que le choix proposé par le formulaire d'ajout du front (avatarConseille)
+    private String avatarParDefaut() {
+        Map<String, Long> nbPorteurs = joueurDao.findAll().stream()
+                .filter(joueur -> joueur.getAvatar() != null)
+                .collect(Collectors.groupingBy(Joueur::getAvatar, Collectors.counting()));
+        int moinsPorte = 1;
+        for (int avatarId = 2; avatarId <= AvatarService.NB_AVATARS_GALERIE; avatarId++) {
+            if (nbPorteurs.getOrDefault(AvatarService.urlGalerie(avatarId), 0L)
+                    < nbPorteurs.getOrDefault(AvatarService.urlGalerie(moinsPorte), 0L)) {
+                moinsPorte = avatarId;
+            }
+        }
+        return AvatarService.urlGalerie(moinsPorte);
     }
 
     private Joueur findJoueurById(Long id) {

@@ -28,12 +28,12 @@ Do $$
 
     BEGIN
 
-    INSERT INTO joueurs (pseudo, avatar) VALUES ('Léa', 'https://api.dicebear.com/9.x/adventurer/svg?seed=L%C3%A9a') RETURNING id INTO _LEA;
-    INSERT INTO joueurs (pseudo, avatar) VALUES ('MaxPower', 'https://api.dicebear.com/9.x/adventurer/svg?seed=MaxPower') RETURNING id INTO _MAX;
-    INSERT INTO joueurs (pseudo, avatar) VALUES ('Samouraï', 'https://api.dicebear.com/9.x/adventurer/svg?seed=Samoura%C3%AF') RETURNING id INTO _SAM;
-    INSERT INTO joueurs (pseudo, avatar) VALUES ('Inès', 'https://api.dicebear.com/9.x/adventurer/svg?seed=In%C3%A8s') RETURNING id INTO _INES;
-    INSERT INTO joueurs (pseudo, avatar) VALUES ('TomTom', 'https://api.dicebear.com/9.x/adventurer/svg?seed=TomTom') RETURNING id INTO _TOM;
-    INSERT INTO joueurs (pseudo, avatar) VALUES ('Noa', 'https://api.dicebear.com/9.x/adventurer/svg?seed=Noa') RETURNING id INTO _NOA;
+    INSERT INTO joueurs (pseudo, avatar) VALUES ('Léa', '/assets/avatars/avatar-02.png') RETURNING id INTO _LEA;
+    INSERT INTO joueurs (pseudo, avatar) VALUES ('MaxPower', '/assets/avatars/avatar-04.png') RETURNING id INTO _MAX;
+    INSERT INTO joueurs (pseudo, avatar) VALUES ('Samouraï', '/assets/avatars/avatar-08.png') RETURNING id INTO _SAM;
+    INSERT INTO joueurs (pseudo, avatar) VALUES ('Inès', '/assets/avatars/avatar-03.png') RETURNING id INTO _INES;
+    INSERT INTO joueurs (pseudo, avatar) VALUES ('TomTom', '/assets/avatars/avatar-01.png') RETURNING id INTO _TOM;
+    INSERT INTO joueurs (pseudo, avatar) VALUES ('Noa', '/assets/avatars/avatar-06.png') RETURNING id INTO _NOA;
 
     -- Jeux de société
     INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image) VALUES ('Catan', 'SOCIETE', null, 3, 4, null) RETURNING id INTO _CATAN;

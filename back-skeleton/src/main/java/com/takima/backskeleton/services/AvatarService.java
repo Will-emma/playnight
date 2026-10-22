@@ -29,10 +29,10 @@ public class AvatarService {
     @Transactional
     public JoueurDto choisir(Long joueurId, Integer avatarId) {
         Joueur joueur = trouver(joueurId);
-        if (avatarId == null || avatarId < 1 || avatarId > 12) {
+        if (avatarId == null || avatarId < 1 || avatarId > NB_AVATARS_GALERIE) {
             throw new IllegalArgumentException("Choisissez un avatar de la galerie.");
         }
-        joueur.modifierAvatar(String.format("/assets/avatars/avatar-%02d.png", avatarId));
+        joueur.modifierAvatar(urlGalerie(avatarId));
         joueurDao.flush();
         return JoueurMapper.toDto(joueur);
     }
@@ -50,6 +50,13 @@ public class AvatarService {
         joueur.modifierAvatar(urlApi + "/joueurs/avatars/" + nom);
         joueurDao.flush();
         return JoueurMapper.toDto(joueur);
+    }
+
+    // Les 12 avatars de la galerie sont servis par le front (src/assets/avatars, liste dans utils/avatar.ts)
+    public static final int NB_AVATARS_GALERIE = 12;
+
+    public static String urlGalerie(int avatarId) {
+        return String.format("/assets/avatars/avatar-%02d.png", avatarId);
     }
 
     private Joueur trouver(Long id) {

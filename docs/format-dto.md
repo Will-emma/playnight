@@ -32,11 +32,11 @@ Lecture et écriture utilisent le même format.
 {
   "id": 1,
   "pseudo": "Léa",
-  "avatar": "https://api.dicebear.com/9.x/adventurer/svg?seed=L%C3%A9a"
+  "avatar": "/assets/avatars/avatar-02.png"
 }
 ```
 
-À la création (`POST`), un `avatar` absent ou vide est remplacé par un personnage DiceBear « Adventurer » généré à partir du pseudo, comme dans l'exemple ci-dessus.
+À la création (`POST`), un `avatar` absent ou vide est remplacé par le portrait de la galerie (`/assets/avatars/avatar-01.png` à `avatar-12.png`) que le moins de joueurs portent.
 
 ## Jeux – `/jeux`
 
