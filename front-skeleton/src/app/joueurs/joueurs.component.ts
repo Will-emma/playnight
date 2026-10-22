@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
 import { HttpErrorResponse } from "@angular/common/http"
 import { JoueurService } from "services/joueur.service"
+import { AVATARS } from "utils/avatar"
 import { JoueurClassement, comparerClassement } from "utils/classement"
 import { pluriel } from "utils/format"
 import { JoueursPageData } from "./joueurs.resolver"
@@ -23,6 +24,7 @@ interface CarteJoueur {
 })
 export class JoueursComponent implements OnInit {
   readonly pluriel = pluriel
+  readonly avatars = AVATARS
 
   classement: JoueurClassement[] = []
   podium: { classement: JoueurClassement; rang: number }[] = [] // dans l'ordre d'affichage : 2e, 1er, 3e
@@ -33,7 +35,7 @@ export class JoueursComponent implements OnInit {
   formulaireOuvert = false
   enregistrement = false
   pseudo = ""
-  avatar = ""
+  avatarChoisi = AVATARS[0] // portrait de la galerie choisi dans le formulaire
   messageErreurAjout = ""
   // Images qui n'ont pas pu être chargées : on affiche l'initiale colorée à la place
   readonly imagesIndisponibles = new Set<string>()
@@ -81,6 +83,7 @@ export class JoueursComponent implements OnInit {
   basculerFormulaire(): void {
     this.formulaireOuvert = !this.formulaireOuvert
     this.messageErreurAjout = ""
+    if (this.formulaireOuvert) this.avatarChoisi = this.avatarConseille
   }
 
   ajouterJoueur(): void {
@@ -89,12 +92,11 @@ export class JoueursComponent implements OnInit {
 
     this.enregistrement = true
     this.messageErreurAjout = ""
-    this.joueurService.create({ pseudo, avatar: this.avatar.trim() || null }).subscribe({
+    this.joueurService.create({ pseudo, avatar: this.avatarChoisi.url }).subscribe({
       next: (joueur) => {
         // Un nouveau joueur n'a encore joué aucune partie : inutile de recharger les profils
         this.mettreAJour([...this.classement, { joueur, nbVictoires: 0, nbParties: 0 }])
         this.pseudo = ""
-        this.avatar = ""
         this.formulaireOuvert = false
         this.enregistrement = false
       },
@@ -112,6 +114,17 @@ export class JoueursComponent implements OnInit {
   get couleurApercu(): string {
     const dernierId = Math.max(0, ...this.classement.map((ligne) => ligne.joueur.id))
     return this.couleur(dernierId + 1)
+  }
+
+  // Portrait proposé d'office : celui de la galerie que le moins de joueurs portent (le premier en cas d'égalité),
+  // pour que chacun ait le sien tant que c'est possible. Même règle que le back (JoueurService.avatarParDefaut)
+  get avatarConseille(): (typeof AVATARS)[number] {
+    const nbPorteurs = (url: string) => this.classement.filter((ligne) => ligne.joueur.avatar === url).length
+    return AVATARS.reduce((moinsPorte, avatar) => (nbPorteurs(avatar.url) < nbPorteurs(moinsPorte.url) ? avatar : moinsPorte))
+  }
+
+  choisirAvatar(avatar: (typeof AVATARS)[number]): void {
+    this.avatarChoisi = avatar
   }
 
   get initialeApercu(): string {
