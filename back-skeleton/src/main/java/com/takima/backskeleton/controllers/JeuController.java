@@ -1,6 +1,8 @@
 package com.takima.backskeleton.controllers;
 
 import com.takima.backskeleton.DTO.FicheJeuDto;
+import com.takima.backskeleton.DTO.ClassementDto;
+import com.takima.backskeleton.services.ClassementService;
 import com.takima.backskeleton.DTO.JeuDto;
 import com.takima.backskeleton.DTO.RawgImportDto;
 import com.takima.backskeleton.DTO.RawgJeuDto;
@@ -27,8 +29,11 @@ import java.util.List;
 public class JeuController {
     private final JeuService jeuService;
 
-    public JeuController(JeuService jeuService) {
+    private final ClassementService classementService;
+
+    public JeuController(JeuService jeuService, ClassementService classementService) {
         this.jeuService = jeuService;
+        this.classementService = classementService;
     }
 
     @GetMapping("")
@@ -44,6 +49,11 @@ public class JeuController {
     @GetMapping("/{id}/fiche")
     public FicheJeuDto getFicheJeu(@PathVariable Long id) {
         return jeuService.getFiche(id);
+    }
+
+    @GetMapping("/{id}/classement")
+    public List<ClassementDto> getClassement(@PathVariable Long id) {
+        return classementService.getClassement(id);
     }
 
     @PostMapping("")

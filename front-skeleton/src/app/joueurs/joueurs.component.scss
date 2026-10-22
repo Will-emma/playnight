@@ -1,1 +1,41 @@
 :host { display: block; }
+
+.podium-player, .player-card, .player-profile-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.podium-player {
+  border-radius: 12px 12px 0 0;
+  transition: background-color .18s;
+
+  &:hover, &:focus-visible { background-color: #a974ff14; }
+  &:hover .podium-name, &:focus-visible .podium-name { color: var(--players-gold); }
+}
+
+.podium-player:focus-visible, .player-card:focus-visible {
+  outline: 2px solid var(--players-gold);
+  outline-offset: -3px;
+}
+
+.leaderboard-row {
+  position: relative;
+  cursor: pointer;
+  transition: background-color .18s;
+
+  &:hover, &:focus-within { background-color: #292d43; }
+}
+
+// Étend le vrai lien à toute la ligne en conservant la structure du tableau.
+.player-profile-link::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.player-profile-link:focus-visible { outline: none; }
+.player-profile-link:focus-visible::after {
+  outline: 2px solid var(--players-gold);
+  outline-offset: -3px;
+}

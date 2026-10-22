@@ -1,6 +1,9 @@
 package com.takima.backskeleton.controllers;
 
 import com.takima.backskeleton.services.RawgIndisponibleException;
+import com.takima.backskeleton.services.AvatarTropVolumineuxException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,10 +32,16 @@ public class ApiExceptionHandler {
             HttpMessageNotReadableException.class,
             MethodArgumentTypeMismatchException.class,
             MissingServletRequestParameterException.class,
+            MissingServletRequestPartException.class,
             MethodArgumentNotValidException.class
     })
     public ResponseEntity<Map<String, String>> handleBadRequest(Exception exception) {
         return error(HttpStatus.BAD_REQUEST, "La requête est invalide.");
+    }
+
+    @ExceptionHandler({AvatarTropVolumineuxException.class, MaxUploadSizeExceededException.class})
+    public ResponseEntity<Map<String, String>> handlePhotoTropVolumineuse(Exception exception) {
+        return error(HttpStatus.PAYLOAD_TOO_LARGE, "La photo ne doit pas dépasser 2 Mo.");
     }
 
     // Règle métier non respectée (ex. : un score pour un joueur absent) : 400 avec le message du service

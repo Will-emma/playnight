@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 import { Observable } from "rxjs"
-import { FicheJeu, Jeu, RawgImport, RawgJeu, TypeJeu } from "models/jeu.model"
+import { ClassementElo, FicheJeu, Jeu, RawgImport, RawgJeu, TypeJeu } from "models/jeu.model"
 
 @Injectable({
   providedIn: "root",
@@ -18,6 +18,10 @@ export class JeuService {
 
   getFiche(id: number): Observable<FicheJeu> {
     return this.http.get<FicheJeu>(`${this.jeuxUrl}/${id}/fiche`)
+  }
+
+  getClassement(id: number): Observable<ClassementElo[]> {
+    return this.http.get<ClassementElo[]>(`${this.jeuxUrl}/${id}/classement`)
   }
 
   rechercherSurRawg(recherche: string): Observable<RawgJeu[]> {

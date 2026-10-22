@@ -1,0 +1,30 @@
+:host {
+  display: block;
+  color: #f0eff8;
+  background: #151827;
+}
+h2 { color: #f0eff8; }
+mat-dialog-content { color: #a7aec5; }
+.apercu { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
+.apercu img, .initiale { width: 80px; height: 80px; flex: none; border: 3px solid #f8b83f; border-radius: 50%; object-fit: cover; }
+.initiale { display: grid; place-items: center; color: #151827; background: #f8b83f; font-size: 2rem; }
+.apercu strong { display: block; color: #f0eff8; overflow-wrap: anywhere; }
+.apercu span:not(.initiale) { font-size: .85rem; }
+.galerie { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 20px 3px; }
+.choix-avatar { position: relative; padding: 0; overflow: hidden; aspect-ratio: 1; border: 2px solid #343a53; border-radius: 14px; background: #11131f; cursor: pointer; transition: border-color .15s; }
+.choix-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+.choix-avatar:hover, .selectionne { border-color: #f8b83f; }
+.coche { position: absolute; right: 0; bottom: 0; padding: 2px 7px; color: #11131f; background: #f8b83f; border-radius: 8px 0 0; font-weight: bold; }
+.import-photo { min-height: 220px; padding: 24px 0; }
+.import-photo label { display: block; margin: 20px 0 10px; color: #f0eff8; font-weight: 700; }
+input { max-width: 100%; }
+input::file-selector-button { padding: 10px; border: 1px solid #343a53; border-radius: 8px; color: #f0eff8; background: #292d43; cursor: pointer; }
+.nom-fichier { margin-top: 12px; overflow-wrap: anywhere; }
+.erreur { margin: 14px 0 0; color: #ff9aab; }
+mat-dialog-actions { gap: 10px; padding: 18px 24px; border-top: 1px solid #343a53; }
+mat-dialog-actions button { padding: 10px 18px; border: 1px solid #343a53; border-radius: 999px; font: inherit; font-weight: 700; cursor: pointer; }
+.annuler { color: #f0eff8; background: #292d43; }
+.enregistrer { color: #11131f; background: #f8b83f; }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, input:focus-visible { outline: 2px solid #f8b83f; outline-offset: 2px; }
+@media (max-width: 420px) { .galerie { gap: 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); } }

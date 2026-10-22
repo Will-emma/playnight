@@ -68,6 +68,11 @@ const routes: Routes = [
     resolve: { detailSoireePage: DetailSoireeResolver },
   },
   {
+    path: "regles-elo",
+    loadComponent: () => import("./regles-elo/regles-elo.component").then(m => m.ReglesEloComponent),
+    title: "Règles Elo · PlayNight",
+  },
+  {
     // À garder en dernier : toute adresse inconnue renvoie vers l'accueil
     path: "**",
     redirectTo: "",

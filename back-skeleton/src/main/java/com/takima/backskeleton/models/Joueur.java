@@ -44,6 +44,10 @@ public class Joueur {
         return avatar;
     }
 
+    public void modifierAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     public List<Score> getScores() {
         return scores;
     }

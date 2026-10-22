@@ -52,3 +52,13 @@ export interface PartieJouee {
   duree: number
   vainqueurs: string[] // pseudos des joueurs classés premiers (plusieurs en cas d'ex aequo ou d'équipe)
 }
+
+// GET /jeux/{id}/classement ; rang partagé en cas d'égalité d'Elo.
+export interface ClassementElo {
+  joueurId: number
+  pseudo: string
+  avatar: string | null
+  elo: number
+  nbParties: number
+  rang: number
+}

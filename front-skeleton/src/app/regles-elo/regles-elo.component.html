@@ -1,0 +1,56 @@
+<main class="regles-elo">
+  <a class="retour" routerLink="/joueurs">← Retour aux joueurs</a>
+  <header>
+    <p class="eyebrow">PLAYNIGHT · LES CLASSEMENTS</p>
+    <h1>Comprendre les règles Elo</h1>
+    <p class="intro">Un score qui évolue avec vos résultats, pour chaque jeu et dans votre profil global.</p>
+  </header>
+
+  <section aria-labelledby="depart-elo">
+    <span class="numero" aria-hidden="true">01</span>
+    <h2 id="depart-elo">Un départ à 1000 points</h2>
+    <p>Chaque joueur commence à <strong>1000 Elo pour chaque jeu</strong>. Vos scores sont indépendants : une partie de Catan ne modifie pas votre Elo sur 7 Wonders.</p>
+    <p>Avant une première partie classée, votre profil global affiche 1000 et « Non classé ».</p>
+  </section>
+
+  <section aria-labelledby="resultats-elo">
+    <span class="numero" aria-hidden="true">02</span>
+    <h2 id="resultats-elo">Victoire, défaite et match nul</h2>
+    <p>L’Elo compare votre résultat au résultat attendu selon le niveau de vos adversaires. Battre un joueur mieux classé rapporte davantage ; perdre contre un joueur moins bien classé coûte davantage.</p>
+    <p>Le résultat vaut <strong>1 pour une victoire, 0 pour une défaite et 0,5 pour une égalité</strong>. C’est le rang enregistré dans la partie qui compte, pas les points bruts.</p>
+    <div class="exemple"><strong>Exemple : deux joueurs à 1000 Elo</strong><p>Le vainqueur passe à <b>1016</b>, le perdant à <b>984</b>. En cas d’égalité, ils restent tous les deux à 1000.</p></div>
+    <details><summary>Voir la formule de calcul</summary>
+      <p>Le coefficient de variation est K = 32. Pour deux adversaires A et B :</p>
+      <p class="formule">E(A,B) = 1 / (1 + 10<sup>(Elo<sub>B</sub> − Elo<sub>A</sub>) / 400</sup>)</p>
+      <p class="formule">Variation = 32 × (résultat réel − résultat attendu)</p>
+      <p>La variation est arrondie à l’entier le plus proche ; un demi-entier est arrondi en s’éloignant de zéro. Tous les résultats attendus utilisent les Elo d’avant la partie.</p>
+    </details>
+  </section>
+
+  <section aria-labelledby="multijoueur-elo">
+    <span class="numero" aria-hidden="true">03</span>
+    <h2 id="multijoueur-elo">À plusieurs et en équipe</h2>
+    <p><strong>En individuel à plusieurs :</strong> chaque joueur est comparé à tous les autres. La variation est la moyenne de ces duels virtuels, avec K = 32. Des rangs identiques sont considérés comme des égalités.</p>
+    <p><strong>En équipe :</strong> le niveau d’une équipe est la moyenne des Elo de ses membres avant la partie. Les équipes sont comparées entre elles et tous les membres d’une équipe reçoivent la même variation. Ils doivent avoir le même rang enregistré.</p>
+    <p>Une partie compte une seule fois par joueur. Avec des effectifs d’équipe différents ou des arrondis, la somme des points gagnés et perdus n’est pas forcément nulle.</p>
+  </section>
+
+  <section aria-labelledby="global-elo">
+    <span class="numero" aria-hidden="true">04</span>
+    <h2 id="global-elo">Votre Elo global et votre rang</h2>
+    <p>L’Elo global est la <strong>moyenne de vos Elo par jeu</strong>, arrondie à l’entier le plus proche. Seuls les jeux avec au moins une partie classée comptent. Chaque jeu a le même poids, quel que soit le nombre de parties jouées.</p>
+    <div class="exemple"><strong>Exemple : 1100 sur un jeu et 1000 sur un autre</strong><p>Votre Elo global est de <b>1050</b>. Commencer un nouveau jeu peut donc faire baisser votre moyenne, même après une victoire.</p></div>
+    <p>Le rang global compare ces moyennes arrondies entre les joueurs classés. Pour un jeu, il compare leurs Elo sur ce jeu. Les ex aequo partagent le même rang : <strong>1er, 2e, 2e, 4e</strong>.</p>
+    <p>Le classement par victoires reste un classement distinct : il compte vos succès, tandis que l’Elo tient aussi compte du niveau des adversaires.</p>
+  </section>
+
+  <section aria-labelledby="courbe-elo">
+    <span class="numero" aria-hidden="true">05</span>
+    <h2 id="courbe-elo">Lire votre courbe de progression</h2>
+    <p>La courbe part de 1000, puis affiche votre Elo global après chaque partie classée. Chaque étape a la même largeur ; l’espacement ne représente pas la durée entre les soirées.</p>
+    <p>Survolez un point ou utilisez le curseur, à la souris ou au clavier, pour consulter le jeu, la date, le score et sa variation. Le meilleur Elo inclut le score initial de 1000 ; « Depuis le départ » mesure l’écart avec ce score.</p>
+    <p>Les résultats sont pris en compte dans l’ordre des soirées. Une correction de résultat, un changement de date ou une suppression peut modifier les scores suivants et la courbe lors de votre prochaine consultation.</p>
+    <p>Sans adversaire, sans résultat exploitable ou avec des résultats d’équipe incohérents, une partie ne modifie pas l’Elo et n’ajoute aucun point à la courbe.</p>
+  </section>
+  <a class="retour" routerLink="/joueurs">← Revenir aux joueurs</a>
+</main>

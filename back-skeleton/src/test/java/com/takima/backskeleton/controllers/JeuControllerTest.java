@@ -39,6 +39,9 @@ class JeuControllerTest {
     @MockBean
     private JeuService jeuService;
 
+    @MockBean
+    private com.takima.backskeleton.services.ClassementService classementService;
+
     @Test
     void listJeuxReturnsDtoJsonWithContractFieldNames() throws Exception {
         when(jeuService.findAll(null)).thenReturn(List.of(jeuDto(1L, "Catan", TypeJeu.SOCIETE)));
@@ -216,6 +219,34 @@ class JeuControllerTest {
                         .content("{\"nbJoueursMin\":1,\"nbJoueursMax\":1}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("« Zelda » est déjà dans la ludothèque."));
+    }
+
+    @Test
+    void classementEloReturnsContract() throws Exception {
+        when(classementService.getClassement(1L)).thenReturn(List.of(
+                new com.takima.backskeleton.DTO.ClassementDto(2L, "Léa", "avatar.png", 1016, 1, 1)));
+        mockMvc.perform(get("/jeux/1/classement"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].joueurId").value(2))
+                .andExpect(jsonPath("$[0].pseudo").value("Léa"))
+                .andExpect(jsonPath("$[0].avatar").value("avatar.png"))
+                .andExpect(jsonPath("$[0].elo").value(1016))
+                .andExpect(jsonPath("$[0].nbParties").value(1))
+                .andExpect(jsonPath("$[0].rang").value(1));
+    }
+
+    @Test
+    void classementEloEmpty() throws Exception {
+        when(classementService.getClassement(1L)).thenReturn(List.of());
+        mockMvc.perform(get("/jeux/1/classement"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void classementEloMissingGame() throws Exception {
+        when(classementService.getClassement(404L)).thenThrow(new NoSuchElementException("Le jeu 404 n'existe pas"));
+        mockMvc.perform(get("/jeux/404/classement"))
+                .andExpect(status().isNotFound()).andExpect(jsonPath("$.message").value("Le jeu 404 n'existe pas"));
     }
 
     private JeuDto jeuDto(Long id, String nom, TypeJeu type) {

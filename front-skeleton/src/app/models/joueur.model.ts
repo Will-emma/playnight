@@ -28,3 +28,33 @@ export interface PartieHistorique {
   rang: number
   points: number | null
 }
+
+// GET /joueurs/{id}/classements : Elo et rang calculés exclusivement par le backend.
+export interface ClassementJoueur {
+  jeu: JeuResume
+  elo: number
+  rang: number
+  nbParties: number
+}
+
+// Moyenne des Elo par jeu, calculée par l'API. Sans résultat : 1000, rang null.
+export interface ClassementGlobal {
+  elo: number
+  rang: number | null
+}
+
+export interface PointElo {
+  partieId: number | null
+  date: string | null
+  jeu: string | null
+  elo: number
+  variation: number
+}
+
+export interface ProgressionElo {
+  classement: ClassementGlobal
+  meilleurElo: number
+  variationTotale: number
+  nbParties: number
+  points: PointElo[]
+}

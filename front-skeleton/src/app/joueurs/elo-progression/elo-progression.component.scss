@@ -1,0 +1,35 @@
+:host { display: block; color: #f0eff8; background: #151827; }
+h2 { color: #f0eff8; }
+mat-dialog-content { color: #a7aec5; }
+.resume { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.resume div { padding: 14px; border: 1px solid #343a53; border-radius: 14px; background: #11131f; }
+.resume span { font-size: .75rem; }
+.resume strong { display: block; margin-top: 8px; color: #f8b83f; font-size: 1.5rem; }
+.explication { margin: 18px 0 8px; font-size: .8rem; }
+.courbe { display: block; width: 100%; height: auto; margin-top: 20px; }
+.courbe text { fill: #a7aec5; font-size: 13px; }
+.grille { stroke: #343a53; }
+.reference { stroke: #a7aec5; stroke-dasharray: 4 5; opacity: .5; }
+.surface { fill: #f8b83f16; }
+.ligne { fill: none; stroke: #f8b83f; stroke-width: 3; stroke-linejoin: round; }
+.point { fill: #f8b83f; stroke: #151827; stroke-width: 2; cursor: pointer; }
+input { display: block; width: 100%; margin: 14px 0; accent-color: #f8b83f; }
+label, summary { font-size: .85rem; }
+.detail-point { display: grid; gap: 5px; padding: 14px; border-radius: 12px; background: #1c2032; }
+.detail-point strong { color: #f0eff8; }
+.detail-point span, small { font-size: .8rem; }
+.baisse { color: #ff9aab !important; }
+details { margin-top: 20px; }
+summary { cursor: pointer; color: #f8b83f; }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; margin-top: 12px; border-collapse: collapse; text-align: left; }
+th, td { padding: 10px; border-bottom: 1px solid #343a53; }
+small { display: block; margin-top: 4px; }
+button { padding: 10px 18px; border: 1px solid #f8b83f; border-radius: 999px; color: #11131f; background: #f8b83f; font: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid #f8b83f; outline-offset: 3px; }
+.etat { padding: 30px 0; }
+@media (max-width: 440px) { .resume div { padding: 10px; } .resume strong { font-size: 1.2rem; } }
+
+.lien-regles { margin: 22px 0 8px; font-size: .8rem; }
+.lien-regles a { color: #f8b83f; text-underline-offset: 4px; }
+.lien-regles a:hover { color: #ffda7b; }

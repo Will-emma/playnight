@@ -1,1 +1,28 @@
 :host { display: block; }
+
+.elo {
+  margin-top: 28px;
+
+  &__description { color: var(--library-secondary); }
+  &__liste { margin: 20px 0 0; padding: 0; list-style: none; }
+  &__ligne {
+    display: grid;
+    grid-template-columns: 2rem 34px minmax(0, 1fr) auto 7rem;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid var(--library-line);
+  }
+  &__rang { color: var(--library-secondary); font-weight: 800; }
+  &__pseudo { overflow-wrap: anywhere; font-weight: 700; }
+  &__points { color: var(--library-accent); white-space: nowrap; }
+  &__points span, &__parties { font-size: .85rem; }
+  &__parties { color: var(--library-secondary); text-align: right; }
+}
+
+@media (max-width: 540px) {
+  .elo {
+    &__ligne { grid-template-columns: 1.5rem 34px minmax(0, 1fr) auto; gap: 10px; }
+    &__parties { grid-column: 3 / 5; text-align: left; }
+  }
+}

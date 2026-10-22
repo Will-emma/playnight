@@ -65,6 +65,34 @@
       </div>
     </section>
 
+    <section class="bloc elo" aria-labelledby="titre-elo">
+      <h2 id="titre-elo">Classement Elo</h2>
+      <p class="elo__description">Un classement propre à {{ fiche.jeu.nom }}, en individuel comme en équipe. Départ à 1000 points.</p>
+      @if (erreurClassement) {
+        <p role="alert">Le classement est momentanément indisponible. Rechargez la page pour réessayer.</p>
+      } @else if (classement.length === 0) {
+        <p class="vide">Aucune partie avec des résultats exploitables pour ce jeu. Le classement apparaîtra après une première partie opposant au moins deux joueurs ou équipes.</p>
+      } @else {
+        <ol class="elo__liste" aria-label="Joueurs classés par Elo décroissant">
+          @for (ligne of classement; track ligne.joueurId) {
+            <li class="elo__ligne">
+              <span class="elo__rang"><span class="visually-hidden">Rang </span>{{ ligne.rang }}</span>
+              <span class="avatar" [style.background]="couleur(ligne.joueurId)">
+                @if (aUneImage(ligne.avatar)) {
+                  <img [src]="ligne.avatar" alt="" (error)="marquerIndisponible(ligne.avatar)" />
+                } @else {
+                  <span aria-hidden="true">{{ initiale(ligne.pseudo) }}</span>
+                }
+              </span>
+              <a class="elo__pseudo" [routerLink]="['/joueurs', ligne.joueurId]">{{ ligne.pseudo }}</a>
+              <strong class="elo__points">{{ ligne.elo }} <span>Elo</span></strong>
+              <span class="elo__parties">{{ pluriel(ligne.nbParties, "partie") }}</span>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+
     @if (fiche.nbParties === 0) {
       <section class="state-panel">
         <h2>Aucune partie pour l'instant</h2>
