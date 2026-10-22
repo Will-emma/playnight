@@ -10,13 +10,28 @@ nav {
     display: flex;
     align-items: center;
 
-    img {
+    .brand {
       margin-left: 20px;
-      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
       transition: 0.3s;
 
       &:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
+      }
+
+      img {
+        height: 48px;
+      }
+
+      span {
+        color: #f0eff8;
+        font-size: 1.5rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
       }
     }
   }
@@ -51,7 +66,9 @@ mat-nav-list a.active span {
 
 @media (max-width: 600px) {
   nav { height: 70px; }
-  nav div img { margin-left: 12px; height: 48px; }
+  nav div .brand { margin-left: 12px; }
+  nav div .brand img { height: 40px; }
+  nav div .brand span { display: none; }
   mat-nav-list { margin-left: 12px; width: auto; flex: 1; overflow-x: auto; }
   mat-nav-list a { min-width: max-content; }
   mat-nav-list span { font-size: .9rem; }

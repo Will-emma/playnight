@@ -3,14 +3,6 @@ import { NgModule } from "@angular/core"
 import { RouterModule, Routes } from "@angular/router"
 import { HomeComponent } from "home/home.component"
 import { HomeResolver } from "home/home.resolver"
-import { StudentsComponent } from "students/students.component"
-import { StudentsResolver } from "students/students.resolver"
-import { StudentDetailsComponent } from "students/student-details/student-details.component"
-import { StudentDetailsResolver } from "students/student-details/student-details.resolver"
-import { MajorsComponent } from "majors/majors.component"
-import { MajorsResolver } from "majors/majors.resolver"
-import { MajorStudentsResolver } from "majors/major-students/major-students.resolver"
-import { MajorStudentsComponent } from "majors/major-students/major-students.component"
 import { JeuxComponent } from "jeux/jeux.component"
 import { JeuxResolver } from "jeux/jeux.resolver"
 import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
@@ -76,32 +68,9 @@ const routes: Routes = [
     resolve: { detailSoireePage: DetailSoireeResolver },
   },
   {
-    path: "etudiants",
-    component: StudentsComponent,
-    resolve: {
-      students: StudentsResolver,
-    },
-  },
-  {
-    path: "details-etudiant/:id",
-    component: StudentDetailsComponent,
-    resolve: {
-      student: StudentDetailsResolver,
-    },
-  },
-  {
-    path: "filieres",
-    component: MajorsComponent,
-    resolve: {
-      majors: MajorsResolver,
-    },
-  },
-  {
-    path: "etudiants-filiere/:id",
-    component: MajorStudentsComponent,
-    resolve: {
-      studentsFromMajor: MajorStudentsResolver,
-    },
+    // À garder en dernier : toute adresse inconnue renvoie vers l'accueil
+    path: "**",
+    redirectTo: "",
   },
 ]
 

@@ -8,13 +8,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { NavbarComponent } from "navbar/navbar.component"
 import { MatListModule } from "@angular/material/list"
 import { HomeComponent } from "home/home.component"
-import { StudentsComponent } from "students/students.component"
-import { StudentDetailsComponent } from "students/student-details/student-details.component"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
-import { MatIconModule } from "@angular/material/icon"
-import { MatButtonModule } from "@angular/material/button"
-import { MajorsComponent } from "majors/majors.component"
-import { MajorStudentsComponent } from "majors/major-students/major-students.component"
 import { HttpClientModule } from "@angular/common/http"
 import { JeuxComponent } from "jeux/jeux.component"
 import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
@@ -31,10 +25,6 @@ import { SoireesComponent } from "soirees/soirees.component"
     AppComponent,
     NavbarComponent,
     HomeComponent,
-    StudentsComponent,
-    StudentDetailsComponent,
-    MajorsComponent,
-    MajorStudentsComponent,
     JeuxComponent,
     NouvelleSoireeComponent,
     FicheJeuComponent,
@@ -50,8 +40,6 @@ import { SoireesComponent } from "soirees/soirees.component"
     BrowserAnimationsModule,
     MatListModule,
     FormsModule,
-    MatIconModule,
-    MatButtonModule,
     HttpClientModule,
     ReactiveFormsModule,
     MatStepperModule,
