@@ -49,6 +49,8 @@
                 >
                   @if (joueur.avatar) {
                     <img [src]="joueur.avatar" alt="" />
+                  } @else {
+                    <span class="joueur__initiale" [style.background]="couleur(joueur.id)" aria-hidden="true">{{ initiale(joueur.pseudo) }}</span>
                   }
                   {{ joueur.pseudo }}
                 </button>

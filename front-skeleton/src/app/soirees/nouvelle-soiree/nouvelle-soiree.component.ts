@@ -8,6 +8,9 @@ import { SoireeCreation } from "models/soiree.model"
 import { SoireeService } from "services/soiree.service"
 import { NouvelleSoireePageData } from "./nouvelle-soiree.resolver"
 
+// Mêmes couleurs que les avatars de la page Joueurs, pour un joueur sans avatar
+const COULEURS = ["#e9562e", "#397df2", "#2fc0b5", "#f5b73e", "#9c5be1", "#ed3f70"]
+
 // Même règle que le back : une soirée doit avoir au moins un joueur présent
 function auMoinsUnJoueur(control: AbstractControl<number[]>): ValidationErrors | null {
   return control.value.length > 0 ? null : { auMoinsUnJoueur: true }
@@ -97,6 +100,14 @@ export class NouvelleSoireeComponent implements OnInit {
   }
 
   // ---------- Étape 1 ----------
+
+  couleur(id: number): string {
+    return COULEURS[Math.max(0, id - 1) % COULEURS.length]
+  }
+
+  initiale(pseudo: string): string {
+    return pseudo.trim().charAt(0).toLocaleUpperCase("fr-FR")
+  }
 
   estPresent(joueur: Joueur): boolean {
     return this.infos.controls.joueurIds.value.includes(joueur.id)
