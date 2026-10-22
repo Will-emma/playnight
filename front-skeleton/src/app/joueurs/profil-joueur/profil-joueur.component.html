@@ -13,29 +13,44 @@
       <p>Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
     </section>
   } @else {
-    <!-- En-tête : le joueur et ses statistiques -->
-    <section class="entete" aria-labelledby="pseudo-joueur">
-      <div class="entete__avatar">
-        @if (profil.joueur.avatar) {
-          <img [src]="profil.joueur.avatar" alt="" />
+    <!-- En-tête : le joueur et ses statistiques, sur un halo de sa couleur -->
+    <section class="entete" aria-labelledby="pseudo-joueur" [style.--couleur-joueur]="couleur(profil.joueur.id)">
+      <div class="entete__avatar" [style.background]="couleur(profil.joueur.id)">
+        @if (aUneImage(profil.joueur.avatar)) {
+          <img [src]="profil.joueur.avatar" alt="" (error)="marquerIndisponible(profil.joueur.avatar)" />
         } @else {
-          <span aria-hidden="true">{{ profil.joueur.pseudo.charAt(0).toUpperCase() }}</span>
+          <span aria-hidden="true">{{ initiale(profil.joueur.pseudo) }}</span>
         }
       </div>
-      <div>
+
+      <div class="entete__infos">
+        <p class="eyebrow"><span class="eyebrow__dot"></span> PLAYNIGHT · JOUEUR</p>
         <h1 id="pseudo-joueur">{{ profil.joueur.pseudo }}</h1>
         <dl class="statistiques">
-          <div>
-            <dt>Parties jouées</dt>
-            <dd>{{ profil.nbParties }}</dd>
+          <div class="statistique">
+            <svg class="icone icone--turquoise" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4" /><circle cx="8.5" cy="8.5" r="1.2" /><circle cx="12" cy="12" r="1.2" /><circle cx="15.5" cy="15.5" r="1.2" /></svg>
+            <div>
+              <dt>Parties jouées</dt>
+              <dd>{{ profil.nbParties }}</dd>
+            </div>
           </div>
-          <div>
-            <dt>Victoires</dt>
-            <dd>{{ profil.nbVictoires }}</dd>
+          <div class="statistique">
+            <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg>
+            <div>
+              <dt>Victoires</dt>
+              <dd>{{ profil.nbVictoires }}</dd>
+            </div>
           </div>
-          <div>
-            <dt>Taux de victoire</dt>
-            <dd>{{ profil.nbParties > 0 ? tauxVictoire + " %" : "–" }}</dd>
+          <div class="statistique">
+            <!-- Jauge circulaire : le trait doré couvre la part du cercle égale au taux de victoire -->
+            <svg class="jauge" viewBox="0 0 64 64" aria-hidden="true">
+              <circle class="jauge__fond" cx="32" cy="32" r="26" />
+              <circle class="jauge__valeur" cx="32" cy="32" r="26" [attr.stroke-dasharray]="remplissageJauge" />
+            </svg>
+            <div>
+              <dt>Taux de victoire</dt>
+              <dd>{{ profil.nbParties > 0 ? tauxVictoire + " %" : "–" }}</dd>
+            </div>
           </div>
         </dl>
       </div>
@@ -52,17 +67,20 @@
         <section class="bloc" aria-labelledby="titre-favoris">
           <h2 id="titre-favoris">Jeux favoris</h2>
           <ol class="favoris">
-            @for (favori of jeuxFavorisAffiches; track favori.jeu.id) {
-              <li class="favoris__ligne">
-                <span class="favoris__image" aria-hidden="true">
-                  @if (afficherImage(favori.jeu)) {
-                    <img [src]="favori.jeu.image" alt="" (error)="imagesIndisponibles.add(favori.jeu.id)" />
+            @for (favori of jeuxFavorisAffiches; track favori.jeu.id; let i = $index) {
+              <li>
+                <a class="favori" [routerLink]="['/jeux', favori.jeu.id]" [style.background]="couleur(favori.jeu.id)">
+                  @if (aUneImage(favori.jeu.image)) {
+                    <img class="favori__image" [src]="favori.jeu.image" alt="" (error)="marquerIndisponible(favori.jeu.image)" />
                   } @else {
-                    {{ initiale(favori.jeu) }}
+                    <span class="favori__initiale" aria-hidden="true">{{ initiale(favori.jeu.nom) }}</span>
                   }
-                </span>
-                <a class="favoris__nom" [routerLink]="['/jeux', favori.jeu.id]">{{ favori.jeu.nom }}</a>
-                <span class="favoris__parties">{{ pluriel(favori.nbParties, "partie") }}</span>
+                  <span class="favori__rang" aria-hidden="true">#{{ i + 1 }}</span>
+                  <span class="favori__bas">
+                    <span class="favori__nom">{{ favori.jeu.nom }}</span>
+                    <span class="favori__parties">{{ pluriel(favori.nbParties, "partie") }}</span>
+                  </span>
+                </a>
               </li>
             }
           </ol>
@@ -79,15 +97,21 @@
           <ul class="historique">
             @for (partie of historiqueAffiche; track partie.partieId) {
               <li class="historique__ligne">
-                <span class="historique__date">{{ formaterDate(partie.date) }}</span>
-                <span class="historique__rang" [class.historique__rang--victoire]="partie.rang === 1">
-                  {{ partie.rang === 1 ? "Victoire" : formaterRang(partie.rang) }}
-                </span>
-                <span class="historique__detail">
-                  <a [routerLink]="['/jeux', partie.jeu.id]">{{ partie.jeu.nom }}</a>
-                  @if (partie.points !== null) {
-                    · {{ pluriel(partie.points, "point") }}
+                <span class="vignette" [style.background]="couleur(partie.jeu.id)" aria-hidden="true">
+                  @if (aUneImage(partie.jeu.image)) {
+                    <img [src]="partie.jeu.image" alt="" (error)="marquerIndisponible(partie.jeu.image)" />
+                  } @else {
+                    {{ initiale(partie.jeu.nom) }}
                   }
+                </span>
+                <span class="historique__texte">
+                  <a [routerLink]="['/jeux', partie.jeu.id]">{{ partie.jeu.nom }}</a>
+                  <span class="historique__date">
+                    {{ formaterDate(partie.date) }}@if (partie.points !== null) { · {{ pluriel(partie.points, "point") }}}
+                  </span>
+                </span>
+                <span class="rang" [class.rang--victoire]="partie.rang === 1" [class.rang--argent]="partie.rang === 2" [class.rang--bronze]="partie.rang === 3">
+                  {{ partie.rang === 1 ? "Victoire" : formaterRang(partie.rang) }}
                 </span>
               </li>
             }

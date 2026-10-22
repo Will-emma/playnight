@@ -414,60 +414,89 @@ app-profil-joueur {
   color: var(--library-text);
   background: var(--library-bg);
 
-  .profil-joueur { max-width: 1100px; margin: auto; padding: 32px clamp(16px, 5vw, 64px) 72px; }
-  .retour { margin-bottom: 24px; padding: 0; border: none; color: var(--library-muted); background: none; font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; }
+  .profil-joueur { max-width: 1200px; margin: auto; padding: 32px clamp(16px, 5vw, 64px) 72px; }
+  .retour { margin-bottom: 24px; padding: 0; border: none; color: var(--library-muted); background: none; font: inherit; font-size: .88rem; font-weight: 700; cursor: pointer; }
   .retour:hover { color: var(--library-accent); }
+  a { color: inherit; font-weight: 700; text-decoration: none; }
+  a:hover { color: var(--library-accent); }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
+  .icone { flex: none; width: 26px; height: 26px; fill: none; stroke: var(--library-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .icone circle { fill: currentColor; }
+  .icone--turquoise { color: #4fd6cb; stroke: #4fd6cb; }
 
-  // En-tête : avatar et statistiques du joueur
-  .entete { display: flex; flex-wrap: wrap; align-items: center; gap: 28px; margin-bottom: 32px; }
-  .entete__avatar { display: grid; flex: none; width: 128px; height: 128px; place-items: center; overflow: hidden; border: 3px solid var(--library-accent); border-radius: 50%; background: var(--library-art-bg); box-shadow: 0 0 28px var(--library-accent-glow); }
-  .entete__avatar img { width: 100%; height: 100%; }
-  .entete__avatar span { color: var(--library-accent); font-size: 3.4rem; font-weight: 800; }
+  // En-tête : avatar, pseudo et statistiques, sur un halo de la couleur du joueur
+  .entete { position: relative; display: flex; overflow: hidden; flex-wrap: wrap; align-items: center; gap: 32px; margin-bottom: 40px; padding: 32px; border: 1px solid var(--library-line); border-radius: 26px; background: radial-gradient(circle at 12% 40%, color-mix(in srgb, var(--couleur-joueur) 28%, transparent), transparent 55%), var(--library-surface); }
+  .entete__avatar { display: grid; overflow: hidden; flex: none; width: 140px; height: 140px; place-items: center; border: 4px solid var(--library-accent); border-radius: 50%; box-shadow: 0 0 36px var(--library-accent-glow); }
+  .entete__avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .entete__avatar span { color: #11131f; font-size: 3.8rem; font-weight: 900; }
+  .entete__infos { flex: 1 1 360px; min-width: 0; }
+  .eyebrow { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; color: var(--library-accent); font-size: .72rem; font-weight: 700; letter-spacing: .16em; }
+  .eyebrow__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--library-accent); box-shadow: 0 0 14px var(--library-accent-glow); }
   // .profil-joueur devant h1 : sinon la typographie Material (.mat-typography h1) l'emporte
-  .profil-joueur h1 { margin: 0 0 16px; font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 750; line-height: 1.05; letter-spacing: -.05em; }
+  .profil-joueur h1 { overflow-wrap: anywhere; margin: 0 0 22px; font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 900; line-height: 1; letter-spacing: -.05em; }
   .statistiques { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; }
-  .statistiques div { min-width: 120px; padding: 12px 16px; border: 1px solid var(--library-line); border-radius: 14px; background: var(--library-surface); }
+  .statistique { display: flex; align-items: center; gap: 14px; min-width: 170px; padding: 14px 18px; border: 1px solid var(--library-line); border-radius: 16px; background: #11131fb3; }
   .statistiques dt { color: var(--library-muted); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-  .statistiques dd { margin: 4px 0 0; font-size: 1.4rem; font-weight: 800; }
+  .statistiques dd { margin: 4px 0 0; font-size: 1.6rem; font-weight: 900; line-height: 1; }
+
+  // Jauge du taux de victoire : le cercle doré part du haut (rotation de -90°)
+  .jauge { flex: none; width: 44px; height: 44px; transform: rotate(-90deg); }
+  .jauge circle { fill: none; stroke-width: 8; }
+  .jauge__fond { stroke: var(--library-art-bg); }
+  .jauge__valeur { stroke: var(--library-accent); stroke-linecap: round; }
 
   // Jeux favoris et historique, côte à côte
-  .colonnes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); align-items: start; gap: 20px; }
-  .bloc { padding: 22px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); }
-  .profil-joueur .bloc h2 { margin: 0 0 16px; font-size: 1.15rem; font-weight: 700; }
-  a { color: inherit; font-weight: 700; text-decoration: none; }
-  a:hover { color: var(--library-accent); text-decoration: underline; }
+  .colonnes { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px; }
+  .bloc { flex: 1 1 380px; min-width: 0; padding: 26px; border: 1px solid var(--library-line); border-radius: 22px; background: var(--library-surface); }
+  .profil-joueur .bloc h2 { margin: 0 0 20px; font-size: 1.5rem; font-weight: 900; }
 
-  .favoris { display: grid; gap: 8px; margin: 0 0 8px; padding: 0; list-style: none; }
-  .favoris__ligne { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--library-card); }
-  .favoris__image { display: grid; flex: none; width: 48px; height: 36px; place-items: center; overflow: hidden; border-radius: 8px; color: var(--library-accent); background: var(--library-art-bg); font-weight: 800; }
-  .favoris__image img { width: 100%; height: 100%; object-fit: cover; }
-  .favoris__nom { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .favoris__parties { color: var(--library-muted); font-size: .85rem; white-space: nowrap; }
+  // Jeux favoris : couvertures portrait, classées
+  .favoris { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin: 0 0 8px; padding: 0; list-style: none; }
+  .favori { position: relative; display: flex; overflow: hidden; aspect-ratio: 3 / 4; flex-direction: column; justify-content: flex-end; padding: 12px; border-radius: 16px; color: #11131f; transition: transform .2s ease, box-shadow .2s ease; }
+  .favori:hover { color: #11131f; transform: translateY(-4px); box-shadow: 0 14px 30px #0006; }
+  .favori__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .favori__initiale { font-size: 3.4rem; font-weight: 900; line-height: .85; }
+  .favori__rang { position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 999px; color: var(--library-accent); background: #11131fcc; font-size: .75rem; font-weight: 900; }
+  .favori__bas { position: relative; display: grid; }
+  // Sur une vraie image, le texte passe en clair sur un fond dégradé pour rester lisible
+  .favori__image ~ .favori__bas { margin: 0 -12px -12px; padding: 28px 12px 12px; color: var(--library-text); background: linear-gradient(transparent, #11131fe6); }
+  .favori__nom { overflow: hidden; font-size: .9rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+  .favori__parties { font-size: .75rem; font-weight: 400; opacity: .85; }
 
-  .historique { display: grid; margin: 0 0 8px; padding: 0; list-style: none; }
-  .historique__ligne { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 12px 0; border-bottom: 1px solid var(--library-line); }
-  .historique__ligne:last-child { border-bottom: none; }
-  .historique__date { font-weight: 700; }
+  // Historique : vignette du jeu, nom, date et points, badge de rang
+  .historique { display: grid; gap: 8px; margin: 0 0 8px; padding: 0; list-style: none; }
+  .historique__ligne { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: 14px; background: var(--library-card); }
+  .vignette { display: grid; overflow: hidden; flex: none; width: 44px; height: 44px; place-items: center; border-radius: 10px; color: #11131f; font-size: 1.2rem; font-weight: 900; }
+  .vignette img { width: 100%; height: 100%; object-fit: cover; }
+  .historique__texte { display: grid; flex: 1; gap: 2px; min-width: 0; }
+  .historique__texte a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .historique__date { color: var(--library-muted); font-size: .8rem; }
   .historique__date::first-letter { text-transform: uppercase; }
-  .historique__rang { align-self: start; border-radius: 99px; padding: 3px 10px; color: var(--library-muted); background: var(--library-card); font-size: .8rem; font-weight: 700; }
-  .historique__rang--victoire { color: var(--library-badge-text); background: var(--library-accent); }
-  .historique__detail { grid-column: 1 / -1; color: var(--library-secondary); font-size: .9rem; }
+  .rang { flex: none; padding: 4px 10px; border: 1px solid var(--library-line); border-radius: 999px; color: var(--library-muted); font-size: .8rem; font-weight: 900; }
+  .rang--victoire { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); }
+  .rang--argent { border-color: #c5c9d966; color: #c5c9d9; }
+  .rang--bronze { border-color: #d0956a66; color: #d0956a; }
 
-  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 10px; padding: 10px 18px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
-  .bouton:hover { text-decoration: none; }
-  .bouton--principal { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); }
-  .bouton--principal:hover { color: var(--library-badge-text); }
+  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 12px; padding: 12px 22px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .bouton--principal, .bouton--principal:hover { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); }
   .bouton--discret { padding: 8px 4px; border-color: transparent; color: var(--library-accent); }
-  a:focus-visible, button:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
 
-  .state-panel { display: grid; justify-items: center; gap: 10px; padding: 40px 24px; border: 1px solid var(--library-line); border-radius: 18px; text-align: center; background: var(--library-surface); }
+  .state-panel { display: grid; justify-items: center; gap: 10px; padding: 40px 24px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); text-align: center; }
   .state-panel h2 { margin: 0; font-size: 1.3rem; }
   .state-panel p { margin: 0 0 8px; color: var(--library-muted); }
 
-  @media (max-width: 760px) {
-    .colonnes { grid-template-columns: 1fr; }
-    .entete { gap: 20px; }
-    .entete__avatar { width: 96px; height: 96px; }
+  // Petits écrans : l'avatar rétrécit et se centre au-dessus des informations
+  @media (max-width: 600px) {
+    .entete { justify-content: center; padding: 22px; text-align: center; }
+    .entete__avatar { width: 104px; height: 104px; }
+    .eyebrow { justify-content: center; }
+    .statistiques { justify-content: center; }
+    .bloc { padding: 20px; }
+  }
+
+  // Pas d'animation au survol pour les personnes qui les ont désactivées dans leur système
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
   }
 }
 
