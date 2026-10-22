@@ -1,91 +1,203 @@
 <main class="accueil">
-  <!-- Bandeau : présentation de PlayNight -->
+  <!-- Bandeau : présentation de PlayNight et collage de jeux -->
   <section class="bandeau" aria-labelledby="titre-accueil">
-    <p class="eyebrow"><span class="eyebrow__dot"></span> BIENVENUE SUR PLAYNIGHT</p>
-    <h1 id="titre-accueil">Vos soirées jeux,<br /><span class="bandeau__accent">au même endroit.</span></h1>
-    <p class="bandeau__texte">
-      Notez les parties de vos soirées entre amis, jeux de société comme jeux vidéo, et suivez qui gagne le plus souvent.
-    </p>
-    <div class="bandeau__actions">
-      <a class="bouton bouton--principal" routerLink="/soirees/nouvelle">+ Nouvelle soirée</a>
-      <a class="bouton" routerLink="/soirees">Voir les soirées</a>
+    <div class="bandeau__halo" aria-hidden="true"></div>
+
+    <div class="bandeau__texte-bloc">
+      <p class="eyebrow"><span class="eyebrow__dot"></span> BIENVENUE SUR PLAYNIGHT</p>
+      <h1 id="titre-accueil">Vos soirées jeux,<br /><span class="bandeau__accent">au même endroit.</span></h1>
+      <p class="bandeau__texte">
+        Notez les parties de vos soirées entre amis, jeux de société comme jeux vidéo, et suivez qui gagne le plus souvent.
+      </p>
+      <div class="bandeau__actions">
+        <a class="bouton bouton--principal" routerLink="/soirees/nouvelle">+ Nouvelle soirée</a>
+        <a class="bouton" routerLink="/soirees">Voir les soirées</a>
+      </div>
     </div>
+
+    @if (couverturesCollage.length > 0) {
+      <div class="collage">
+        <!-- Cartes posées en éventail : la position de chacune dépend de sa place (voir .collage__carte--N) -->
+        @for (jeu of couverturesCollage; track jeu.id; let i = $index) {
+          <a class="collage__carte collage__carte--{{ i + 1 }}" [routerLink]="['/jeux', jeu.id]" [style.--cover-color]="couleur(jeu.id)">
+            @if (aUneImage(jeu)) {
+              <img class="collage__image" [src]="jeu.image" alt="" (error)="marquerIndisponible(jeu.image)" />
+            }
+            <span class="collage__type">{{ labelType(jeu.type) }}</span>
+            <span class="collage__bas">
+              @if (!aUneImage(jeu)) {
+                <span class="collage__initiale" aria-hidden="true">{{ initiale(jeu.nom) }}</span>
+              }
+              <span class="collage__nom">{{ jeu.nom }}</span>
+            </span>
+          </a>
+        }
+
+        @if (dernierGagnant) {
+          <p class="collage__bulle">
+            <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg>
+            <span>
+              <strong>{{ dernierGagnant.gagnants }} {{ dernierGagnant.gagnants.includes(",") ? "ont" : "a" }} gagné à {{ dernierGagnant.partie.jeu.nom }}</strong>
+              <span class="collage__bulle-detail">
+                {{ derniereSoiree?.lieu }}@if (dernierGagnant.points !== null) { · {{ pluriel(dernierGagnant.points, "point") }}}
+              </span>
+            </span>
+          </p>
+        }
+      </div>
+    }
   </section>
 
   @if (erreur === "indisponible") {
     <section class="state-panel" role="alert">
-      <h2>Les chiffres et les dernières soirées sont momentanément indisponibles</h2>
+      <h2>Les chiffres, les champions et la dernière soirée sont momentanément indisponibles</h2>
       <p>Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
     </section>
   } @else {
     <!-- Chiffres clés -->
     <ul class="chiffres" aria-label="PlayNight en chiffres">
-      <li class="chiffre">
-        <strong>{{ nbJeux }}</strong>
-        <span>{{ nbJeux > 1 ? "jeux dans la ludothèque" : "jeu dans la ludothèque" }}</span>
+      <li class="chiffre chiffre--or">
+        <span class="chiffre__icone" aria-hidden="true">
+          <svg class="icone" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" /><circle cx="8.5" cy="8.5" r="1.2" /><circle cx="12" cy="12" r="1.2" /><circle cx="15.5" cy="15.5" r="1.2" /></svg>
+        </span>
+        <span><strong>{{ nbJeux }}</strong> {{ nbJeux > 1 ? "jeux dans la ludothèque" : "jeu dans la ludothèque" }}</span>
       </li>
-      <li class="chiffre">
-        <strong>{{ nbSoirees }}</strong>
-        <span>{{ nbSoirees > 1 ? "soirées organisées" : "soirée organisée" }}</span>
+      <li class="chiffre chiffre--violet">
+        <span class="chiffre__icone" aria-hidden="true">
+          <svg class="icone" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
+        </span>
+        <span><strong>{{ nbSoirees }}</strong> {{ nbSoirees > 1 ? "soirées organisées" : "soirée organisée" }}</span>
       </li>
-      <li class="chiffre">
-        <strong>{{ nbParties }}</strong>
-        <span>{{ nbParties > 1 ? "parties jouées" : "partie jouée" }}</span>
+      <li class="chiffre chiffre--turquoise">
+        <span class="chiffre__icone" aria-hidden="true">
+          <svg class="icone" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg>
+        </span>
+        <span><strong>{{ nbParties }}</strong> {{ nbParties > 1 ? "parties jouées" : "partie jouée" }}</span>
+      </li>
+      <li class="chiffre chiffre--bleu">
+        <span class="chiffre__icone" aria-hidden="true">
+          <svg class="icone" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6" /></svg>
+        </span>
+        <span><strong>{{ nbJoueurs }}</strong> {{ nbJoueurs > 1 ? "joueurs dans la bande" : "joueur dans la bande" }}</span>
       </li>
     </ul>
 
-    <!-- Dernières soirées : mêmes cartes que la liste des soirées -->
-    <section class="section" aria-labelledby="titre-recentes">
-      <div class="section__entete">
-        <h2 id="titre-recentes">Dernières soirées</h2>
-        @if (nbSoirees > 0) {
-          <a class="lien-discret" routerLink="/soirees">Toutes les soirées →</a>
-        }
-      </div>
+    <div class="duo">
+      <!-- Podium des 3 meilleurs joueurs (même classement que la page Joueurs) -->
+      @if (podium.length > 0) {
+        <section class="panneau panneau--podium" aria-labelledby="titre-champions">
+          <div class="section__entete">
+            <h2 id="titre-champions">Champions du moment</h2>
+            <a class="lien-discret" routerLink="/joueurs">Tous les joueurs →</a>
+          </div>
+          <ol class="podium">
+            @for (marche of podium; track marche.classement.joueur.id) {
+              <li class="podium__marche podium__marche--{{ marche.rang }}">
+                @if (marche.rang === 1) {
+                  <svg class="podium__couronne" viewBox="0 0 30 22" aria-hidden="true"><path d="M2 20h26L26 6l-6 5-5-9-5 9-6-5z" /></svg>
+                }
+                <a class="podium__joueur" [routerLink]="['/joueurs', marche.classement.joueur.id]">
+                  <span class="podium__avatar" [style.background]="couleur(marche.classement.joueur.id)">
+                    @if (aUnAvatar(marche.classement.joueur)) {
+                      <img [src]="marche.classement.joueur.avatar" alt="" (error)="marquerIndisponible(marche.classement.joueur.avatar)" />
+                    } @else {
+                      <span aria-hidden="true">{{ initiale(marche.classement.joueur.pseudo) }}</span>
+                    }
+                  </span>
+                  <span class="podium__pseudo">{{ marche.classement.joueur.pseudo }}</span>
+                </a>
+                <span class="podium__stats">
+                  {{ pluriel(marche.classement.nbVictoires, "victoire") }} · {{ pluriel(marche.classement.nbParties, "partie") }}
+                </span>
+                <span class="podium__socle"><span class="visually-hidden">Rang </span>{{ marche.rang }}</span>
+              </li>
+            }
+          </ol>
+        </section>
+      }
 
-      @if (soireesRecentes.length === 0) {
-        <div class="state-panel">
+      <!-- Dernière soirée, mise en avant -->
+      @if (derniereSoiree) {
+        <section class="panneau panneau--vedette" aria-labelledby="titre-derniere">
+          <div class="vedette__entete">
+            <span class="pastille">DERNIÈRE SOIRÉE</span>
+            <span class="vedette__date">{{ formaterDate(derniereSoiree.date) }}</span>
+          </div>
+          <div>
+            <h2 id="titre-derniere">
+              <!-- Lien "étiré" sur toute la carte (voir .carte__lien dans styles.scss) -->
+              <a class="carte__lien" [routerLink]="['/soirees', derniereSoiree.id]">{{ derniereSoiree.lieu }}</a>
+            </h2>
+            <p class="vedette__resume">
+              {{ pluriel(derniereSoiree.parties.length, "partie") }} · {{ pluriel(derniereSoiree.joueurs.length, "joueur") }}
+            </p>
+          </div>
+          <ul class="avatars" aria-label="Joueurs présents">
+            @for (joueur of derniereSoiree.joueurs; track joueur.id) {
+              <li class="avatars__item" [style.background]="couleur(joueur.id)" [title]="joueur.pseudo">
+                @if (aUnAvatar(joueur)) {
+                  <img [src]="joueur.avatar" [alt]="joueur.pseudo" (error)="marquerIndisponible(joueur.avatar)" />
+                } @else {
+                  <span [attr.aria-label]="joueur.pseudo">{{ initiale(joueur.pseudo) }}</span>
+                }
+              </li>
+            }
+          </ul>
+          <ul class="parties">
+            @for (resume of partiesDerniereSoiree; track resume.partie.id) {
+              <li class="partie">
+                <span class="partie__image" [style.background]="couleur(resume.partie.jeu.id)">
+                  @if (aUneImage(resume.partie.jeu)) {
+                    <img [src]="resume.partie.jeu.image" alt="" (error)="marquerIndisponible(resume.partie.jeu.image)" />
+                  } @else {
+                    <span aria-hidden="true">{{ initiale(resume.partie.jeu.nom) }}</span>
+                  }
+                </span>
+                <span class="partie__jeu">
+                  <strong>{{ resume.partie.jeu.nom }}</strong>
+                  <span>{{ formaterDuree(resume.partie.duree) }}</span>
+                </span>
+                <span class="partie__gagnant">
+                  <strong>{{ resume.gagnants }}</strong>
+                  @if (resume.points !== null) {
+                    <span>{{ pluriel(resume.points, "point") }}</span>
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+          <span class="lien-discret vedette__lien" aria-hidden="true">Voir le détail de la soirée →</span>
+        </section>
+      } @else {
+        <section class="panneau state-panel">
           <p>Aucune soirée pour l'instant : créez la première !</p>
           <a class="bouton bouton--principal" routerLink="/soirees/nouvelle">Créer une soirée</a>
+        </section>
+      }
+    </div>
+
+    <!-- Quelques jeux de la ludothèque -->
+    @if (couverturesRangee.length > 0) {
+      <section class="section" aria-labelledby="titre-ludotheque">
+        <div class="section__entete">
+          <h2 id="titre-ludotheque">Dans la ludothèque</h2>
+          <a class="lien-discret" routerLink="/jeux">Toute la ludothèque →</a>
         </div>
-      } @else {
-        <ul class="liste">
-          @for (soiree of soireesRecentes; track soiree.id) {
-            <li class="carte">
-              <p class="carte__date">{{ formaterDate(soiree.date) }}</p>
-              <h3>
-                <!-- Lien "étiré" sur toute la carte (voir .carte__lien dans styles.scss) -->
-                <a class="carte__lien" [routerLink]="['/soirees', soiree.id]">{{ soiree.lieu }}</a>
-              </h3>
-              <p class="carte__resume">{{ pluriel(soiree.nbParties, "partie") }} · {{ pluriel(soiree.joueurs.length, "joueur") }}</p>
+        <ul class="rangee">
+          @for (jeu of couverturesRangee; track jeu.id) {
+            <li>
+              <a class="rangee__carte" [routerLink]="['/jeux', jeu.id]" [style.--cover-color]="couleur(jeu.id)">
+                @if (aUneImage(jeu)) {
+                  <img class="rangee__image" [src]="jeu.image" alt="" (error)="marquerIndisponible(jeu.image)" />
+                } @else {
+                  <span class="rangee__initiale" aria-hidden="true">{{ initiale(jeu.nom) }}</span>
+                }
+                <span class="rangee__nom">{{ jeu.nom }}</span>
+              </a>
             </li>
           }
         </ul>
-      }
-    </section>
+      </section>
+    }
   }
-
-  <!-- Raccourcis vers les pages principales -->
-  <section class="section" aria-labelledby="titre-raccourcis">
-    <div class="section__entete">
-      <h2 id="titre-raccourcis">Par où commencer ?</h2>
-    </div>
-    <ul class="liste">
-      <li class="carte raccourci">
-        <span class="raccourci__icone" aria-hidden="true">♟</span>
-        <h3><a class="carte__lien" routerLink="/jeux">La ludothèque</a></h3>
-        <p class="carte__resume">Parcourez les jeux de société et jeux vidéo, et découvrez qui y brille.</p>
-      </li>
-      <li class="carte raccourci">
-        <span class="raccourci__icone" aria-hidden="true">✦</span>
-        <h3><a class="carte__lien" routerLink="/soirees">Les soirées</a></h3>
-        <p class="carte__resume">Revivez chaque soirée : les parties jouées, les classements et les scores.</p>
-      </li>
-      <li class="carte raccourci">
-        <span class="raccourci__icone" aria-hidden="true">+</span>
-        <h3><a class="carte__lien" routerLink="/soirees/nouvelle">Nouvelle soirée</a></h3>
-        <p class="carte__resume">Enregistrez une soirée en quelques étapes : joueurs, parties puis scores.</p>
-      </li>
-    </ul>
-  </section>
 </main>

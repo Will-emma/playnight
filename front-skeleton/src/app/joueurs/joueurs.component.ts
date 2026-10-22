@@ -4,12 +4,7 @@ import { HttpErrorResponse } from "@angular/common/http"
 import { forkJoin, map } from "rxjs"
 import { Joueur } from "models/joueur.model"
 import { JoueurService } from "services/joueur.service"
-
-interface JoueurClassement {
-  joueur: Joueur
-  nbVictoires: number
-  nbParties: number
-}
+import { JoueurClassement, comparerClassement } from "utils/classement"
 
 @Component({
   selector: "app-joueurs",
@@ -75,12 +70,7 @@ export class JoueursComponent implements OnInit {
       ),
     ).subscribe({
       next: (classement) => {
-        this.classement = classement.sort(
-          (a, b) =>
-            b.nbVictoires - a.nbVictoires ||
-            b.nbParties - a.nbParties ||
-            a.joueur.pseudo.localeCompare(b.joueur.pseudo, "fr", { sensitivity: "base" }),
-        )
+        this.classement = classement.sort(comparerClassement)
         this.classementCharge = true
         this.chargementClassement = false
       },
