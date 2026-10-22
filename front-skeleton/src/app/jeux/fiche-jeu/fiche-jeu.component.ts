@@ -1,8 +1,18 @@
 import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
 import { FicheJeu, Jeu, MeilleurJoueur, TypeJeu } from "models/jeu.model"
+import { Joueur } from "models/joueur.model"
 import { formaterDate, formaterDuree, pluriel } from "utils/format"
 import { FicheJeuPageData } from "./fiche-jeu.resolver"
+
+// Mêmes couleurs que les couvertures de la Ludothèque et les avatars de la page Joueurs
+const COULEURS = ["#e9562e", "#397df2", "#2fc0b5", "#f5b73e", "#9c5be1", "#ed3f70"]
+
+// Badge de date des parties : "12" / "SEPT" (format fourni par le navigateur)
+const FORMAT_MOIS_COURT = new Intl.DateTimeFormat("fr-FR", { month: "short" })
+
+// Nombre de joueurs sur le podium ; les suivants sont listés en dessous
+const NB_PODIUM = 3
 
 @Component({
   selector: "app-fiche-jeu",
@@ -10,13 +20,14 @@ import { FicheJeuPageData } from "./fiche-jeu.resolver"
   styleUrls: ["./fiche-jeu.component.scss"],
 })
 export class FicheJeuComponent implements OnInit {
-  // Le back renvoie tous les vainqueurs : la page n'en montre que 5, sauf si on demande à tout voir
+  // Le back renvoie tous les vainqueurs : la page n'en montre que 5 (podium compris), sauf si on demande à tout voir
   readonly nbMeilleursJoueursAffiches = 5
 
   fiche: FicheJeu | null = null
   erreur: FicheJeuPageData["erreur"] = null
   toutLeClassement = false
-  imageIndisponible = false
+  // Images qui n'ont pas pu être chargées (couverture du jeu, avatars) : on affiche la couleur et l'initiale à la place
+  readonly imagesIndisponibles = new Set<string>()
 
   constructor(private route: ActivatedRoute) {}
 
@@ -27,13 +38,19 @@ export class FicheJeuComponent implements OnInit {
       this.fiche = page.fiche
       this.erreur = page.erreur
       this.toutLeClassement = false
-      this.imageIndisponible = false
     })
   }
 
-  get meilleursJoueursAffiches(): MeilleurJoueur[] {
+  // Podium : le 1er au centre, comme sur une vraie marche (2e, 1er, 3e)
+  get podium(): { meilleur: MeilleurJoueur }[] {
+    const [premier, deuxieme, troisieme] = this.fiche?.meilleursJoueurs ?? []
+    return [{ meilleur: deuxieme }, { meilleur: premier }, { meilleur: troisieme }].filter((ligne) => ligne.meilleur !== undefined)
+  }
+
+  // Les joueurs après le podium : jusqu'au 5e, ou tout le classement à la demande
+  get suivants(): MeilleurJoueur[] {
     const classement = this.fiche?.meilleursJoueurs ?? []
-    return this.toutLeClassement ? classement : classement.slice(0, this.nbMeilleursJoueursAffiches)
+    return classement.slice(NB_PODIUM, this.toutLeClassement ? undefined : this.nbMeilleursJoueursAffiches)
   }
 
   // Les joueurs à égalité de victoires partagent la même place (1, 2, 2, 4…)
@@ -52,14 +69,38 @@ export class FicheJeuComponent implements OnInit {
     return `${jeu.nbJoueursMin} à ${jeu.nbJoueursMax} joueurs`
   }
 
-  initiale(jeu: Jeu): string {
-    return jeu.nom.trim().charAt(0).toLocaleUpperCase("fr-FR")
+  aUneImage(url: string | null): boolean {
+    return !!url && !this.imagesIndisponibles.has(url)
+  }
+
+  marquerIndisponible(url: string | null): void {
+    if (url) this.imagesIndisponibles.add(url)
+  }
+
+  couleur(id: number): string {
+    return COULEURS[Math.max(0, id - 1) % COULEURS.length]
+  }
+
+  initiale(texte: string): string {
+    return texte.trim().charAt(0).toLocaleUpperCase("fr-FR")
+  }
+
+  // "2026-09-12T20:00:00" → { numero: "12", mois: "SEPT" }
+  badgeDate(date: string): { numero: string; mois: string } {
+    const jour = new Date(date)
+    return {
+      numero: String(jour.getDate()),
+      mois: FORMAT_MOIS_COURT.format(jour).replace(".", "").toLocaleUpperCase("fr-FR"),
+    }
+  }
+
+  avatarDe(joueur: Joueur): string | null {
+    return this.aUneImage(joueur.avatar) ? joueur.avatar : null
   }
 
   readonly formaterDate = formaterDate
   readonly formaterDuree = formaterDuree
   readonly pluriel = pluriel
-
 
   // ["Alex", "Léa", "Max"] → "Alex, Léa et Max"
   formaterVainqueurs(vainqueurs: string[]): string {
