@@ -22,25 +22,33 @@
     <form id="formulaire-joueur" class="formulaire" (ngSubmit)="ajouterJoueur()" #formulaire="ngForm">
       <div class="formulaire__entete">
         <span class="avatar" [style.background]="couleurApercu" [style.--couleur-joueur]="couleurApercu">
-          @if (aUneImage(avatar.trim())) {
-            <img [src]="avatar.trim()" alt="" (error)="marquerIndisponible(avatar.trim())" />
+          @if (aUneImage(avatarChoisi.url)) {
+            <img [src]="avatarChoisi.url" alt="" (error)="marquerIndisponible(avatarChoisi.url)" />
           } @else {
             <span aria-hidden="true">{{ initialeApercu }}</span>
           }
         </span>
         <div>
           <h2>Nouveau joueur</h2>
-          <p>Sans avatar, il aura son initiale sur une couleur, comme ici.</p>
+          <p>Choisissez son portrait. Il pourra aussi importer sa photo depuis son profil.</p>
         </div>
       </div>
       <label class="champ champ--pseudo">
         <span>Pseudo <b aria-hidden="true">*</b></span>
         <input name="pseudo" [(ngModel)]="pseudo" required autocomplete="nickname" placeholder="Ex. Alex" />
       </label>
-      <label class="champ champ--avatar">
-        <span>URL de l’avatar <small>(facultatif)</small></span>
-        <input name="avatar" [(ngModel)]="avatar" type="url" placeholder="https://…" />
-      </label>
+      <fieldset class="galerie">
+        <legend>Portrait</legend>
+        <div class="galerie__choix">
+          @for (portrait of avatars; track portrait.id) {
+            <button type="button" class="galerie__portrait" [class.galerie__portrait--choisi]="portrait.id === avatarChoisi.id"
+              [attr.aria-pressed]="portrait.id === avatarChoisi.id" [attr.aria-label]="portrait.nom" [title]="portrait.nom"
+              (click)="choisirAvatar(portrait)">
+              <img [src]="portrait.url" alt="" />
+            </button>
+          }
+        </div>
+      </fieldset>
       <div class="formulaire__actions">
         <button class="bouton" type="button" (click)="basculerFormulaire()">Annuler</button>
         <button class="bouton bouton--principal" type="submit" [disabled]="!formulaire.valid || enregistrement">
