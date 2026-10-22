@@ -174,5 +174,17 @@
         </section>
       </div>
     }
+
+    <!-- Seul un joueur qui n'a jamais joué peut être supprimé : l'API refuse sinon, pour garder l'historique des autres -->
+    @if (profil.nbParties === 0) {
+      <app-suppression
+        libelle="Supprimer le joueur"
+        [titre]="'Supprimer ' + profil.joueur.pseudo + ' ?'"
+        message="Il disparaîtra de la liste des joueurs. Cette action est définitive."
+        messageConflit="Ce joueur a joué une partie entre-temps : il ne peut plus être supprimé. Rechargez la page."
+        [action]="supprimerJoueur"
+        (supprime)="apresSuppression()"
+      />
+    }
   }
 </main>

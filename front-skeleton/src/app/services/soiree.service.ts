@@ -23,4 +23,9 @@ export class SoireeService {
   create(soiree: SoireeCreation): Observable<SoireeDetail> {
     return this.http.post<SoireeDetail>(this.soireesUrl, soiree)
   }
+
+  // Supprime aussi les parties et les scores de la soirée
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.soireesUrl}/${id}`)
+  }
 }

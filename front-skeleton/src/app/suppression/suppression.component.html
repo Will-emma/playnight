@@ -1,0 +1,24 @@
+<section class="suppression" aria-label="Zone de suppression">
+  <button type="button" class="suppression__bouton" (click)="ouvrir()">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" /></svg>
+    {{ libelle }}
+  </button>
+</section>
+
+<dialog #fenetre class="confirmation" aria-labelledby="titre-confirmation" aria-describedby="message-confirmation" (cancel)="empecherFermeture($event)">
+  <span class="confirmation__icone" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg>
+  </span>
+  <h2 id="titre-confirmation">{{ titre }}</h2>
+  <p id="message-confirmation">{{ message }}</p>
+  @if (erreur) {
+    <p class="confirmation__erreur" role="alert">{{ erreur }}</p>
+  }
+  <div class="confirmation__actions">
+    <!-- Annuler en premier : c'est lui qui reçoit le focus à l'ouverture, pour qu'un Entrée réflexe ne supprime rien -->
+    <button type="button" class="confirmation__annuler" (click)="fermer()" [disabled]="enCours">Annuler</button>
+    <button type="button" class="confirmation__supprimer" (click)="confirmer()" [disabled]="enCours">
+      {{ enCours ? "Suppression…" : "Supprimer définitivement" }}
+    </button>
+  </div>
+</dialog>

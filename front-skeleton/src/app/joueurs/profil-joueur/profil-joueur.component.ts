@@ -3,8 +3,9 @@ import { MatDialog } from "@angular/material/dialog"
 import { AvatarDialogComponent } from "../avatar-dialog/avatar-dialog.component"
 import { Location } from "@angular/common"
 import { Component, OnInit } from "@angular/core"
-import { ActivatedRoute } from "@angular/router"
+import { ActivatedRoute, Router } from "@angular/router"
 import { ClassementGlobal, ClassementJoueur, JeuFavori, PartieHistorique, ProfilJoueur } from "models/joueur.model"
+import { JoueurService } from "services/joueur.service"
 import { formaterDate, pluriel } from "utils/format"
 import { ProfilJoueurPageData } from "./profil-joueur.resolver"
 
@@ -41,6 +42,8 @@ export class ProfilJoueurComponent implements OnInit {
     private route: ActivatedRoute,
     private location: Location,
     private dialog: MatDialog,
+    private router: Router,
+    private joueurService: JoueurService,
   ) {}
 
   ngOnInit(): void {
@@ -93,6 +96,14 @@ export class ProfilJoueurComponent implements OnInit {
   // On arrive sur un profil depuis plusieurs pages (fiche jeu, liste des joueurs…) : on revient à la précédente
   retour(): void {
     this.location.back()
+  }
+
+  // Fonction fléchée : la fenêtre de confirmation l'appelle sans connaître ce composant
+  supprimerJoueur = () => this.joueurService.delete(this.profil!.joueur.id)
+
+  // Le joueur n'existe plus : retour à la liste (replaceUrl pour que « Précédent » ne ramène pas sur son profil)
+  apresSuppression(): void {
+    this.router.navigate(["/joueurs"], { replaceUrl: true })
   }
 
   // Pourcentage de parties gagnées, arrondi : calculé ici à partir des deux nombres renvoyés par l'API

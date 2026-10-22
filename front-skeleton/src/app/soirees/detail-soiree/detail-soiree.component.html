@@ -203,5 +203,13 @@
         </ol>
       </section>
     }
+
+    <app-suppression
+      libelle="Supprimer la soirée"
+      [titre]="'Supprimer la soirée « ' + soiree.lieu + ' » ?'"
+      [message]="messageSuppression"
+      [action]="supprimerSoiree"
+      (supprime)="apresSuppression()"
+    />
   }
 </main>

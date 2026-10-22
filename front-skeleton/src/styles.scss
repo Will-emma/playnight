@@ -947,3 +947,32 @@ app-importer-jeu {
   --mat-tab-header-inactive-label-text-color: #a7aec5;
   --mat-tab-header-inactive-hover-label-text-color: #f0eff8;
 }
+
+// Bouton "Supprimer…" en bas d'une page et sa fenêtre de confirmation (détail d'une soirée, profil joueur, fiche jeu).
+// Les couleurs --library-* viennent de la page qui l'affiche.
+app-suppression {
+  display: block;
+
+  .suppression { display: flex; justify-content: flex-end; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--library-line); }
+  .suppression__bouton { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1px solid #ff7a8a55; border-radius: 12px; color: #ff9aab; background: transparent; font: inherit; font-size: .9rem; font-weight: 700; cursor: pointer; transition: background .2s ease, border-color .2s ease; }
+  .suppression__bouton:hover { border-color: #ff9aab; background: #ff7a8a14; }
+  .suppression__bouton svg, .confirmation__icone svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  button:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
+
+  // Fenêtre native <dialog> : centrée, au premier plan, page assombrie derrière
+  .confirmation { box-sizing: border-box; width: min(440px, calc(100% - 32px)); padding: 28px; border: 1px solid var(--library-line); border-radius: 22px; color: var(--library-text); background: var(--library-surface); box-shadow: 0 24px 60px #000a; text-align: center; }
+  .confirmation::backdrop { background: #0b0d16cc; backdrop-filter: blur(3px); }
+  .confirmation__icone { display: inline-grid; width: 52px; height: 52px; place-items: center; margin-bottom: 14px; border-radius: 50%; color: #ff9aab; background: #ff7a8a1f; }
+  .confirmation__icone svg { width: 26px; height: 26px; }
+  // .confirmation devant h2 : sinon la typographie Material (.mat-typography h2) l'emporte
+  .confirmation h2 { overflow-wrap: anywhere; margin: 0 0 10px; font-size: 1.3rem; font-weight: 900; }
+  .confirmation p { margin: 0; color: var(--library-muted); line-height: 1.5; }
+  .confirmation .confirmation__erreur { margin-top: 14px; color: #ff9aab; }
+  .confirmation__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 24px; }
+  .confirmation__actions button { min-height: 46px; padding: 0 20px; border-radius: 12px; font: inherit; font-weight: 700; cursor: pointer; }
+  .confirmation__actions button:disabled { opacity: .6; cursor: progress; }
+  .confirmation__annuler { border: 1px solid var(--library-line); color: var(--library-text); background: transparent; }
+  .confirmation__annuler:hover:not(:disabled) { border-color: var(--library-accent); }
+  .confirmation__supprimer { border: 1px solid #e5485f; color: #fff; background: #c9374d; }
+  .confirmation__supprimer:hover:not(:disabled) { background: #d8435a; }
+}

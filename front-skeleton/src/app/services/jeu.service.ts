@@ -33,4 +33,9 @@ export class JeuService {
   importerDepuisRawg(idRawg: number, importJeu: RawgImport): Observable<Jeu> {
     return this.http.post<Jeu>(`${this.jeuxUrl}/rawg/${idRawg}`, importJeu)
   }
+
+  // Refusé par l'API (409) si le jeu a déjà été joué
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.jeuxUrl}/${id}`)
+  }
 }

@@ -45,4 +45,9 @@ export class JoueurService {
   getProfil(id: number): Observable<ProfilJoueur> {
     return this.http.get<ProfilJoueur>(`${this.joueursUrl}/${id}/profil`)
   }
+
+  // Refusé par l'API (409) si le joueur a déjà joué une partie
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.joueursUrl}/${id}`)
+  }
 }
