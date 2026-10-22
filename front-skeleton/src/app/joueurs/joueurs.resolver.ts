@@ -1,16 +1,21 @@
 import { inject } from "@angular/core"
 import { ResolveFn } from "@angular/router"
-import { catchError, map, of } from "rxjs"
-import { Joueur } from "models/joueur.model"
+import { catchError, map, of, switchMap } from "rxjs"
 import { JoueurService } from "services/joueur.service"
+import { JoueurClassement, chargerClassement } from "utils/classement"
 
 export interface JoueursPageData {
-  joueurs: Joueur[]
-  error: boolean
+  classement: JoueurClassement[] // tous les joueurs, déjà triés (voir utils/classement.ts)
+  // "indisponible" : l'API ne répond pas ou a échoué
+  erreur: "indisponible" | null
 }
 
-export const JoueursResolver: ResolveFn<JoueursPageData> = () =>
-  inject(JoueurService).findAll().pipe(
-    map((joueurs) => ({ joueurs, error: false })),
-    catchError(() => of({ joueurs: [], error: true })),
+export const JoueursResolver: ResolveFn<JoueursPageData> = () => {
+  const joueurService = inject(JoueurService)
+  // Les joueurs, puis le profil de chacun pour ses victoires et ses parties
+  return joueurService.findAll().pipe(
+    switchMap((joueurs) => chargerClassement(joueurService, joueurs)),
+    map((classement): JoueursPageData => ({ classement, erreur: null })),
+    catchError(() => of<JoueursPageData>({ classement: [], erreur: "indisponible" })),
   )
+}

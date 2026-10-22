@@ -1,10 +1,20 @@
 import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
 import { HttpErrorResponse } from "@angular/common/http"
-import { forkJoin, map } from "rxjs"
-import { Joueur } from "models/joueur.model"
 import { JoueurService } from "services/joueur.service"
 import { JoueurClassement, comparerClassement } from "utils/classement"
+import { pluriel } from "utils/format"
+import { JoueursPageData } from "./joueurs.resolver"
+
+// Mêmes couleurs que l'accueil, la Ludothèque et les profils (index : id - 1)
+const COULEURS = ["#e9562e", "#397df2", "#2fc0b5", "#f5b73e", "#9c5be1", "#ed3f70"]
+
+// Une carte de "Toute la bande" : le joueur, ses chiffres et sa place au classement
+interface CarteJoueur {
+  classement: JoueurClassement
+  rang: number
+  tauxVictoire: number // en %, arrondi
+}
 
 @Component({
   selector: "app-joueurs",
@@ -12,20 +22,21 @@ import { JoueurClassement, comparerClassement } from "utils/classement"
   styleUrls: ["./joueurs.component.scss"],
 })
 export class JoueursComponent implements OnInit {
-  afficherClassement = false
-  chargementClassement = false
-  erreurClassement = false
-  classementCharge = false
+  readonly pluriel = pluriel
+
   classement: JoueurClassement[] = []
-  joueurs: Joueur[] = []
-  loading = true
-  error = false
-  afficherFormulaire = false
+  podium: { classement: JoueurClassement; rang: number }[] = [] // dans l'ordre d'affichage : 2e, 1er, 3e
+  cartes: CarteJoueur[] = [] // dans l'ordre d'arrivée dans le groupe (id)
+  nbVictoires = 0
+  erreur: JoueursPageData["erreur"] = null
+
+  formulaireOuvert = false
   enregistrement = false
   pseudo = ""
   avatar = ""
   messageErreurAjout = ""
-  readonly avatarsIndisponibles = new Set<number>()
+  // Images qui n'ont pas pu être chargées : on affiche l'initiale colorée à la place
+  readonly imagesIndisponibles = new Set<string>()
 
   constructor(
     private route: ActivatedRoute,
@@ -33,59 +44,43 @@ export class JoueursComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const data = this.route.snapshot.data["joueursPage"]
-    this.joueurs = data.joueurs
-    this.error = data.error
-    this.loading = false
-  }
-
-  ouvrirFormulaire(): void {
-    this.afficherFormulaire = !this.afficherFormulaire
-    this.messageErreurAjout = ""
-  }
-
-  basculerClassement(): void {
-    this.afficherClassement = !this.afficherClassement
-    if (this.afficherClassement && !this.classementCharge) this.chargerClassement()
-  }
-
-  chargerClassement(): void {
-    if (this.joueurs.length === 0) {
-      this.classement = []
-      this.classementCharge = true
-      return
-    }
-
-    this.chargementClassement = true
-    this.erreurClassement = false
-    forkJoin(
-      this.joueurs.map((joueur) =>
-        this.joueurService.getProfil(joueur.id).pipe(
-          map((profil) => ({
-            joueur,
-            nbVictoires: profil.nbVictoires,
-            nbParties: profil.nbParties,
-          })),
-        ),
-      ),
-    ).subscribe({
-      next: (classement) => {
-        this.classement = classement.sort(comparerClassement)
-        this.classementCharge = true
-        this.chargementClassement = false
-      },
-      error: () => {
-        this.erreurClassement = true
-        this.chargementClassement = false
-      },
+    this.route.data.subscribe((data) => {
+      const page: JoueursPageData = data["joueursPage"]
+      this.erreur = page.erreur
+      this.mettreAJour(page.classement)
     })
   }
 
-  get podium(): JoueurClassement[] {
+  // Recalcule tout ce qui dépend du classement (au chargement et après un ajout)
+  private mettreAJour(classement: JoueurClassement[]): void {
+    this.classement = [...classement].sort(comparerClassement)
+    this.nbVictoires = this.classement.reduce((total, ligne) => total + ligne.nbVictoires, 0)
+
+    // Podium : le 1er au centre, comme sur une vraie marche
     const [premier, deuxieme, troisieme] = this.classement
-    return [deuxieme, premier, troisieme].filter(
-      (joueur): joueur is JoueurClassement => joueur !== undefined,
-    )
+    this.podium = [
+      { classement: deuxieme, rang: 2 },
+      { classement: premier, rang: 1 },
+      { classement: troisieme, rang: 3 },
+    ].filter((marche) => marche.classement !== undefined)
+
+    this.cartes = this.classement
+      .map((ligne, index) => ({
+        classement: ligne,
+        rang: index + 1,
+        tauxVictoire: ligne.nbParties === 0 ? 0 : Math.round((ligne.nbVictoires / ligne.nbParties) * 100),
+      }))
+      .sort((a, b) => a.classement.joueur.id - b.classement.joueur.id)
+  }
+
+  // Les joueurs classés après le podium
+  get suite(): { classement: JoueurClassement; rang: number }[] {
+    return this.classement.slice(3).map((ligne, index) => ({ classement: ligne, rang: index + 4 }))
+  }
+
+  basculerFormulaire(): void {
+    this.formulaireOuvert = !this.formulaireOuvert
+    this.messageErreurAjout = ""
   }
 
   ajouterJoueur(): void {
@@ -94,18 +89,13 @@ export class JoueursComponent implements OnInit {
 
     this.enregistrement = true
     this.messageErreurAjout = ""
-    this.joueurService.create({
-      pseudo,
-      avatar: this.avatar.trim() || null,
-    }).subscribe({
+    this.joueurService.create({ pseudo, avatar: this.avatar.trim() || null }).subscribe({
       next: (joueur) => {
-        this.joueurs = [...this.joueurs, joueur].sort((a, b) =>
-          a.pseudo.localeCompare(b.pseudo, "fr", { sensitivity: "base" }),
-        )
-        this.classementCharge = false
+        // Un nouveau joueur n'a encore joué aucune partie : inutile de recharger les profils
+        this.mettreAJour([...this.classement, { joueur, nbVictoires: 0, nbParties: 0 }])
         this.pseudo = ""
         this.avatar = ""
-        this.afficherFormulaire = false
+        this.formulaireOuvert = false
         this.enregistrement = false
       },
       error: (erreur: HttpErrorResponse) => {
@@ -118,31 +108,40 @@ export class JoueursComponent implements OnInit {
     })
   }
 
-  recharger(): void {
-    this.loading = true
-    this.error = false
-    this.joueurService.findAll().subscribe({
-      next: (joueurs) => {
-        this.joueurs = joueurs
-        this.loading = false
-      },
-      error: () => {
-        this.error = true
-        this.loading = false
-      },
-    })
+  // Couleur que recevra le joueur en cours de création (les id se suivent)
+  get couleurApercu(): string {
+    const dernierId = Math.max(0, ...this.classement.map((ligne) => ligne.joueur.id))
+    return this.couleur(dernierId + 1)
   }
 
-  marquerAvatarIndisponible(joueur: Joueur): void {
-    this.avatarsIndisponibles.add(joueur.id)
+  get initialeApercu(): string {
+    return this.pseudo.trim() ? this.initiale(this.pseudo) : "?"
   }
 
-  initiale(joueur: Joueur): string {
-    return joueur.pseudo.trim().charAt(0).toLocaleUpperCase("fr-FR")
+  aUneImage(url: string | null): boolean {
+    return !!url && !this.imagesIndisponibles.has(url)
   }
 
-  couleurAvatar(joueur: Joueur): string {
-    const couleurs = ["#e9562e", "#397df2", "#2fc0b5", "#f5b73e", "#9c5be1", "#ed3f70"]
-    return couleurs[Math.max(0, joueur.id - 1) % couleurs.length]
+  marquerIndisponible(url: string | null): void {
+    if (url) this.imagesIndisponibles.add(url)
+  }
+
+  couleur(id: number): string {
+    return COULEURS[Math.max(0, id - 1) % COULEURS.length]
+  }
+
+  initiale(texte: string): string {
+    return texte.trim().charAt(0).toLocaleUpperCase("fr-FR")
+  }
+
+  // 0 → "Nouveau dans la bande", 1 → "1 partie jouée", 5 → "5 parties jouées"
+  resumeParties(nbParties: number): string {
+    if (nbParties === 0) return "Nouveau dans la bande"
+    return `${pluriel(nbParties, "partie")} jouée${nbParties > 1 ? "s" : ""}`
+  }
+
+  // "1er", "2e", "3e"…
+  libelleRang(rang: number): string {
+    return rang === 1 ? "1er" : `${rang}e`
   }
 }

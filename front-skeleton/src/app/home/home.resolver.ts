@@ -1,13 +1,12 @@
 import { inject } from "@angular/core"
 import { ResolveFn } from "@angular/router"
-import { Observable, catchError, forkJoin, map, of, switchMap } from "rxjs"
+import { catchError, forkJoin, map, of, switchMap } from "rxjs"
 import { Jeu } from "models/jeu.model"
-import { Joueur } from "models/joueur.model"
 import { SoireeDetail, SoireeResume } from "models/soiree.model"
 import { JeuService } from "services/jeu.service"
 import { JoueurService } from "services/joueur.service"
 import { SoireeService } from "services/soiree.service"
-import { JoueurClassement, comparerClassement } from "utils/classement"
+import { JoueurClassement, chargerClassement } from "utils/classement"
 
 export interface HomePageData {
   jeux: Jeu[]
@@ -22,19 +21,6 @@ export const HomeResolver: ResolveFn<HomePageData> = () => {
   const joueurService = inject(JoueurService)
   const soireeService = inject(SoireeService)
 
-  // Profil de chaque joueur, pour connaître ses victoires et ses parties (comme la page Joueurs)
-  const chargerClassement = (joueurs: Joueur[]): Observable<JoueurClassement[]> =>
-    // forkJoin sur une liste vide ne renverrait jamais rien : on répond tout de suite
-    joueurs.length === 0
-      ? of([])
-      : forkJoin(
-          joueurs.map((joueur) =>
-            joueurService.getProfil(joueur.id).pipe(
-              map((profil) => ({ joueur, nbVictoires: profil.nbVictoires, nbParties: profil.nbParties })),
-            ),
-          ),
-        ).pipe(map((classement) => classement.sort(comparerClassement)))
-
   // forkJoin lance les appels en même temps et attend qu'ils soient tous terminés
   return forkJoin({
     jeux: inject(JeuService).findAll(),
@@ -44,7 +30,7 @@ export const HomeResolver: ResolveFn<HomePageData> = () => {
     // Deuxième vague : elle a besoin des joueurs et de l'id de la soirée la plus récente
     switchMap(({ jeux, soirees, joueurs }) =>
       forkJoin({
-        classement: chargerClassement(joueurs),
+        classement: chargerClassement(joueurService, joueurs),
         derniereSoiree: soirees.length > 0 ? soireeService.findById(soirees[0].id) : of(null),
       }).pipe(map(({ classement, derniereSoiree }): HomePageData => ({ jeux, soirees, classement, derniereSoiree, erreur: null }))),
     ),
