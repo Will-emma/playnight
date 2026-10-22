@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -89,14 +90,39 @@ class JoueurServiceTest {
     }
 
     @Test
-    void addJoueurWithoutAvatarGetsDiceBearAvatarFromPseudo() {
+    void addJoueurWithoutAvatarGetsLeastUsedGalleryAvatar() {
+        // avatar-01 porté deux fois, avatar-02 une fois : avatar-03 est le premier que personne ne porte
+        when(joueurDao.findAll()).thenReturn(List.of(
+                joueur(1L, "Léa", "/assets/avatars/avatar-01.png"),
+                joueur(2L, "Max", "/assets/avatars/avatar-01.png"),
+                joueur(3L, "Sam", "/assets/avatars/avatar-02.png"),
+                joueur(4L, "Noa", "https://example.com/photo.png"),
+                joueur(5L, "Tom", null)));
         when(joueurDao.save(any(Joueur.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        joueurService.addJoueur(dto(null, "Léa la Rouge", "  "));
+        joueurService.addJoueur(dto(null, "Inès", "  "));
 
         ArgumentCaptor<Joueur> captor = ArgumentCaptor.forClass(Joueur.class);
         verify(joueurDao).save(captor.capture());
-        assertEquals("https://api.dicebear.com/9.x/adventurer/svg?seed=L%C3%A9a%20la%20Rouge", captor.getValue().getAvatar());
+        assertEquals("/assets/avatars/avatar-03.png", captor.getValue().getAvatar());
+    }
+
+    @Test
+    void addJoueurWithoutAvatarReusesGalleryWhenAllAvatarsAreTaken() {
+        // Les 12 avatars sont portés, avatar-05 une fois de plus : on repart du plus petit numéro le moins porté
+        List<Joueur> joueurs = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            joueurs.add(joueur((long) i, "J" + i, String.format("/assets/avatars/avatar-%02d.png", i)));
+        }
+        joueurs.add(joueur(13L, "J13", "/assets/avatars/avatar-05.png"));
+        when(joueurDao.findAll()).thenReturn(joueurs);
+        when(joueurDao.save(any(Joueur.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        joueurService.addJoueur(dto(null, "Nouveau", null));
+
+        ArgumentCaptor<Joueur> captor = ArgumentCaptor.forClass(Joueur.class);
+        verify(joueurDao).save(captor.capture());
+        assertEquals("/assets/avatars/avatar-01.png", captor.getValue().getAvatar());
     }
 
     @Test
