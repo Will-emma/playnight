@@ -127,3 +127,7 @@ Les tâches sont suivies dans les [Issues](https://github.com/Will-emma/playnigh
 - [Modèle de données](docs/modele-donnees.md)
 - [Format des DTO (JSON échangé entre le back et le front)](docs/format-dto.md)
 - [Guide d'installation fourni par l'école](INSTALLATION-ECOLE.md) (IntelliJ, Docker, captures d'écran)
+
+## Crédits
+
+- Avatars des joueurs : style « [Adventurer](https://www.figma.com/community/file/1184595184137881796) » de Lisa Wischofsky, sous licence [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), via [DiceBear](https://www.dicebear.com/styles/adventurer/) (remix de l'original par DiceBear ; aucune modification de notre part)

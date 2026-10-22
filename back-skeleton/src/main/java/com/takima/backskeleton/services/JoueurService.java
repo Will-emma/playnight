@@ -12,6 +12,8 @@ import com.takima.backskeleton.models.Score;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -50,6 +52,10 @@ public class JoueurService {
 
     @Transactional
     public JoueurDto addJoueur(JoueurDto joueurDto) {
+        // Sans avatar fourni, le joueur reçoit un personnage DiceBear généré à partir de son pseudo
+        if ((joueurDto.getAvatar() == null || joueurDto.getAvatar().isBlank()) && joueurDto.getPseudo() != null) {
+            joueurDto.setAvatar(avatarParDefaut(joueurDto.getPseudo()));
+        }
         Joueur joueur = JoueurMapper.fromDto(joueurDto, null);
         return JoueurMapper.toDto(joueurDao.save(joueur));
     }
@@ -65,6 +71,13 @@ public class JoueurService {
     public void deleteById(Long id) {
         findJoueurById(id);
         joueurDao.deleteById(id);
+    }
+
+    // Style "Adventurer" de DiceBear (CC BY 4.0, Lisa Wischofsky, voir README) : le même pseudo donne toujours le même personnage.
+    // Même URL que l'aperçu du formulaire côté front (avatarParDefaut dans joueurs.component.ts)
+    static String avatarParDefaut(String pseudo) {
+        String seed = URLEncoder.encode(pseudo.trim(), StandardCharsets.UTF_8).replace("+", "%20");
+        return "https://api.dicebear.com/9.x/adventurer/svg?seed=" + seed;
     }
 
     private Joueur findJoueurById(Long id) {
