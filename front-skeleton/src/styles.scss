@@ -63,7 +63,8 @@ app-jeux {
   .library__intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
   .eyebrow { display: flex; align-items: center; gap: 9px; margin: 0 0 16px; color: var(--library-accent); font-size: .72rem; font-weight: 700; letter-spacing: .16em; }
   .eyebrow__dot, .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--library-accent); box-shadow: 0 0 14px var(--library-accent-glow); }
-  h1 { margin: 0; font-size: clamp(2.2rem, 5vw, 3.7rem); font-weight: 750; letter-spacing: -.055em; }
+  // .library devant h1 : sinon la typographie Material (.mat-typography h1) l'emporte
+  .library h1 { margin: 0; font-size: clamp(2.6rem, 6vw, 4rem); font-weight: 900; line-height: 1; letter-spacing: -.05em; }
   .intro-copy { max-width: 570px; margin: 14px 0 0; color: var(--library-muted); font-size: 1.02rem; line-height: 1.65; }
   .collection-count { display: grid; justify-items: end; padding-bottom: 5px; color: var(--library-muted); font-size: .84rem; }
   .collection-count strong { color: var(--library-text); font-size: 1.55rem; }
@@ -264,7 +265,8 @@ app-nouvelle-soiree {
   legend { padding: 0 8px; font-size: 1rem; font-weight: 700; color: var(--library-text); }
   .joueurs__liste { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
   .joueur { display: flex; align-items: center; gap: 9px; border: 1px solid var(--library-line); border-radius: 999px; padding: 6px 14px 6px 6px; color: var(--library-muted); background: transparent; font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; transition: color .18s, background .18s, border-color .18s; }
-  .joueur img { width: 30px; height: 30px; border-radius: 50%; background: var(--library-art-bg); }
+  .joueur img, .joueur__initiale { width: 30px; height: 30px; border-radius: 50%; background: var(--library-art-bg); }
+  .joueur__initiale { display: grid; flex: none; place-items: center; color: #11131f; font-size: .8rem; font-weight: 900; }
   .joueur:hover { color: var(--library-text); }
   .joueur--present { color: var(--library-accent); border-color: var(--library-accent-border); background: var(--library-accent-soft); }
 
@@ -783,6 +785,8 @@ app-home {
   .panneau--podium { padding-bottom: 0; }
   .podium { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 12px; margin: 0; padding: 0; list-style: none; }
   .podium__marche { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; text-align: center; }
+  // Un seul joueur : sa marche va au centre (avec deux, l'ordre 2e puis 1er les place déjà à gauche et au centre)
+  .podium__marche:only-child { grid-column: 2; }
   .podium__couronne { width: 30px; height: 22px; fill: var(--library-accent); }
   .podium__joueur { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: 100%; color: var(--library-text); font-weight: 700; text-decoration: none; }
   .podium__joueur:hover .podium__pseudo { text-decoration: underline; }
