@@ -354,6 +354,8 @@ app-fiche-jeu {
   // Podium : le 1er au centre et plus haut ; or, argent, bronze
   .podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 10px; margin: 0 0 16px; padding: 0; list-style: none; }
   .podium__marche { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  // Un seul vainqueur : sa marche va au centre (avec deux, l'ordre 2e puis 1er les place déjà à gauche et au centre)
+  .podium__marche:only-child { grid-column: 2; }
   .podium__couronne { width: 28px; height: 20px; fill: var(--library-accent); }
   .podium__joueur { display: flex; max-width: 100%; flex-direction: column; align-items: center; gap: 8px; color: var(--library-text); font-weight: 700; text-decoration: none; }
   .podium__joueur:hover .podium__pseudo { color: var(--library-accent); text-decoration: underline; }
