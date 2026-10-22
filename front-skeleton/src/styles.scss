@@ -523,20 +523,21 @@ app-soirees {
   .carte:has(.carte__lien:focus-visible) { outline: 3px solid var(--library-accent); outline-offset: 3px; }
 
   // Mosaïque des jeux joués, collée aux bords de la carte
-  .mosaique { display: flex; height: 150px; }
-  .tuile { position: relative; display: flex; overflow: hidden; flex: 1 1 0; min-width: 0; flex-direction: column; justify-content: flex-end; padding: 12px; color: #11131f; }
+  .mosaique { display: flex; height: 160px; }
+  // Bas des tuiles laissé libre (40px) : le badge de date vient s'y poser sans cacher le nom des jeux
+  .tuile { position: relative; display: flex; overflow: hidden; flex: 1 1 0; min-width: 0; flex-direction: column; justify-content: flex-end; padding: 12px 12px 40px; color: #11131f; }
   .tuile + .tuile { border-left: 2px solid var(--library-surface); }
   .tuile__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .tuile__initiale { font-size: 3.4rem; font-weight: 900; line-height: .85; }
   .tuile__type { position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 999px; color: var(--library-text); background: #11131fcc; font-size: .7rem; font-weight: 700; white-space: nowrap; }
   .tuile__nom { position: relative; overflow: hidden; font-size: .8rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
   // Sur une vraie image, le nom passe en clair sur un fond dégradé pour rester lisible
-  .tuile__image ~ .tuile__nom { margin: 0 -12px -12px; padding: 28px 12px 12px; color: var(--library-text); background: linear-gradient(transparent, #11131fe6); }
+  .tuile__image ~ .tuile__nom { margin: 0 -12px -40px; padding: 28px 12px 40px; color: var(--library-text); background: linear-gradient(transparent, #11131fe6 45%); }
   .tuile--reste { flex: 0 0 64px; align-items: center; justify-content: center; color: var(--library-secondary); background: var(--library-card); font-size: 1.1rem; font-weight: 900; }
   .tuile--vide { align-items: center; justify-content: center; color: var(--library-muted); background: var(--library-art-bg); font-size: .9rem; }
 
   // Badge de date posé à cheval sur la mosaïque
-  .date { position: absolute; z-index: 2; top: 116px; left: 20px; display: flex; width: 64px; height: 68px; margin: 0; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--library-accent); border-radius: 16px; background: var(--library-card); box-shadow: 0 10px 24px #000a; }
+  .date { position: absolute; z-index: 2; top: 126px; left: 20px; display: flex; width: 64px; height: 68px; margin: 0; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--library-accent); border-radius: 16px; background: var(--library-card); box-shadow: 0 10px 24px #000a; }
   .date__jour { font-size: 1.6rem; font-weight: 900; line-height: 1; }
   .date__mois { color: var(--library-accent); font-size: .7rem; font-weight: 700; letter-spacing: .08em; }
 
