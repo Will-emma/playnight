@@ -15,12 +15,18 @@
   } @else {
     <!-- En-tête : le joueur et ses statistiques, sur un halo de sa couleur -->
     <section class="entete" aria-labelledby="pseudo-joueur" [style.--couleur-joueur]="couleur(profil.joueur.id)">
+      <div class="avatar-modifiable">
       <div class="entete__avatar" [style.background]="couleur(profil.joueur.id)">
         @if (aUneImage(profil.joueur.avatar)) {
           <img [src]="profil.joueur.avatar" alt="" (error)="marquerIndisponible(profil.joueur.avatar)" />
         } @else {
           <span aria-hidden="true">{{ initiale(profil.joueur.pseudo) }}</span>
         }
+      </div>
+
+        <button type="button" class="modifier-avatar" (click)="modifierAvatar()" aria-label="Modifier la photo de profil" title="Modifier l’avatar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 5 5-12 12H4v-5L16 3ZM13 6l5 5" /></svg>
+        </button>
       </div>
 
       <div class="entete__infos">
@@ -52,8 +58,52 @@
               <dd>{{ profil.nbParties > 0 ? tauxVictoire + " %" : "–" }}</dd>
             </div>
           </div>
+          <div class="statistique statistique--elo" title="Moyenne des Elo par jeu, chaque jeu comptant à parts égales.">
+            <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 17 6-6 4 4 8-10M15 5h6v6" /></svg>
+            <div>
+              <dt><button type="button" class="elo-global-action" (click)="ouvrirProgression()" aria-haspopup="dialog" aria-label="Voir la courbe de progression de l’Elo global">Elo global</button></dt>
+              @if (classementGlobal; as global) {
+                <dd>{{ global.elo }}</dd>
+                <span class="elo-global-rang">{{ global.rang === null ? "Non classé" : formaterRang(global.rang) + " au classement global" }}</span>
+              } @else {
+                <dd>–</dd>
+                <span class="elo-global-rang">Momentanément indisponible</span>
+              }
+              <span class="elo-global-invitation">Voir la progression ↗</span>
+            </div>
+          </div>
         </dl>
       </div>
+    </section>
+
+    <section class="bloc elo-personnel" aria-labelledby="titre-elo-personnel">
+      <h2 id="titre-elo-personnel">Classement Elo par jeu</h2>
+      @if (erreurClassements) {
+        <p role="alert">Le classement Elo est momentanément indisponible. Rechargez la page pour réessayer.</p>
+      } @else if (classements.length === 0) {
+        <p class="vide">Aucun classement Elo pour l’instant. Il apparaîtra après une partie avec des résultats exploitables face à au moins un adversaire.</p>
+      } @else {
+        <ul class="elo-personnel__liste">
+          @for (classement of classements; track classement.jeu.id) {
+            <li>
+              <a class="elo-personnel__jeu" [routerLink]="['/jeux', classement.jeu.id]"
+                [attr.aria-label]="classement.jeu.nom + ' : voir la fiche et le classement Elo complet'">
+                <span class="vignette" [style.background]="couleur(classement.jeu.id)" aria-hidden="true">
+                  @if (aUneImage(classement.jeu.image)) {
+                    <img [src]="classement.jeu.image" alt="" (error)="marquerIndisponible(classement.jeu.image)" />
+                  } @else { {{ initiale(classement.jeu.nom) }} }
+                </span>
+                <span class="elo-personnel__nom">{{ classement.jeu.nom }}<small>Voir le classement complet →</small></span>
+                <dl class="elo-personnel__stats">
+                  <div><dt>Elo</dt><dd class="elo-personnel__points">{{ classement.elo }}</dd></div>
+                  <div><dt>Rang</dt><dd>{{ formaterRang(classement.rang) }}</dd></div>
+                  <div><dt>Parties</dt><dd>{{ classement.nbParties }}</dd></div>
+                </dl>
+              </a>
+            </li>
+          }
+        </ul>
+      }
     </section>
 
     @if (profil.nbParties === 0) {

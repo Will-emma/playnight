@@ -1,0 +1,42 @@
+<h2 mat-dialog-title id="avatar-dialog-title">Personnaliser l’avatar</h2>
+<mat-dialog-content>
+  <div class="apercu" aria-live="polite">
+    @if (apercu && !apercuIndisponible) {
+      <img [src]="apercu" alt="Aperçu de l’avatar sélectionné" (error)="apercuIndisponible = true" />
+    } @else {
+      <span class="initiale" aria-label="Avatar sans photo">{{ joueur.pseudo.charAt(0).toLocaleUpperCase("fr-FR") }}</span>
+    }
+    <div><strong>{{ joueur.pseudo }}</strong><span>Prévisualisation avant enregistrement</span></div>
+  </div>
+  <mat-tab-group [selectedIndex]="onglet" (selectedIndexChange)="changerOnglet($event)">
+    <mat-tab label="Choisir un avatar" [disabled]="enregistrement">
+      <div class="galerie" role="group" aria-label="Avatars pixel art disponibles">
+        @for (avatar of avatars; track avatar.id) {
+          <button type="button" class="choix-avatar" [class.selectionne]="avatarId === avatar.id"
+            [attr.aria-label]="avatar.nom" [attr.aria-pressed]="avatarId === avatar.id"
+            [disabled]="enregistrement" (click)="choisir(avatar.id)">
+            <img [src]="avatar.url" alt="" />
+            @if (avatarId === avatar.id) { <span class="coche" aria-hidden="true">✓</span> }
+          </button>
+        }
+      </div>
+    </mat-tab>
+    <mat-tab label="Importer une photo" [disabled]="enregistrement">
+      <div class="import-photo">
+        <p id="photo-contraintes">JPEG, PNG ou WebP · 2 Mo maximum<br />4096 pixels de côté et 16 mégapixels maximum</p>
+        <label for="photo-joueur">Sélectionner une photo</label>
+        <input id="photo-joueur" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="photo-contraintes"
+          [disabled]="enregistrement || validation" (change)="importer($event)" />
+        @if (fichier) { <p class="nom-fichier">{{ fichier.name }}</p> }
+        @if (validation) { <p role="status">Vérification de l’image…</p> }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+  @if (erreur) { <p class="erreur" role="alert">{{ erreur }}</p> }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="annuler" mat-dialog-close [disabled]="enregistrement">Annuler</button>
+  <button type="button" class="enregistrer" [disabled]="!peutEnregistrer" (click)="enregistrer()">
+    {{ enregistrement ? "Enregistrement…" : "Enregistrer" }}
+  </button>
+</mat-dialog-actions>

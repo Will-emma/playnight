@@ -34,14 +34,16 @@ public class SoireeService {
     private final ScoreDao scoreDao;
     private final JoueurDao joueurDao;
     private final JeuDao jeuDao;
+    private final ClassementService classementService;
 
     public SoireeService(SoireeDao soireeDao, PartieDao partieDao, ScoreDao scoreDao,
-                         JoueurDao joueurDao, JeuDao jeuDao) {
+                         JoueurDao joueurDao, JeuDao jeuDao, ClassementService classementService) {
         this.soireeDao = soireeDao;
         this.partieDao = partieDao;
         this.scoreDao = scoreDao;
         this.joueurDao = joueurDao;
         this.jeuDao = jeuDao;
+        this.classementService = classementService;
     }
 
     @Transactional(readOnly = true)
@@ -67,6 +69,7 @@ public class SoireeService {
     // si une étape échoue, rien n'est enregistré en base.
     @Transactional
     public SoireeDetailDto creerSoiree(SoireeCreationDto dto) {
+        classementService.verrouillerHistorique();
         // 0. On vérifie les règles métier avant d'enregistrer quoi que ce soit
         verifierSoiree(dto);
 
@@ -82,7 +85,9 @@ public class SoireeService {
         enregistrerParties(soiree, dto.getParties());
 
         // 3. On renvoie la soirée au format du détail
-        return SoireeMapper.toDetailDto(soiree, soiree.getParties());
+        SoireeDetailDto resultat = SoireeMapper.toDetailDto(soiree, soiree.getParties());
+        classementService.recalculer();
+        return resultat;
     }
 
     // Modifie une soirée existante avec le même format que la création.
@@ -90,6 +95,7 @@ public class SoireeService {
     // parties (la base supprime leurs scores, grâce au "on delete cascade") et on recrée les nouvelles.
     @Transactional
     public SoireeDetailDto modifierSoiree(Long id, SoireeCreationDto dto) {
+        classementService.verrouillerHistorique();
         Soiree soiree = findSoireeById(id); // 404 si la soirée n'existe pas
         verifierSoiree(dto);
 
@@ -97,12 +103,16 @@ public class SoireeService {
         soiree.modifier(dto.getDate(), dto.getLieu(), findJoueursByIds(dto.getJoueurIds()));
         enregistrerParties(soiree, dto.getParties());
 
-        return SoireeMapper.toDetailDto(soiree, soiree.getParties());
+        SoireeDetailDto resultat = SoireeMapper.toDetailDto(soiree, soiree.getParties());
+        classementService.recalculer();
+        return resultat;
     }
 
     @Transactional
     public void deleteById(Long id) {
+        classementService.verrouillerHistorique();
         soireeDao.delete(findSoireeById(id));
+        classementService.recalculer();
     }
 
     // Enregistre chaque partie de la soirée, puis ses scores (utilisé par la création et la modification)

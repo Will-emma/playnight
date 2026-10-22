@@ -1,4 +1,8 @@
 
+import { EloProgressionComponent } from "joueurs/elo-progression/elo-progression.component"
+import { MatDialogModule } from "@angular/material/dialog"
+import { MatTabsModule } from "@angular/material/tabs"
+import { AvatarDialogComponent } from "joueurs/avatar-dialog/avatar-dialog.component"
 import { NgModule } from "@angular/core"
 import { BrowserModule } from "@angular/platform-browser"
 
@@ -33,12 +37,16 @@ import { SoireesComponent } from "soirees/soirees.component"
     SoireesComponent,
     ImporterJeuComponent,
     JoueursComponent,
+    AvatarDialogComponent,
+    EloProgressionComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatListModule,
+    MatDialogModule,
+    MatTabsModule,
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,

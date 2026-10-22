@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
-import { FicheJeu, Jeu, MeilleurJoueur, TypeJeu } from "models/jeu.model"
+import { ClassementElo, FicheJeu, Jeu, MeilleurJoueur, TypeJeu } from "models/jeu.model"
 import { Joueur } from "models/joueur.model"
 import { formaterDate, formaterDuree, pluriel } from "utils/format"
 import { FicheJeuPageData } from "./fiche-jeu.resolver"
@@ -24,6 +24,8 @@ export class FicheJeuComponent implements OnInit {
   readonly nbMeilleursJoueursAffiches = 5
 
   fiche: FicheJeu | null = null
+  classement: ClassementElo[] = []
+  erreurClassement = false
   erreur: FicheJeuPageData["erreur"] = null
   toutLeClassement = false
   // Images qui n'ont pas pu être chargées (couverture du jeu, avatars) : on affiche la couleur et l'initiale à la place
@@ -36,6 +38,8 @@ export class FicheJeuComponent implements OnInit {
     this.route.data.subscribe((data) => {
       const page: FicheJeuPageData = data["ficheJeuPage"]
       this.fiche = page.fiche
+      this.classement = page.classement
+      this.erreurClassement = page.erreurClassement
       this.erreur = page.erreur
       this.toutLeClassement = false
     })

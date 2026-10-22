@@ -180,6 +180,71 @@ Contrôles faits par le backend (sinon `400`) :
 }
 ```
 
+### Classement Elo d'un jeu – `GET /jeux/{id}/classement`
+
+```json
+[
+  { "joueurId": 1, "pseudo": "Léa", "avatar": "https://...", "elo": 1016, "nbParties": 1, "rang": 1 },
+  { "joueurId": 2, "pseudo": "Max", "avatar": null, "elo": 984, "nbParties": 1, "rang": 2 }
+]
+```
+
+Tri : Elo décroissant, puis pseudo et identifiant. Les joueurs ayant le même
+Elo partagent un rang (1, 2, 2, 4…). Un jeu existant sans résultat exploitable
+renvoie `[]`, un jeu inexistant renvoie 404. Ce classement est indépendant de
+`meilleursJoueurs`, qui reste le classement par victoires de la fiche jeu.
+Le calcul et la procédure de migration sont décrits dans [le modèle de données](modele-donnees.md#classement-elo-ticket-24).
+
+### Classement personnel – `GET /joueurs/{id}/classements`
+
+```json
+[
+  {
+    "jeu": { "id": 1, "nom": "Catan", "type": "SOCIETE", "image": "https://..." },
+    "elo": 1145, "rang": 2, "nbParties": 8
+  }
+]
+```
+
+Les valeurs proviennent de `classements`, sans recalcul à la lecture. Le rang
+compare le joueur à tous les joueurs du même jeu ; les ex aequo partagent leur
+rang (1, 2, 2, 4…). Une requête SQL avec `RANK()` récupère tous ses jeux, triés par
+nom puis identifiant, sans requête par jeu. Joueur sans classement : `200 []` ;
+joueur inexistant : `404`. Les statistiques de victoires restent indépendantes.
+
+### Elo global – `GET /joueurs/{id}/classement-global`
+
+Réponse : `{ "elo": 1088, "rang": 3 }`. Le score global est la moyenne
+arithmétique des Elo par jeu ayant au moins une partie classée, arrondie à l'entier
+le plus proche (demi-entiers à l'opposé de zéro). Chaque jeu a le même poids,
+indépendamment du nombre de parties ; il s'agit d'une synthèse des Elo par jeu.
+Le classement global compare ces moyennes arrondies entre tous les joueurs
+classés, avec les mêmes rangs partagés (1, 2, 2, 4…). Un joueur sans résultat a
+le score initial 1000 et `rang: null` (« Non classé »). Joueur absent : 404.
+Une requête d'agrégation et de rang suffit, sans recalculer l'historique ni
+modifier les Elo par jeu ou les classements par victoires.
+
+### Progression globale – `GET /joueurs/{id}/progression-elo`
+
+Renvoie `classement` (Elo et rang actuels), `meilleurElo`, `variationTotale`,
+`nbParties` et `points`. Chaque point contient `partieId`, `date`, `jeu`, `elo`
+et `variation` (différence depuis l'étape précédente). Une série non vide
+commence par un point initial à 1000, sans partie, date ni jeu. Sans résultat
+exploitable, `points` est vide et le meilleur score est le score initial 1000.
+
+La courbe rejoue en mémoire les parties des jeux du joueur, dans le même ordre
+que le calcul Elo, avec le même `EloService`. Elle inclut l'historique des
+adversaires, même lorsque le joueur n'a pas participé à leurs autres parties.
+Seules les parties exploitables auxquelles il participe ajoutent un point.
+À chaque étape, le score est la moyenne arrondie de ses Elo sur les jeux déjà
+joués à cet instant. L'axe horizontal représente les étapes, pas une durée
+proportionnelle ; les dates réelles sont consultables pour chaque point.
+
+La lecture utilise un instantané PostgreSQL cohérent (`REPEATABLE_READ`) et
+n'écrit pas dans la base. Les modifications et suppressions de résultats sont
+prises en compte à la prochaine ouverture de la courbe. Le chargement n'est
+lancé que lorsque l'utilisateur ouvre la fenêtre. Joueur inexistant : 404.
+
 ## Endpoints
 
 | Ressource | Lister | Détail | Créer | Modifier | Supprimer |
@@ -221,5 +286,7 @@ Ces réponses sont produites par une classe `@RestControllerAdvice`, commune à 
 | `PartieCreationDto`, `ScoreCreationDto` | Parties et scores dans la création |
 | `ProfilJoueurDto` | Profil d'un joueur |
 | `FicheJeuDto` | Fiche d'un jeu |
+| `ClassementJoueurDto` | Classements Elo d’un joueur pour tous ses jeux |
+| `ClassementDto` | Classement Elo d'un jeu (`ClassementElo` côté Angular) |
 
 Côté Angular, chaque DTO a son interface TypeScript équivalente dans `models/`.

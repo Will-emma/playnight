@@ -1,0 +1,19 @@
+:host { display: block; min-height: calc(100vh - 80px); color: #f0eff8; background: #11131f; }
+.regles-elo { max-width: 900px; margin: auto; padding: 32px clamp(18px, 5vw, 56px) 64px; }
+a { color: #f8b83f; text-underline-offset: 4px; }
+.retour { display: inline-block; margin-bottom: 28px; font-size: .85rem; }
+header { margin-bottom: 30px; }
+.eyebrow { color: #f8b83f; font-size: .72rem; font-weight: 700; letter-spacing: .12em; }
+h1 { margin: 12px 0 16px; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.12; font-weight: 800; }
+.intro, p { color: #a7aec5; line-height: 1.7; }
+section { position: relative; margin-bottom: 20px; padding: 26px; border: 1px solid #343a53; border-radius: 20px; background: #151827; }
+h2 { margin: 0 32px 18px 0; font-size: 1.25rem; font-weight: 750; line-height: 1.35; }
+.numero { position: absolute; top: 26px; right: 24px; color: #f8b83f; font-size: .8rem; font-weight: 800; }
+strong, b { color: #f0eff8; }
+.exemple { margin: 18px 0; padding: 16px; border-left: 3px solid #f8b83f; border-radius: 0 10px 10px 0; background: #f8b83f0a; }
+.exemple p { margin: 8px 0 0; }
+.exemple b { color: #f8b83f; }
+summary { color: #f8b83f; cursor: pointer; }
+.formule { overflow-wrap: anywhere; color: #f0eff8; }
+a:focus-visible, summary:focus-visible { outline: 2px solid #f8b83f; outline-offset: 4px; }
+@media (max-width: 480px) { section { padding: 20px; } .numero { top: 20px; right: 18px; } }

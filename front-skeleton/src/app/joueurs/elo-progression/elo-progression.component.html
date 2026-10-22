@@ -1,0 +1,56 @@
+<h2 mat-dialog-title id="progression-elo-titre">Progression Elo · {{ joueur.pseudo }}</h2>
+<mat-dialog-content>
+  @if (chargement) {
+    <p class="etat" role="status">Chargement de la progression…</p>
+  } @else if (erreur) {
+    <div class="etat" role="alert"><p>La progression est momentanément indisponible.</p><button type="button" (click)="charger()">Réessayer</button></div>
+  } @else if (progression) {
+    <div class="resume">
+      <div><span>Elo actuel</span><strong>{{ progression.classement.elo }}</strong></div>
+      <div><span>Meilleur Elo</span><strong>{{ progression.meilleurElo }}</strong></div>
+      <div><span>Depuis le départ</span><strong [class.baisse]="progression.variationTotale < 0">{{ variation(progression.variationTotale) }}</strong></div>
+    </div>
+    @if (points.length === 0) {
+      <p class="etat">Aucune partie classée pour l’instant. Votre progression commencera à 1000 Elo après votre première partie avec un résultat exploitable.</p>
+    } @else {
+      <p class="explication">{{ pluriel(progression.nbParties, "partie") }} classée{{ progression.nbParties > 1 ? "s" : "" }} · Évolution après chaque partie, à partir de 1000 Elo.</p>
+      <svg class="courbe" viewBox="0 0 744 244" role="img" aria-labelledby="courbe-titre courbe-description">
+        <title id="courbe-titre">Courbe de progression de l’Elo global</title>
+        <desc id="courbe-description">Moyenne des Elo par jeu après chaque partie. Explorez les étapes avec le curseur sous le graphique ou consultez le tableau des résultats.</desc>
+        @for (graduation of graduations; track graduation) {
+          <line x1="54" x2="704" [attr.y1]="y(graduation)" [attr.y2]="y(graduation)" class="grille" />
+          <text x="44" [attr.y]="y(graduation) + 4" text-anchor="end">{{ graduation }}</text>
+        }
+        <line x1="54" x2="704" [attr.y1]="y(1000)" [attr.y2]="y(1000)" class="reference" />
+        <polygon [attr.points]="surface" class="surface" />
+        <polyline [attr.points]="ligne" class="ligne" />
+        @for (point of points; track point.partieId; let i = $index) {
+          <circle [attr.cx]="x(i)" [attr.cy]="y(point.elo)" [attr.r]="selection === i ? 6 : 4" class="point"
+            (mouseenter)="selection = i" (click)="selection = i"><title>{{ point.jeu || 'Départ' }} : {{ point.elo }} Elo</title></circle>
+        }
+        <text x="54" y="238">Départ</text>
+        <text x="704" y="238" text-anchor="end">Partie {{ progression.nbParties }}</text>
+      </svg>
+      <label for="etape-elo">Explorer la progression</label>
+      <input id="etape-elo" type="range" min="0" [max]="points.length - 1" [value]="selection" (input)="choisirPoint($event)"
+        [attr.aria-valuetext]="(pointSelectionne?.jeu || 'Départ') + ' : ' + pointSelectionne?.elo + ' Elo'" />
+      @if (pointSelectionne; as point) {
+        <div class="detail-point" aria-live="polite">
+          <strong>{{ point.jeu || "Départ" }} · {{ point.elo }} Elo <span [class.baisse]="point.variation < 0">({{ variation(point.variation) }})</span></strong>
+          <span>{{ point.date ? formaterDate(point.date) : "Score initial" }}</span>
+        </div>
+      }
+      <details><summary>Voir les résultats détaillés</summary>
+        <div class="table-scroll"><table><caption class="visually-hidden">Historique de l’Elo global</caption>
+          <thead><tr><th scope="col">Date et jeu</th><th scope="col">Elo</th><th scope="col">Variation</th></tr></thead>
+          <tbody>@for (point of points; track point.partieId) {
+            <tr><td>{{ point.jeu || "Départ" }}<small>{{ point.date ? formaterDate(point.date) : "Score initial" }}</small></td><td>{{ point.elo }}</td><td>{{ variation(point.variation) }}</td></tr>
+          }</tbody>
+        </table></div>
+      </details>
+      <p class="explication">L’Elo global est la moyenne de vos Elo par jeu. Chaque jeu compte à parts égales.</p>
+    }
+  }
+  <p class="lien-regles"><a routerLink="/regles-elo" [mat-dialog-close]="progression?.classement">Comprendre les règles Elo →</a></p>
+</mat-dialog-content>
+<mat-dialog-actions align="end"><button type="button" [mat-dialog-close]="progression?.classement">Fermer</button></mat-dialog-actions>

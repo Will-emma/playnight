@@ -1,7 +1,10 @@
+import { EloProgressionComponent } from "../elo-progression/elo-progression.component"
+import { MatDialog } from "@angular/material/dialog"
+import { AvatarDialogComponent } from "../avatar-dialog/avatar-dialog.component"
 import { Location } from "@angular/common"
 import { Component, OnInit } from "@angular/core"
 import { ActivatedRoute } from "@angular/router"
-import { JeuFavori, PartieHistorique, ProfilJoueur } from "models/joueur.model"
+import { ClassementGlobal, ClassementJoueur, JeuFavori, PartieHistorique, ProfilJoueur } from "models/joueur.model"
 import { formaterDate, pluriel } from "utils/format"
 import { ProfilJoueurPageData } from "./profil-joueur.resolver"
 
@@ -25,6 +28,9 @@ export class ProfilJoueurComponent implements OnInit {
   readonly perimetreJauge = PERIMETRE_JAUGE
 
   profil: ProfilJoueur | null = null
+  classementGlobal: ClassementGlobal | null = null
+  classements: ClassementJoueur[] = []
+  erreurClassements = false
   erreur: ProfilJoueurPageData["erreur"] = null
   tousLesFavoris = false
   toutLHistorique = false
@@ -34,6 +40,7 @@ export class ProfilJoueurComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private location: Location,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -41,9 +48,45 @@ export class ProfilJoueurComponent implements OnInit {
     this.route.data.subscribe((data) => {
       const page: ProfilJoueurPageData = data["profilJoueurPage"]
       this.profil = page.profil
+      this.classementGlobal = page.classementGlobal
+      this.classements = page.classements
+      this.erreurClassements = page.erreurClassements
       this.erreur = page.erreur
       this.tousLesFavoris = false
       this.toutLHistorique = false
+    })
+  }
+
+  ouvrirProgression(): void {
+    if (!this.profil) return
+    const id = this.profil.joueur.id
+    this.dialog.open(EloProgressionComponent, {
+      data: this.profil.joueur,
+      width: "840px",
+      maxWidth: "94vw",
+      maxHeight: "90vh",
+      ariaLabelledBy: "progression-elo-titre",
+      panelClass: "avatar-dialog-panel",
+    }).afterClosed().subscribe((classement: ClassementGlobal | undefined) => {
+      if (classement && this.profil?.joueur.id === id) this.classementGlobal = classement
+    })
+  }
+
+  modifierAvatar(): void {
+    if (!this.profil) return
+    const id = this.profil.joueur.id
+    this.dialog.open(AvatarDialogComponent, {
+      data: this.profil.joueur,
+      width: "560px",
+      maxWidth: "94vw",
+      maxHeight: "90vh",
+      ariaLabelledBy: "avatar-dialog-title",
+      panelClass: "avatar-dialog-panel",
+    }).afterClosed().subscribe((joueur) => {
+      if (joueur && this.profil?.joueur.id === id) {
+        this.profil = { ...this.profil, joueur }
+        this.imagesIndisponibles.delete(joueur.avatar)
+      }
     })
   }
 

@@ -931,3 +931,19 @@ app-importer-jeu {
     .resultat__ajout { justify-content: space-between; }
   }
 }
+
+// Fenêtre de personnalisation de l'avatar (hors du composant profil, dans l'overlay Material).
+.avatar-dialog-panel .mat-mdc-dialog-container {
+  --mdc-dialog-container-color: #151827;
+  --mdc-dialog-subhead-color: #f0eff8;
+  --mdc-dialog-supporting-text-color: #a7aec5;
+}
+
+.avatar-dialog-panel .mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: #f8b83f;
+  --mat-tab-header-active-label-text-color: #f8b83f;
+  --mat-tab-header-active-focus-label-text-color: #f8b83f;
+  --mat-tab-header-active-hover-label-text-color: #f8b83f;
+  --mat-tab-header-inactive-label-text-color: #a7aec5;
+  --mat-tab-header-inactive-hover-label-text-color: #f0eff8;
+}

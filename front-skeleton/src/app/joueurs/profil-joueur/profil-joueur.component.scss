@@ -1,1 +1,43 @@
 :host { display: block; }
+
+.avatar-modifiable { position: relative; flex: none; }
+.modifier-avatar {
+  position: absolute; right: 0; bottom: 0;
+  display: grid; width: 40px; height: 40px; place-items: center;
+  border: 3px solid #151827; border-radius: 50%;
+  color: #11131f; background: #f8b83f; cursor: pointer;
+  transition: transform .18s;
+}
+.modifier-avatar:hover { transform: scale(1.08); }
+.modifier-avatar svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+
+.elo-personnel {
+  margin-bottom: 28px;
+  &__liste { margin: 0; padding: 0; list-style: none; }
+  &__liste li + li { border-top: 1px solid var(--library-line); }
+  &__jeu { display: flex; align-items: center; gap: 14px; padding: 16px 0; color: inherit; text-decoration: none; }
+  &__jeu:hover { background: #f8b83f0a; }
+  &__nom { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 700; }
+  &__nom small { display: block; margin-top: 5px; color: var(--library-muted); font-size: .75rem; font-weight: 400; }
+  &__stats { display: flex; gap: 28px; margin: 0; text-align: right; }
+  &__stats dt { color: var(--library-muted); font-size: .7rem; }
+  &__stats dd { margin: 4px 0 0; font-weight: 800; }
+  &__points { color: var(--library-accent); }
+}
+@media (max-width: 600px) {
+  .elo-personnel {
+    &__jeu { flex-wrap: wrap; }
+    &__nom { flex-basis: calc(100% - 70px); }
+    &__stats { justify-content: space-between; width: 100%; text-align: left; }
+  }
+}
+
+.statistique--elo dd { color: var(--library-accent); }
+.elo-global-rang { display: block; margin-top: 6px; color: var(--library-muted); font-size: .72rem; }
+
+.statistique--elo { position: relative; cursor: pointer; }
+.statistique--elo:hover { border-color: var(--library-accent); }
+.elo-global-action { padding: 0; border: 0; color: inherit; background: none; font: inherit; text-transform: inherit; cursor: pointer; }
+.elo-global-action::after { position: absolute; inset: 0; border-radius: 16px; content: ""; }
+.elo-global-action:focus-visible::after { outline: 2px solid var(--library-accent); outline-offset: 3px; }
+.elo-global-invitation { display: block; margin-top: 6px; color: var(--library-accent); font-size: .72rem; }

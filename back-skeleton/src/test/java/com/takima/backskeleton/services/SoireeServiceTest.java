@@ -50,6 +50,8 @@ class SoireeServiceTest {
     private JoueurDao joueurDao;
     @Mock
     private JeuDao jeuDao;
+    @Mock
+    private ClassementService classementService;
     @InjectMocks
     private SoireeService soireeService;
 

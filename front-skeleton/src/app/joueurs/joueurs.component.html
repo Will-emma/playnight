@@ -98,8 +98,10 @@
         <section class="podium" aria-label="Podium des trois premiers joueurs">
           <div class="podium__players">
             @for (entry of podium; track entry.joueur.id) {
-              <article
+              <a
                 class="podium-player"
+                [routerLink]="['/joueurs', entry.joueur.id]"
+                [attr.aria-label]="'Voir le profil de ' + entry.joueur.pseudo"
                 [class.podium-player--first]="classement.indexOf(entry) === 0"
                 [class.podium-player--second]="classement.indexOf(entry) === 1"
                 [class.podium-player--third]="classement.indexOf(entry) === 2"
@@ -119,7 +121,7 @@
                 <div class="podium-step">
                   <span>{{ classement.indexOf(entry) + 1 }}</span>
                 </div>
-              </article>
+              </a>
             }
           </div>
         </section>
@@ -143,7 +145,13 @@
                       <span aria-hidden="true">{{ initiale(entry.joueur) }}</span>
                     }
                   </div>
-                  <span>{{ entry.joueur.pseudo }}</span>
+                  <span>
+                    <a
+                      class="player-profile-link"
+                      [routerLink]="['/joueurs', entry.joueur.id]"
+                      [attr.aria-label]="'Voir le profil de ' + entry.joueur.pseudo"
+                    >{{ entry.joueur.pseudo }}</a>
+                  </span>
                 </div>
                 <strong class="rank-stat" role="cell">{{ entry.nbVictoires }}</strong>
                 <span class="rank-stat rank-stat--muted" role="cell">{{ entry.nbParties }}</span>
@@ -175,7 +183,7 @@
   } @else {
     <section class="players-grid" aria-label="Liste des joueurs">
       @for (joueur of joueurs; track joueur.id) {
-        <article class="player-card">
+        <a class="player-card" [routerLink]="['/joueurs', joueur.id]" [attr.aria-label]="'Voir le profil de ' + joueur.pseudo">
           <div class="player-avatar" [style.--avatar-color]="couleurAvatar(joueur)">
             @if (joueur.avatar && !avatarsIndisponibles.has(joueur.id)) {
               <img [src]="joueur.avatar" alt="" loading="lazy" (error)="marquerAvatarIndisponible(joueur)" />
@@ -190,7 +198,7 @@
           <span class="player-status" aria-label="Joueur PlayNight">
             <span aria-hidden="true"></span>
           </span>
-        </article>
+        </a>
       }
     </section>
   }
