@@ -539,56 +539,153 @@ app-soirees {
 app-home {
   display: block;
   min-height: calc(100vh - 80px);
+  overflow-x: hidden; // le halo et les cartes inclinées du collage ne doivent pas créer de défilement horizontal
   color: var(--library-text);
   background: var(--library-bg);
 
-  .accueil { max-width: 1100px; margin: auto; padding: 56px clamp(16px, 5vw, 64px) 72px; }
+  .accueil { max-width: 1200px; margin: auto; padding: 56px clamp(16px, 5vw, 64px) 72px; }
   a:focus-visible { outline: 3px solid var(--library-accent-border); outline-offset: 2px; }
+  .icone { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  // Bandeau de présentation
-  .bandeau { margin-bottom: 40px; }
+  // Bandeau de présentation : texte à gauche, collage de jeux à droite
+  .bandeau { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 48px; margin-bottom: 56px; }
+  .bandeau__halo { position: absolute; top: -80px; right: 0; width: min(560px, 100%); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #f8b83f22 0%, #9c5be11a 45%, transparent 70%); pointer-events: none; }
+  .bandeau__texte-bloc { position: relative; flex: 1 1 440px; min-width: 0; }
   .eyebrow { display: flex; align-items: center; gap: 9px; margin: 0 0 16px; color: var(--library-accent); font-size: .72rem; font-weight: 700; letter-spacing: .16em; }
   .eyebrow__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--library-accent); box-shadow: 0 0 14px var(--library-accent-glow); }
   // .accueil devant h1 : sinon la typographie Material (.mat-typography h1) l'emporte
-  .accueil h1 { margin: 0 0 18px; font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 750; line-height: 1.05; letter-spacing: -.05em; }
+  .accueil h1 { margin: 0 0 18px; font-size: clamp(2.6rem, 6vw, 4.5rem); font-weight: 900; line-height: 1; letter-spacing: -.05em; }
   .bandeau__accent { color: var(--library-accent); }
-  .bandeau__texte { max-width: 600px; margin: 0 0 28px; color: var(--library-muted); font-size: 1.05rem; line-height: 1.65; }
+  .bandeau__texte { max-width: 540px; margin: 0 0 28px; color: var(--library-muted); font-size: 1.1rem; line-height: 1.65; }
   .bandeau__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
-  // Chiffres clés
-  .chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; margin: 0 0 48px; padding: 0; list-style: none; }
-  .chiffre { display: grid; gap: 4px; padding: 20px 22px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); }
-  .chiffre strong { color: var(--library-accent); font-size: 2.2rem; font-weight: 800; line-height: 1; }
-  .chiffre span { color: var(--library-muted); font-size: .9rem; }
+  // Collage : 3 couvertures posées en éventail, la 3e au centre et devant
+  .collage { position: relative; flex: 1 1 420px; min-width: 0; height: 420px; }
+  .collage__carte { position: absolute; display: flex; overflow: hidden; width: 44%; aspect-ratio: 3 / 4; flex-direction: column; justify-content: space-between; padding: 16px; border-radius: 18px; color: #11131f; background: var(--cover-color); box-shadow: 0 20px 40px #0008; text-decoration: none; transition: transform .3s ease; }
+  .collage__carte--1 { top: 70px; left: 4%; transform: rotate(-11deg); }
+  .collage__carte--2 { top: 40px; right: 2%; transform: rotate(9deg); }
+  .collage__carte--3 { z-index: 1; top: 0; left: 28%; border: 2px solid var(--library-accent); transform: rotate(-2deg); }
+  .collage__carte--1:hover { transform: rotate(-11deg) translateY(-8px); }
+  .collage__carte--2:hover { transform: rotate(9deg) translateY(-8px); }
+  .collage__carte--3:hover { transform: rotate(-2deg) translateY(-8px); }
+  .collage__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .collage__type { position: relative; align-self: flex-start; padding: 4px 10px; border-radius: 999px; color: var(--library-text); background: #11131fcc; font-size: .75rem; font-weight: 700; }
+  .collage__bas { position: relative; display: grid; }
+  // Sur une vraie image, le nom passe en clair sur un fond dégradé pour rester lisible
+  .collage__image ~ .collage__bas { margin: 0 -16px -16px; padding: 40px 16px 16px; color: var(--library-text); background: linear-gradient(transparent, #11131fe6); }
+  .collage__initiale { font-size: clamp(4rem, 8vw, 6rem); font-weight: 900; line-height: .9; }
+  .collage__nom { font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+  .collage__bulle { position: absolute; z-index: 2; bottom: 0; left: 24%; display: flex; align-items: center; gap: 10px; max-width: 76%; margin: 0; padding: 10px 16px; border: 1px solid var(--library-line); border-radius: 14px; background: var(--library-card); box-shadow: 0 12px 28px #0008; font-size: .9rem; line-height: 1.35; }
+  .collage__bulle .icone { flex: none; color: var(--library-accent); }
+  .collage__bulle strong { display: block; }
+  .collage__bulle-detail { color: var(--library-muted); }
 
-  // Sections "Dernières soirées" et "Par où commencer ?"
-  .section { margin-bottom: 48px; }
-  .section__entete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
-  .accueil h2 { margin: 0; font-size: 1.5rem; font-weight: 700; }
-  .lien-discret { color: var(--library-accent); font-weight: 700; text-decoration: none; }
-  .lien-discret:hover { text-decoration: underline; }
+  // Chiffres clés, chacun avec son icône et sa couleur
+  .chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; margin: 0 0 32px; padding: 0; list-style: none; }
+  .chiffre { display: flex; align-items: center; gap: 16px; padding: 20px 22px; border: 1px solid var(--library-line); border-radius: 18px; color: var(--library-muted); background: var(--library-surface); font-size: .9rem; transition: transform .2s ease, box-shadow .2s ease; }
+  .chiffre:hover { transform: translateY(-4px); box-shadow: 0 14px 30px #0006; }
+  .chiffre strong { display: block; margin-bottom: 4px; color: var(--library-text); font-size: 2.1rem; font-weight: 900; line-height: 1; }
+  .chiffre__icone { display: grid; flex: none; width: 52px; height: 52px; place-items: center; border-radius: 14px; }
+  .chiffre__icone circle { fill: currentColor; }
+  .chiffre--or .chiffre__icone { color: var(--library-accent); background: var(--library-accent-soft); }
+  .chiffre--violet .chiffre__icone { color: #b48cf0; background: #2a2340; }
+  .chiffre--turquoise .chiffre__icone { color: #4fd6cb; background: #183533; }
+  .chiffre--bleu .chiffre__icone { color: #6ea2f7; background: #1c2a45; }
 
-  // Cartes cliquables (mêmes cartes que la liste des soirées)
-  .liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px; margin: 0; padding: 0; list-style: none; }
-  .carte { position: relative; display: grid; align-content: start; gap: 6px; padding: 20px 22px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
-  .carte:hover { transform: translateY(-4px); border-color: var(--library-accent-border); box-shadow: 0 14px 34px #0004; }
-  .carte:has(.carte__lien:focus-visible) { outline: 3px solid var(--library-accent); outline-offset: 3px; }
-  .carte__date { margin: 0; color: var(--library-accent); font-size: .8rem; font-weight: 700; letter-spacing: .03em; }
-  .carte__date::first-letter { text-transform: uppercase; }
-  .accueil .carte h3 { overflow: hidden; margin: 0; font-size: 1.2rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+  // Podium et dernière soirée côte à côte (l'un sous l'autre sur petit écran)
+  .duo { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 56px; }
+  .panneau { position: relative; display: flex; flex: 1 1 420px; min-width: 0; flex-direction: column; gap: 22px; padding: 28px; border: 1px solid var(--library-line); border-radius: 22px; background: var(--library-surface); }
+  .accueil .panneau .section__entete { margin-bottom: 0; }
+
+  // Podium : le 1er au centre et plus haut ; or, argent, bronze
+  // Les socles reposent sur le bas du panneau, comme une vraie estrade
+  .panneau--podium { padding-bottom: 0; }
+  .podium { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .podium__marche { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; text-align: center; }
+  .podium__couronne { width: 30px; height: 22px; fill: var(--library-accent); }
+  .podium__joueur { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: 100%; color: var(--library-text); font-weight: 700; text-decoration: none; }
+  .podium__joueur:hover .podium__pseudo { text-decoration: underline; }
+  .podium__pseudo { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
+  .podium__avatar { display: grid; overflow: hidden; width: 64px; height: 64px; place-items: center; border: 3px solid var(--podium-couleur); border-radius: 50%; color: #11131f; font-size: 1.6rem; font-weight: 900; }
+  .podium__avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .podium__stats { color: var(--library-muted); font-size: .8rem; }
+  .podium__socle { display: grid; width: 100%; height: var(--podium-hauteur); place-items: center; border-radius: 14px 14px 0 0; color: var(--podium-couleur); background: var(--library-art-bg); font-size: 2rem; font-weight: 900; }
+  .podium__marche--1 { --podium-couleur: var(--library-accent); --podium-hauteur: 136px; }
+  .podium__marche--2 { --podium-couleur: #c5c9d9; --podium-hauteur: 96px; }
+  .podium__marche--3 { --podium-couleur: #d0956a; --podium-hauteur: 72px; }
+  .podium__marche--1 .podium__avatar { width: 80px; height: 80px; box-shadow: 0 0 28px var(--library-accent-glow); }
+  .podium__marche--1 .podium__socle { border: 1px solid var(--library-accent-border); border-bottom: 0; background: var(--library-accent-soft); font-size: 2.6rem; }
+
+  // Dernière soirée : toute la carte est cliquable grâce au lien étiré
+  .panneau--vedette { border-color: var(--library-accent-border-soft); background: var(--library-card); transition: transform .2s ease, box-shadow .2s ease; }
+  .panneau--vedette:hover { transform: translateY(-4px); box-shadow: 0 14px 34px #0006; }
+  .panneau--vedette:has(.carte__lien:focus-visible) { outline: 3px solid var(--library-accent); outline-offset: 3px; }
+  .vedette__entete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .pastille { padding: 6px 12px; border-radius: 999px; color: var(--library-accent); background: var(--library-accent-soft); font-size: .72rem; font-weight: 700; letter-spacing: .08em; }
+  .vedette__date { color: var(--library-muted); font-size: .85rem; }
+  .vedette__date::first-letter { text-transform: uppercase; }
+  .accueil .panneau--vedette h2 { margin-bottom: 6px; font-size: 1.8rem; font-weight: 900; }
+  .vedette__resume { margin: 0; color: var(--library-muted); }
+  .vedette__lien { align-self: flex-start; font-size: .9rem; }
   .carte__lien { color: inherit; text-decoration: none; }
   .carte__lien::after { position: absolute; z-index: 1; inset: 0; content: ""; } // le lien couvre toute la carte
   .carte__lien:focus-visible { outline: none; }
-  .carte__resume { margin: 0; color: var(--library-muted); font-size: .9rem; line-height: 1.5; }
-  .raccourci__icone { display: grid; width: 40px; height: 40px; margin-bottom: 6px; place-items: center; border-radius: 12px; color: var(--library-accent); background: var(--library-accent-soft); font-size: 1.2rem; font-weight: 800; }
 
-  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 10px; padding: 10px 18px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
-  .bouton--principal { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); }
+  // Avatars des joueurs présents, qui se chevauchent
+  .avatars { display: flex; margin: 0; padding: 0; list-style: none; }
+  .avatars__item { display: grid; overflow: hidden; width: 40px; height: 40px; place-items: center; border: 3px solid var(--library-card); border-radius: 50%; color: #11131f; font-weight: 900; }
+  .avatars__item + .avatars__item { margin-left: -10px; }
+  .avatars__item img { width: 100%; height: 100%; object-fit: cover; }
 
-  .state-panel { display: grid; justify-items: center; gap: 10px; margin-bottom: 48px; padding: 32px 24px; border: 1px solid var(--library-line); border-radius: 18px; text-align: center; background: var(--library-surface); }
+  // Parties de la dernière soirée, avec leur gagnant
+  .parties { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .partie { display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 14px; background: var(--library-surface); }
+  .partie__image { display: grid; overflow: hidden; flex: none; width: 48px; height: 48px; place-items: center; border-radius: 10px; color: #11131f; font-size: 1.4rem; font-weight: 900; }
+  .partie__image img { width: 100%; height: 100%; object-fit: cover; }
+  .partie__jeu, .partie__gagnant { display: grid; min-width: 0; font-size: .85rem; }
+  .partie__jeu { flex: 1; }
+  .partie__jeu strong { overflow: hidden; color: var(--library-text); font-size: 1rem; text-overflow: ellipsis; white-space: nowrap; }
+  .partie__jeu span, .partie__gagnant span { color: var(--library-muted); }
+  .partie__gagnant { max-width: 45%; text-align: right; }
+  .partie__gagnant strong { color: var(--library-accent); }
+
+  // Rangée "Dans la ludothèque"
+  .section { margin-bottom: 48px; }
+  .section__entete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  .accueil h2 { margin: 0; font-size: 1.6rem; font-weight: 900; }
+  .lien-discret { color: var(--library-accent); font-weight: 700; text-decoration: none; }
+  .lien-discret:hover { text-decoration: underline; }
+  .rangee { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .rangee__carte { position: relative; display: flex; overflow: hidden; aspect-ratio: 3 / 4; flex-direction: column; justify-content: flex-end; padding: 14px; border-radius: 16px; color: #11131f; background: var(--cover-color); text-decoration: none; transition: transform .2s ease, box-shadow .2s ease; }
+  .rangee__carte:hover { transform: translateY(-4px); box-shadow: 0 14px 30px #0006; }
+  .rangee__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .rangee__image + .rangee__nom { margin: 0 -14px -14px; padding: 28px 14px 14px; color: var(--library-text); background: linear-gradient(transparent, #11131fe6); }
+  .rangee__initiale { font-size: 3.5rem; font-weight: 900; line-height: .9; }
+  .rangee__nom { position: relative; font-weight: 700; line-height: 1.2; }
+
+  .bouton { display: inline-block; border: 1px solid var(--library-line); border-radius: 12px; padding: 12px 22px; color: var(--library-text); background: transparent; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .bouton:hover { border-color: var(--library-accent); }
+  .bouton--principal { border-color: var(--library-accent); color: var(--library-badge-text); background: var(--library-accent); box-shadow: 0 8px 24px #f8b83f40; }
+  .bouton--principal:hover { filter: brightness(1.08); }
+
+  .state-panel { display: grid; justify-items: center; gap: 10px; margin-bottom: 48px; padding: 32px 24px; border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); text-align: center; }
   .state-panel h2 { margin: 0; font-size: 1.2rem; }
   .state-panel p { margin: 0; color: var(--library-muted); }
-  .section .state-panel { margin-bottom: 0; }
+  .panneau.state-panel { justify-content: center; align-items: center; margin-bottom: 0; }
+
+  // Petits écrans : le collage rétrécit
+  @media (max-width: 600px) {
+    .collage { height: 320px; }
+    .collage__bulle { left: 4%; max-width: 92%; }
+    .panneau { padding: 20px; }
+    .podium__avatar { width: 52px; height: 52px; font-size: 1.3rem; }
+    .podium__marche--1 .podium__avatar { width: 64px; height: 64px; }
+  }
+
+  // Pas d'animation au survol pour les personnes qui les ont désactivées dans leur système
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+  }
 }
 
 
