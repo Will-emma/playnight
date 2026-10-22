@@ -15,20 +15,66 @@
   } @else {
     <!-- En-tête : quand, où, et qui était là -->
     <section class="entete" aria-labelledby="lieu-soiree">
-      <p class="entete__date">{{ formaterDate(soiree.date) }}</p>
-      <h1 id="lieu-soiree">{{ soiree.lieu }}</h1>
-      <p class="entete__resume">{{ pluriel(soiree.parties.length, "partie") }} · {{ pluriel(soiree.joueurs.length, "joueur") }}</p>
+      <div class="entete__halo" aria-hidden="true"></div>
+
+      <div class="entete__ligne">
+        <div class="entete__principal">
+          <!-- Bloc de date décoratif : la date complète est lue juste après par les lecteurs d'écran -->
+          <p class="date" aria-hidden="true">
+            <span class="date__jour">{{ date.jour }}</span>
+            <span class="date__numero">{{ date.numero }}</span>
+            <span class="date__mois">{{ date.moisAnnee }}</span>
+          </p>
+          <div class="entete__texte">
+            <p class="eyebrow">
+              <span class="eyebrow__dot"></span> SOIRÉE · {{ date.heure }}
+              <span class="visually-hidden">, {{ formaterDate(soiree.date) }}</span>
+            </p>
+            <h1 id="lieu-soiree">{{ soiree.lieu }}</h1>
+            <ul class="pastilles" aria-label="En résumé">
+              <li class="pastille"><strong>{{ soiree.parties.length }}</strong> {{ soiree.parties.length > 1 ? "parties" : "partie" }}</li>
+              <li class="pastille"><strong>{{ soiree.joueurs.length }}</strong> {{ soiree.joueurs.length > 1 ? "joueurs" : "joueur" }}</li>
+              @if (dureeTotale > 0) {
+                <li class="pastille"><strong>{{ formaterDuree(dureeTotale) }}</strong> de jeu</li>
+              }
+            </ul>
+          </div>
+        </div>
+
+        @if (star) {
+          <a class="star" [routerLink]="['/joueurs', star.joueur.id]">
+            <span class="star__avatar-bloc">
+              <svg class="star__couronne" viewBox="0 0 30 22" aria-hidden="true"><path d="M2 20h26L26 6l-6 5-5-9-5 9-6-5z" /></svg>
+              <span class="avatar avatar--star" [style.background]="couleur(star.joueur.id)">
+                @if (aUneImage(star.joueur.avatar)) {
+                  <img [src]="star.joueur.avatar" alt="" (error)="marquerIndisponible(star.joueur.avatar)" />
+                } @else {
+                  <span aria-hidden="true">{{ initiale(star.joueur.pseudo) }}</span>
+                }
+              </span>
+            </span>
+            <span class="star__texte">
+              <span class="star__titre">STAR DE LA SOIRÉE</span>
+              <span class="star__pseudo">{{ star.joueur.pseudo }}</span>
+              <span class="star__detail">{{ pluriel(star.nbVictoires, "victoire") }} sur {{ pluriel(soiree.parties.length, "partie") }}</span>
+            </span>
+          </a>
+        }
+      </div>
 
       <ul class="presents" aria-label="Joueurs présents">
         @for (joueur of soiree.joueurs; track joueur.id) {
           <li>
             <a class="present" [routerLink]="['/joueurs', joueur.id]">
-              @if (joueur.avatar) {
-                <img [src]="joueur.avatar" alt="" />
-              } @else {
-                <span class="present__initiale" aria-hidden="true">{{ initiale(joueur.pseudo) }}</span>
-              }
+              <span class="avatar" [style.background]="couleur(joueur.id)">
+                @if (aUneImage(joueur.avatar)) {
+                  <img [src]="joueur.avatar" alt="" (error)="marquerIndisponible(joueur.avatar)" />
+                } @else {
+                  <span aria-hidden="true">{{ initiale(joueur.pseudo) }}</span>
+                }
+              </span>
               {{ joueur.pseudo }}
+              <span class="present__victoires">{{ pluriel(victoires(joueur), "victoire") }}</span>
             </a>
           </li>
         }
@@ -41,51 +87,121 @@
         <p>Cette soirée n'a pas encore de partie.</p>
       </section>
     } @else {
-      <!-- Une carte par partie, dans l'ordre où elles ont été jouées -->
-      <div class="parties">
-        @for (partie of soiree.parties; track partie.id; let i = $index) {
-          <section class="partie" [attr.aria-labelledby]="'partie-' + partie.id">
-            <header class="partie__entete">
-              <h2 [id]="'partie-' + partie.id">
-                <span class="partie__numero">Partie {{ i + 1 }}</span>
-                <a [routerLink]="['/jeux', partie.jeu.id]">{{ partie.jeu.nom }}</a>
-              </h2>
-              <span class="partie__duree">{{ formaterDuree(partie.duree) }}</span>
-            </header>
+      <section aria-labelledby="titre-deroule">
+        <h2 id="titre-deroule" class="titre-section">Le déroulé de la soirée</h2>
 
-            @if (equipesParPartie.get(partie.id); as equipes) {
-              <!-- Partie en équipe : une ligne par équipe, avec ses membres -->
-              <ol class="classement">
-                @for (ligne of equipes; track $index) {
-                  <li class="classement__ligne classement__ligne--equipe" [class.classement__ligne--premier]="ligne.rang === 1">
-                    <span class="classement__rang">{{ formaterRang(ligne.rang) }}</span>
-                    <span class="classement__equipe">
-                      <span class="classement__nom-equipe">{{ ligne.numeroEquipe !== null ? "Équipe " + ligne.numeroEquipe : "Sans équipe" }}</span>
-                      <span class="classement__membres">
-                        @for (membre of ligne.membres; track membre.id; let dernier = $last) {
-                          <a [routerLink]="['/joueurs', membre.joueur.id]">{{ membre.joueur.pseudo }}</a>@if (pointsIndividuels(ligne) && membre.points !== null) {<span class="classement__points-membre"> ({{ membre.points }})</span>}@if (!dernier) {<span>, </span>}
+        <!-- Une partie par étape de la frise, dans l'ordre où elles ont été jouées -->
+        <ol class="frise">
+          @for (affichee of partiesAffichees; track affichee.partie.id; let i = $index) {
+            <li class="partie" [attr.aria-labelledby]="'partie-' + affichee.partie.id">
+              <span class="partie__puce" aria-hidden="true">{{ i + 1 }}</span>
+
+              <a class="couverture" [routerLink]="['/jeux', affichee.partie.jeu.id]" [style.background]="couleur(affichee.partie.jeu.id)" tabindex="-1" aria-hidden="true">
+                @if (aUneImage(affichee.partie.jeu.image)) {
+                  <img class="couverture__image" [src]="affichee.partie.jeu.image" alt="" (error)="marquerIndisponible(affichee.partie.jeu.image)" />
+                } @else {
+                  <span class="couverture__initiale">{{ initiale(affichee.partie.jeu.nom) }}</span>
+                }
+                <span class="couverture__type">{{ labelType(affichee.partie.jeu.type) }}</span>
+                <span class="couverture__nom">{{ affichee.partie.jeu.nom }}</span>
+              </a>
+
+              <div class="partie__contenu">
+                <header class="partie__entete">
+                  <h3 [id]="'partie-' + affichee.partie.id">
+                    <span class="partie__numero">Partie {{ i + 1 }}@if (affichee.equipes) { · en équipes}</span>
+                    <a [routerLink]="['/jeux', affichee.partie.jeu.id]">{{ affichee.partie.jeu.nom }}</a>
+                  </h3>
+                  <span class="pastille">{{ formaterDuree(affichee.partie.duree) }}</span>
+                </header>
+
+                @if (affichee.equipes; as equipes) {
+                  <!-- Partie en équipe : une carte par équipe, la gagnante en doré -->
+                  <ol class="equipes">
+                    @for (ligne of equipes; track $index; let premiere = $first) {
+                      @if (!premiere && equipes.length === 2) {
+                        <li class="equipes__vs" aria-hidden="true">VS</li>
+                      }
+                      <li class="equipe" [class.equipe--gagnante]="ligne.rang === 1">
+                        <div class="equipe__entete">
+                          <span class="equipe__nom">
+                            @if (ligne.rang === 1) {
+                              <svg class="couronne" viewBox="0 0 30 22" aria-hidden="true"><path d="M2 20h26L26 6l-6 5-5-9-5 9-6-5z" /></svg>
+                            }
+                            {{ ligne.numeroEquipe !== null ? "Équipe " + ligne.numeroEquipe : "Sans équipe" }} · {{ ligne.rang === 1 ? "Victoire" : formaterRang(ligne.rang) }}
+                          </span>
+                          @if (ligne.points !== null) {
+                            <span class="equipe__points">{{ pluriel(ligne.points, "point") }}</span>
+                          }
+                        </div>
+                        <ul class="equipe__membres">
+                          @for (membre of ligne.membres; track membre.id) {
+                            <li>
+                              <a class="membre" [routerLink]="['/joueurs', membre.joueur.id]">
+                                <span class="avatar avatar--petit" [style.background]="couleur(membre.joueur.id)">
+                                  @if (aUneImage(membre.joueur.avatar)) {
+                                    <img [src]="membre.joueur.avatar" alt="" (error)="marquerIndisponible(membre.joueur.avatar)" />
+                                  } @else {
+                                    <span aria-hidden="true">{{ initiale(membre.joueur.pseudo) }}</span>
+                                  }
+                                </span>
+                                {{ membre.joueur.pseudo }}
+                                @if (pointsIndividuels(ligne) && membre.points !== null) {
+                                  <span class="membre__points">({{ membre.points }})</span>
+                                }
+                              </a>
+                            </li>
+                          }
+                        </ul>
+                      </li>
+                    }
+                  </ol>
+                } @else {
+                  <!-- Chacun pour soi : les scores arrivent déjà triés par rang -->
+                  <ol class="classement">
+                    @for (score of affichee.vainqueurs; track score.id) {
+                      <li class="vainqueur">
+                        <svg class="couronne" viewBox="0 0 30 22" aria-hidden="true"><path d="M2 20h26L26 6l-6 5-5-9-5 9-6-5z" /></svg>
+                        <span class="avatar" [style.background]="couleur(score.joueur.id)">
+                          @if (aUneImage(score.joueur.avatar)) {
+                            <img [src]="score.joueur.avatar" alt="" (error)="marquerIndisponible(score.joueur.avatar)" />
+                          } @else {
+                            <span aria-hidden="true">{{ initiale(score.joueur.pseudo) }}</span>
+                          }
+                        </span>
+                        <span class="vainqueur__texte">
+                          <a [routerLink]="['/joueurs', score.joueur.id]">{{ score.joueur.pseudo }}</a>
+                          <span class="vainqueur__detail">Victoire</span>
+                        </span>
+                        @if (score.points !== null) {
+                          <span class="vainqueur__points">{{ pluriel(score.points, "point") }}</span>
                         }
-                      </span>
-                    </span>
-                    <span class="classement__points">{{ ligne.points !== null ? pluriel(ligne.points, "point") : "" }}</span>
-                  </li>
+                      </li>
+                    }
+                    @for (autre of affichee.autres; track autre.score.id) {
+                      <li class="ligne">
+                        <span class="ligne__rang ligne__rang--{{ autre.score.rang }}">{{ formaterRang(autre.score.rang) }}</span>
+                        <span class="avatar avatar--petit" [style.background]="couleur(autre.score.joueur.id)">
+                          @if (aUneImage(autre.score.joueur.avatar)) {
+                            <img [src]="autre.score.joueur.avatar" alt="" (error)="marquerIndisponible(autre.score.joueur.avatar)" />
+                          } @else {
+                            <span aria-hidden="true">{{ initiale(autre.score.joueur.pseudo) }}</span>
+                          }
+                        </span>
+                        <a class="ligne__joueur" [routerLink]="['/joueurs', autre.score.joueur.id]">{{ autre.score.joueur.pseudo }}</a>
+                        @if (autre.largeur !== null) {
+                          <span class="barre" aria-hidden="true"><span [style.width.%]="autre.largeur"></span></span>
+                        }
+                        <span class="ligne__points">{{ autre.score.points !== null ? pluriel(autre.score.points, "point") : "" }}</span>
+                      </li>
+                    }
+                  </ol>
                 }
-              </ol>
-            } @else {
-              <!-- Chacun pour soi : les scores arrivent déjà triés par rang -->
-              <ol class="classement">
-                @for (score of partie.scores; track score.id) {
-                  <li class="classement__ligne" [class.classement__ligne--premier]="score.rang === 1">
-                    <span class="classement__rang">{{ formaterRang(score.rang) }}</span>
-                    <a class="classement__joueur" [routerLink]="['/joueurs', score.joueur.id]">{{ score.joueur.pseudo }}</a>
-                    <span class="classement__points">{{ score.points !== null ? pluriel(score.points, "point") : "" }}</span>
-                  </li>
-                }
-              </ol>
-            }
-          </section>
-        }
-      </div>
+              </div>
+            </li>
+          }
+        </ol>
+      </section>
     }
   }
 </main>
