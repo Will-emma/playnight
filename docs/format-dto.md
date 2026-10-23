@@ -54,6 +54,11 @@ Lecture et écriture utilisent le même format. `type` vaut `"SOCIETE"` ou `"JEU
 }
 ```
 
+`description` (texte) et `dureeEstimee` (entier strictement positif en minutes)
+sont facultatifs dans `JeuDto`, y compris dans `fiche.jeu`. Ils valent `null`
+pour les jeux sans ces informations. La durée est indicative et ne remplace pas
+la durée réelle saisie pour une partie. Les résumés de jeux restent inchangés.
+
 Filtre par type : `GET /jeux?type=SOCIETE` ou `GET /jeux?type=JEU_VIDEO`.
 
 ## Soirées – `/soirees`

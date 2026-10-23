@@ -55,6 +55,7 @@ public class JeuService {
 
     @Transactional
     public JeuDto addJeu(JeuDto jeuDto) {
+        verifierDureeEstimee(jeuDto);
         Jeu jeu = JeuMapper.fromDto(jeuDto, null);
         return JeuMapper.toDto(jeuDao.save(jeu));
     }
@@ -62,6 +63,7 @@ public class JeuService {
     @Transactional
     public JeuDto updateJeu(JeuDto jeuDto, Long id) {
         findJeuById(id);
+        verifierDureeEstimee(jeuDto);
         Jeu jeu = JeuMapper.fromDto(jeuDto, id);
         return JeuMapper.toDto(jeuDao.save(jeu));
     }
@@ -100,6 +102,12 @@ public class JeuService {
     public void deleteById(Long id) {
         findJeuById(id);
         jeuDao.deleteById(id);
+    }
+
+    private void verifierDureeEstimee(JeuDto jeuDto) {
+        if (jeuDto.getDureeEstimee() != null && jeuDto.getDureeEstimee() <= 0) {
+            throw new IllegalArgumentException("La durée estimée doit être un nombre de minutes strictement positif.");
+        }
     }
 
     private Jeu findJeuById(Long id) {

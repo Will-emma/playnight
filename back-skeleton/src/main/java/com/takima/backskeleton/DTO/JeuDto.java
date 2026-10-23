@@ -10,6 +10,8 @@ public class JeuDto {
     private Integer nbJoueursMin;
     private Integer nbJoueursMax;
     private String image;
+    private String description;
+    private Integer dureeEstimee;
 
     public Long getId() {
         return id;
@@ -38,6 +40,11 @@ public class JeuDto {
     public String getImage() {
         return image;
     }
+
+    public String getDescription() { return description; }
+    public Integer getDureeEstimee() { return dureeEstimee; }
+    public void setDescription(String description) { this.description = description; }
+    public void setDureeEstimee(Integer dureeEstimee) { this.dureeEstimee = dureeEstimee; }
 
     public void setId(Long id) {
         this.id = id;
@@ -75,6 +82,8 @@ public class JeuDto {
         private Integer nbJoueursMin;
         private Integer nbJoueursMax;
         private String image;
+        private String description;
+        private Integer dureeEstimee;
 
         public JeuDtoBuilder id(Long id) {
             this.id = id;
@@ -111,6 +120,16 @@ public class JeuDto {
             return this;
         }
 
+        public JeuDtoBuilder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public JeuDtoBuilder dureeEstimee(Integer dureeEstimee) {
+            this.dureeEstimee = dureeEstimee;
+            return this;
+        }
+
         public JeuDto build() {
             JeuDto jeuDto = new JeuDto();
             jeuDto.id = this.id;
@@ -120,6 +139,8 @@ public class JeuDto {
             jeuDto.nbJoueursMin = this.nbJoueursMin;
             jeuDto.nbJoueursMax = this.nbJoueursMax;
             jeuDto.image = this.image;
+            jeuDto.description = this.description;
+            jeuDto.dureeEstimee = this.dureeEstimee;
             return jeuDto;
         }
     }
