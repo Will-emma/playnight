@@ -100,9 +100,10 @@
       </section>
     } @else {
       <div class="colonnes">
-        <!-- Meilleurs joueurs : podium des 3 premiers, puis les suivants (jusqu'au 5e, ou tous à la demande) -->
+        <!-- Aperçu de cinq joueurs : trois sur le podium et deux dans la liste. -->
         <section class="bloc" aria-labelledby="titre-classement">
-          <h2 id="titre-classement">Meilleurs joueurs</h2>
+          <h2 id="titre-classement">Classement par victoires</h2>
+          <p>Chaque rang 1 compte une victoire, y compris en équipe ou ex æquo. À nombre de victoires égal, les joueurs partagent la même place.</p>
           @if (fiche.meilleursJoueurs.length === 0) {
             <p class="vide">Aucun vainqueur enregistré pour ce jeu.</p>
           } @else {
@@ -148,9 +149,7 @@
               </ol>
             }
             @if (fiche.meilleursJoueurs.length > nbMeilleursJoueursAffiches) {
-              <button type="button" class="bouton bouton--discret" (click)="toutLeClassement = !toutLeClassement">
-                {{ toutLeClassement ? "Voir seulement le top " + nbMeilleursJoueursAffiches : "Voir tout le classement (" + fiche.meilleursJoueurs.length + ")" }}
-              </button>
+              <a class="bouton bouton--discret" [routerLink]="['/jeux', fiche.jeu.id, 'classement-victoires']">Voir tout le classement</a>
             }
           }
         </section>

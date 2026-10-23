@@ -2,6 +2,8 @@ package com.takima.backskeleton.services;
 
 import com.takima.backskeleton.DAO.JeuDao;
 import com.takima.backskeleton.DAO.PartieDao;
+import com.takima.backskeleton.DAO.ScoreDao;
+import com.takima.backskeleton.DAO.ClassementVictoiresProjection;
 import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.JeuDto;
 import com.takima.backskeleton.DTO.MeilleurJoueurDto;
@@ -44,6 +46,9 @@ class JeuServiceTest {
 
     @Mock
     private RawgService rawgService;
+
+    @Mock
+    private ScoreDao scoreDao;
 
     @InjectMocks
     private JeuService jeuService;
@@ -214,7 +219,7 @@ class JeuServiceTest {
     }
 
     @Test
-    void getFicheRanksPlayersByWinsThenByPseudo() {
+    void getFicheUsesAggregatedRankingAndPreservesHistory() {
         Joueur lea = joueur(1L, "Léa");
         Joueur tom = joueur(2L, "Tom");
         Joueur alex = joueur(3L, "Alex");
@@ -228,6 +233,8 @@ class JeuServiceTest {
         ajouterScore(partie3, alex, 1); // ex aequo : les deux gagnent
         when(jeuDao.findById(1L)).thenReturn(Optional.of(jeu(1L, "Catan", TypeJeu.SOCIETE)));
         when(partieDao.findDetailsByJeuId(1L)).thenReturn(List.of(partie1, partie2, partie3));
+        when(scoreDao.findClassementVictoiresByJeuId(1L)).thenReturn(List.of(
+                victoire(2L, "Tom", 2L), victoire(3L, "Alex", 1L), victoire(1L, "Léa", 1L)));
 
         FicheJeuDto fiche = jeuService.getFiche(1L);
 
@@ -262,6 +269,39 @@ class JeuServiceTest {
                 () -> jeuService.getFiche(404L));
         assertEquals("Le jeu 404 n'existe pas", exception.getMessage());
         verify(partieDao, never()).findDetailsByJeuId(any());
+    }
+
+    @Test
+    void classementVictoiresMapsProjectionWithoutLoadingHistory() {
+        when(jeuDao.findById(42L)).thenReturn(Optional.of(jeu(42L, "Catan", TypeJeu.SOCIETE)));
+        when(scoreDao.findClassementVictoiresByJeuId(42L)).thenReturn(List.of(victoire(7L, "Léa", 3L)));
+        var classement = jeuService.getClassementVictoires(42L);
+        assertEquals(7L, classement.get(0).getJoueur().getId());
+        assertEquals("Léa", classement.get(0).getJoueur().getPseudo());
+        assertEquals("avatar.png", classement.get(0).getJoueur().getAvatar());
+        assertEquals(3L, classement.get(0).getNbVictoires());
+        verify(partieDao, never()).findDetailsByJeuId(any());
+    }
+
+    @Test
+    void classementVictoiresOfExistingGameCanBeEmpty() {
+        when(jeuDao.findById(42L)).thenReturn(Optional.of(jeu(42L, "Catan", TypeJeu.SOCIETE)));
+        assertTrue(jeuService.getClassementVictoires(42L).isEmpty());
+    }
+
+    @Test
+    void classementVictoiresMissingGameDoesNotQueryScores() {
+        assertThrows(NoSuchElementException.class, () -> jeuService.getClassementVictoires(404L));
+        verify(scoreDao, never()).findClassementVictoiresByJeuId(any());
+    }
+
+    private ClassementVictoiresProjection victoire(Long id, String pseudo, Long nombre) {
+        return new ClassementVictoiresProjection() {
+            public Long getJoueurId() { return id; }
+            public String getPseudo() { return pseudo; }
+            public String getAvatar() { return "avatar.png"; }
+            public Long getNbVictoires() { return nombre; }
+        };
     }
 
     private Partie partie(LocalDateTime date, int duree) {

@@ -36,3 +36,7 @@ build/
 
 # Photos personnelles persistantes (ne pas versionner).
 /uploads/
+
+# Sauvegardes locales et sauvegarde SQL personnelle : jamais dans les PR.
+/backups/
+/playnight-backup-before-reset-20261006-1134.sql
