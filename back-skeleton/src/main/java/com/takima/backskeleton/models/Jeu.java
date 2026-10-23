@@ -37,6 +37,12 @@ public class Jeu {
     @Column(columnDefinition = "TEXT")
     private String image;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "duree_estimee")
+    private Integer dureeEstimee;
+
     public Jeu() {
     }
 
@@ -48,6 +54,8 @@ public class Jeu {
         this.nbJoueursMin = builder.nbJoueursMin;
         this.nbJoueursMax = builder.nbJoueursMax;
         this.image = builder.image;
+        this.description = builder.description;
+        this.dureeEstimee = builder.dureeEstimee;
     }
 
     public Long getId() {
@@ -78,6 +86,10 @@ public class Jeu {
         return image;
     }
 
+    public String getDescription() { return description; }
+
+    public Integer getDureeEstimee() { return dureeEstimee; }
+
     public static class Builder {
         private Long id;
         private String nom;
@@ -86,6 +98,8 @@ public class Jeu {
         private Integer nbJoueursMin;
         private Integer nbJoueursMax;
         private String image;
+        private String description;
+        private Integer dureeEstimee;
 
         public Builder id(Long id) {
             this.id = id;
@@ -119,6 +133,16 @@ public class Jeu {
 
         public Builder image(String image) {
             this.image = image;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder dureeEstimee(Integer dureeEstimee) {
+            this.dureeEstimee = dureeEstimee;
             return this;
         }
 

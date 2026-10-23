@@ -1,3 +1,5 @@
+import { JoueurService } from "services/joueur.service"
+import { SuppressionComponent } from "../../suppression/suppression.component"
 import { TypeJeu } from "models/jeu.model"
 import { Location } from "@angular/common"
 import { ComponentFixture, TestBed } from "@angular/core/testing"
@@ -16,9 +18,10 @@ describe("Classement Elo sur le profil", () => {
   beforeEach(async () => {
     route = new Subject()
     await TestBed.configureTestingModule({
-      declarations: [ProfilJoueurComponent],
+      declarations: [ProfilJoueurComponent, SuppressionComponent],
       imports: [RouterTestingModule],
       providers: [
+        { provide: JoueurService, useValue: jasmine.createSpyObj("JoueurService", ["delete"]) },
         { provide: ActivatedRoute, useValue: { data: route } },
         { provide: Location, useValue: { back: jasmine.createSpy() } },
         { provide: MatDialog, useValue: { open: jasmine.createSpy("open").and.returnValue({ afterClosed: () => of({ elo: 1007, rang: 1 }) }) } },

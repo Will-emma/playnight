@@ -68,3 +68,66 @@ Les chemins `/assets/avatars/avatar-XX.png` de la galerie sont servis par Angula
 et les photos importées sont servies par l'API. Les tests vérifient séparément
 la persistance SQL et la récupération des fichiers par une nouvelle instance du
 stockage ; le stockage doit rester monté au même emplacement après redémarrage.
+
+
+### Catalogue de jeux de société
+
+`initdb/4_AJOUT_JEUX_SOCIETE.sql` ajoute les métadonnées facultatives
+`description` et `duree_estimee`, puis les quatre jeux suivants :
+
+| Jeu | Joueurs | Durée indicative |
+|---|---|---|
+| Undercover | 3–12 | 15 min |
+| UNO | 2–10 | 20 min |
+| Dames (internationales) | 2 | 20 min |
+| Échecs (partie rapide) | 2 | 30 min |
+
+Ces estimations dépendent de la variante et du rythme des joueurs. Il s'agit
+séparément de jeux de type `SOCIETE`, sans plateforme ni moteur de règles.
+Les parties, scores et classements utilisent les écrans et endpoints existants.
+Pour Undercover, saisir le camp gagnant au rang 1 et les autres au rang 2 ;
+si des équipes sont renseignées, tous leurs membres doivent partager le même
+rang. Pour une nulle aux Dames ou aux Échecs, attribuer le même rang aux deux
+joueurs. Le calcul Elo existant reste inchangé.
+
+Une base neuve exécute les scripts dans leur ordre habituel. Sur une base
+existante, arrêter l'API puis appliquer **uniquement** le nouveau script depuis
+`back-skeleton/`, avant de relancer l'API compilée :
+
+```sh
+docker compose exec -T database sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < initdb/4_AJOUT_JEUX_SOCIETE.sql
+```
+
+Ne pas rejouer les anciens jeux de données ni réinitialiser le volume PostgreSQL.
+Le script conserve les jeux présents, leurs identifiants et leurs personnalisations.
+Il reconnaît les noms après suppression des espaces extérieurs et normalisation
+de la casse et des accents de « Échecs ». Une réexécution ne crée pas de doublon.
+Il n'est pas exécuté au démarrage de Spring : un jeu supprimé reste supprimé
+après redémarrage. Une réexécution **manuelle** restaure les jeux du catalogue
+qui manquent. La suppression existante reste disponible pour un jeu jamais joué ;
+un jeu utilisé dans une partie reste protégé par les clés étrangères.
+
+Les quatre couvertures dans `front-skeleton/src/assets/jeux/` sont des images
+originales générées pour PlayNight : masque et indices pour Undercover, cartes
+colorées aux formes géométriques pour UNO, damier et pions pour Dames, cavalier
+et roi pour Échecs. Consigne artistique commune : illustration de couverture
+chaleureuse, sans texte ni logo, adaptée au thème sombre et doré. Aucune image
+de boîte commerciale n'a été téléchargée.
+
+
+Les jeux de société historiques disposent également de couvertures originales
+créées pour PlayNight : île et village pour Catan, livre et paysage onirique pour
+Dixit, cartes et accessoires d'espionnage pour Codenames, port et monuments
+antiques pour 7 Wonders. Même direction artistique : illustration chaleureuse,
+ombres bleu nuit et lumière dorée, sans texte ni logo commercial.
+
+Sur une base existante, compléter les images manquantes avec :
+
+```sh
+docker compose exec -T database sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < initdb/5_IMAGES_JEUX_SOCIETE.sql
+```
+
+Ce script renseigne les images nulles, vides ou temporaires (`placehold.co`)
+des quatre jeux concernés.
+Il conserve les images personnalisées, ne crée aucun jeu et peut être rejoué.
+Il est aussi exécuté dans l'ordre habituel à l'initialisation d'une base neuve.

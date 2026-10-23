@@ -90,9 +90,11 @@
               <span class="game-id">#{{ jeu.id }}</span>
             </div>
             <p class="platform">{{ jeu.plateforme || (jeu.type === "SOCIETE" ? "Jeu de plateau" : "Plateforme non renseignée") }}</p>
+            @if (jeu.description) { <p class="game-description">{{ jeu.description }}</p> }
             <div class="game-card__meta">
               <span class="meta-icon" aria-hidden="true">♟</span>
               <span>{{ nombreJoueurs(jeu) }}</span>
+              @if (jeu.dureeEstimee) { <span class="game-duration">· env. {{ jeu.dureeEstimee }} min</span> }
             </div>
           </div>
         </article>

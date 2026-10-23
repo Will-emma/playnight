@@ -13,6 +13,8 @@ export interface Jeu {
   nbJoueursMin: number | null
   nbJoueursMax: number | null
   image: string | null
+  description?: string | null
+  dureeEstimee?: number | null // minutes indicatives, distinctes de la durée d’une partie
 }
 
 // Un jeu vidéo trouvé sur RAWG, pas encore dans la ludothèque : GET /jeux/rawg?recherche=...
