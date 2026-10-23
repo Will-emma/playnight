@@ -29,6 +29,8 @@ erDiagram
         int nb_joueurs_min "au moins 1"
         int nb_joueurs_max "au moins nb_joueurs_min"
         text image "URL, facultatif"
+        text description "facultatif"
+        int duree_estimee "minutes, facultatif, positif"
     }
     SOIREES {
         bigserial id PK
@@ -81,6 +83,8 @@ erDiagram
 | nb_joueurs_min | INT | Integer | obligatoire, au moins 1 |
 | nb_joueurs_max | INT | Integer | obligatoire, au moins `nb_joueurs_min` |
 | image | TEXT | String | facultatif (URL) |
+| description | TEXT | String | facultatif |
+| duree_estimee | INT | Integer | facultatif, minutes, strictement positif |
 
 ### `soirees`
 | Colonne | Type SQL | Type Java | Contraintes |

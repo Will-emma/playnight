@@ -22,6 +22,8 @@ public class JeuMapper {
                 .nbJoueursMin(dto.getNbJoueursMin())
                 .nbJoueursMax(dto.getNbJoueursMax())
                 .image(dto.getImage())
+                .description(dto.getDescription())
+                .dureeEstimee(dto.getDureeEstimee())
                 .build();
     }
 
@@ -34,6 +36,8 @@ public class JeuMapper {
                 .nbJoueursMin(jeu.getNbJoueursMin())
                 .nbJoueursMax(jeu.getNbJoueursMax())
                 .image(jeu.getImage())
+                .description(jeu.getDescription())
+                .dureeEstimee(jeu.getDureeEstimee())
                 .build();
     }
 

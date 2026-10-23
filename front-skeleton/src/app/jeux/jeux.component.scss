@@ -1,1 +1,5 @@
 :host { display: block; }
+
+.game-description { margin: 0 0 16px; color: var(--library-muted); font-size: .85rem; line-height: 1.5; }
+.game-duration { white-space: nowrap; }
+.game-card__meta { flex-wrap: wrap; }
