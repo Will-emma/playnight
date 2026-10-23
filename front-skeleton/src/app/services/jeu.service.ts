@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 import { Observable } from "rxjs"
-import { ClassementElo, FicheJeu, Jeu, RawgImport, RawgJeu, TypeJeu } from "models/jeu.model"
+import { ClassementElo, FicheJeu, Jeu, MeilleurJoueur, RawgImport, RawgJeu, TypeJeu } from "models/jeu.model"
 
 @Injectable({
   providedIn: "root",
@@ -18,6 +18,14 @@ export class JeuService {
 
   getFiche(id: number): Observable<FicheJeu> {
     return this.http.get<FicheJeu>(`${this.jeuxUrl}/${id}/fiche`)
+  }
+
+  getById(id: number): Observable<Jeu> {
+    return this.http.get<Jeu>(`${this.jeuxUrl}/${id}`)
+  }
+
+  getClassementVictoires(id: number): Observable<MeilleurJoueur[]> {
+    return this.http.get<MeilleurJoueur[]>(`${this.jeuxUrl}/${id}/classement-victoires`)
   }
 
   getClassement(id: number): Observable<ClassementElo[]> {

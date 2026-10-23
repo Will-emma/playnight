@@ -182,6 +182,34 @@ Contrôles faits par le backend (sinon `400`) :
 }
 ```
 
+### Classement par victoires d'un jeu – `GET /jeux/{id}/classement-victoires`
+
+```json
+[
+  { "joueur": { "id": 42, "pseudo": "Léa", "avatar": null }, "nbVictoires": 3 }
+]
+```
+
+Chaque score de rang 1 compte une victoire, y compris pour chaque membre d'une
+équipe gagnante et pour chaque premier ex æquo. Les points ne départagent pas.
+Seuls les joueurs ayant au moins une victoire pour ce jeu apparaissent, triés par
+nombre de victoires décroissant, puis pseudo et identifiant croissants.
+Les parties sans résultat ou sans rang 1 ne contribuent pas.
+
+La fiche `/jeux/{id}/fiche` réutilise la même agrégation JPQL dans
+`meilleursJoueurs`. Angular affiche les places partagées : 1, 2, 2, 4.
+La fiche conserve un aperçu de cinq joueurs, podium compris. Au-delà, le lien
+« Voir tout le classement » ouvre `/jeux/{id}/classement-victoires`, qui charge
+le classement complet via cet endpoint. Chaque ligne mène au profil du joueur,
+et « Retour au jeu » ramène à sa fiche.
+Un jeu existant sans victoire renvoie `200 []` ; un jeu absent renvoie `404`.
+Une modification ou suppression de soirée est reflétée à la lecture suivante.
+Aucune migration ni table supplémentaire n'est nécessaire.
+
+Un rang 1 partagé compte comme une victoire pour chaque joueur dans ce classement,
+même si l'Elo considère leurs rangs égaux comme une égalité. L'endpoint Elo
+`/jeux/{id}/classement` et son calcul restent indépendants.
+
 ### Classement Elo d'un jeu – `GET /jeux/{id}/classement`
 
 ```json

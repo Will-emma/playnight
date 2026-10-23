@@ -2,6 +2,8 @@ package com.takima.backskeleton.services;
 
 import com.takima.backskeleton.DAO.JeuDao;
 import com.takima.backskeleton.DAO.PartieDao;
+import com.takima.backskeleton.DAO.ScoreDao;
+import com.takima.backskeleton.DTO.JoueurResumeDto;
 import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.JeuDto;
 import com.takima.backskeleton.DTO.JeuMapper;
@@ -9,28 +11,26 @@ import com.takima.backskeleton.DTO.MeilleurJoueurDto;
 import com.takima.backskeleton.DTO.RawgImportDto;
 import com.takima.backskeleton.DTO.RawgJeuDto;
 import com.takima.backskeleton.models.Jeu;
-import com.takima.backskeleton.models.Joueur;
 import com.takima.backskeleton.models.Partie;
-import com.takima.backskeleton.models.Score;
 import com.takima.backskeleton.models.TypeJeu;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 public class JeuService {
     private final JeuDao jeuDao;
     private final PartieDao partieDao;
     private final RawgService rawgService;
+    private final ScoreDao scoreDao;
 
-    public JeuService(JeuDao jeuDao, PartieDao partieDao, RawgService rawgService) {
+    public JeuService(JeuDao jeuDao, PartieDao partieDao, RawgService rawgService, ScoreDao scoreDao) {
         this.jeuDao = jeuDao;
         this.partieDao = partieDao;
         this.rawgService = rawgService;
+        this.scoreDao = scoreDao;
     }
 
     public List<JeuDto> findAll(TypeJeu type) {
@@ -50,7 +50,13 @@ public class JeuService {
     public FicheJeuDto getFiche(Long id) {
         Jeu jeu = findJeuById(id);
         List<Partie> parties = partieDao.findDetailsByJeuId(id);
-        return JeuMapper.toFicheDto(jeu, parties, classerVainqueurs(parties));
+        return JeuMapper.toFicheDto(jeu, parties, lireClassementVictoires(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<MeilleurJoueurDto> getClassementVictoires(Long id) {
+        findJeuById(id);
+        return lireClassementVictoires(id);
     }
 
     @Transactional
@@ -107,18 +113,12 @@ public class JeuService {
                 .orElseThrow(() -> new NoSuchElementException("Le jeu " + id + " n'existe pas"));
     }
 
-    // Compte les victoires (scores au rang 1) de chaque joueur sur ces parties,
-    // du plus grand nombre de victoires au plus petit, puis par pseudo en cas d'égalité
-    private List<MeilleurJoueurDto> classerVainqueurs(List<Partie> parties) {
-        Map<Joueur, Long> nbVictoires = parties.stream()
-                .flatMap(partie -> partie.getScores().stream())
-                .filter(Score::estVainqueur)
-                .collect(Collectors.groupingBy(Score::getJoueur, Collectors.counting()));
-
-        return nbVictoires.entrySet().stream()
-                .sorted(Map.Entry.<Joueur, Long>comparingByValue().reversed()
-                        .thenComparing(entry -> entry.getKey().getPseudo()))
-                .map(entry -> JeuMapper.toMeilleurJoueurDto(entry.getKey(), entry.getValue()))
+    // Même agrégation pour la fiche et l'endpoint dédié ; aucun calcul depuis l'Elo.
+    private List<MeilleurJoueurDto> lireClassementVictoires(Long id) {
+        return scoreDao.findClassementVictoiresByJeuId(id).stream()
+                .map(ligne -> new MeilleurJoueurDto(
+                        new JoueurResumeDto(ligne.getJoueurId(), ligne.getPseudo(), ligne.getAvatar()),
+                        ligne.getNbVictoires()))
                 .toList();
     }
 }

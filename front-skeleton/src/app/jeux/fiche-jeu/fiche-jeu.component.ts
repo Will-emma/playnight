@@ -21,14 +21,13 @@ const NB_PODIUM = 3
   styleUrls: ["./fiche-jeu.component.scss"],
 })
 export class FicheJeuComponent implements OnInit {
-  // Le back renvoie tous les vainqueurs : la page n'en montre que 5 (podium compris), sauf si on demande à tout voir
+  // Aperçu limité à cinq joueurs, podium compris ; le classement complet a sa propre page.
   readonly nbMeilleursJoueursAffiches = 5
 
   fiche: FicheJeu | null = null
   classement: ClassementElo[] = []
   erreurClassement = false
   erreur: FicheJeuPageData["erreur"] = null
-  toutLeClassement = false
   // Images qui n'ont pas pu être chargées (couverture du jeu, avatars) : on affiche la couleur et l'initiale à la place
   readonly imagesIndisponibles = new Set<string>()
 
@@ -46,7 +45,6 @@ export class FicheJeuComponent implements OnInit {
       this.classement = page.classement
       this.erreurClassement = page.erreurClassement
       this.erreur = page.erreur
-      this.toutLeClassement = false
     })
   }
 
@@ -64,10 +62,10 @@ export class FicheJeuComponent implements OnInit {
     return [{ meilleur: deuxieme }, { meilleur: premier }, { meilleur: troisieme }].filter((ligne) => ligne.meilleur !== undefined)
   }
 
-  // Les joueurs après le podium : jusqu'au 5e, ou tout le classement à la demande
+  // Les joueurs après le podium, jusqu'au cinquième joueur affiché.
   get suivants(): MeilleurJoueur[] {
     const classement = this.fiche?.meilleursJoueurs ?? []
-    return classement.slice(NB_PODIUM, this.toutLeClassement ? undefined : this.nbMeilleursJoueursAffiches)
+    return classement.slice(NB_PODIUM, this.nbMeilleursJoueursAffiches)
   }
 
   // Les joueurs à égalité de victoires partagent la même place (1, 2, 2, 4…)

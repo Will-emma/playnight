@@ -2,6 +2,7 @@ package com.takima.backskeleton.controllers;
 
 import com.takima.backskeleton.DTO.FicheJeuDto;
 import com.takima.backskeleton.DTO.ClassementDto;
+import com.takima.backskeleton.DTO.MeilleurJoueurDto;
 import com.takima.backskeleton.services.ClassementService;
 import com.takima.backskeleton.DTO.JeuDto;
 import com.takima.backskeleton.DTO.RawgImportDto;
@@ -54,6 +55,11 @@ public class JeuController {
     @GetMapping("/{id}/classement")
     public List<ClassementDto> getClassement(@PathVariable Long id) {
         return classementService.getClassement(id);
+    }
+
+    @GetMapping("/{id}/classement-victoires")
+    public List<MeilleurJoueurDto> getClassementVictoires(@PathVariable Long id) {
+        return jeuService.getClassementVictoires(id);
     }
 
     @PostMapping("")
