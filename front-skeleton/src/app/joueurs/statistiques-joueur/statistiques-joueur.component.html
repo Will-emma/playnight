@@ -1,0 +1,44 @@
+<section class="statistiques-jeu" aria-labelledby="titre-statistiques-jeu">
+  <h2 id="titre-statistiques-jeu">Statistiques de jeu</h2>
+  @if (historique.length === 0) {
+    <p class="etat" role="status">Aucune partie enregistrée. Les graphiques apparaîtront après votre première partie.</p>
+  } @else {
+    @defer (on viewport) {
+      <app-graphiques-joueur [statistiques]="statistiques" />
+    } @placeholder {
+      <p class="etat">Les graphiques s’afficheront ici.</p>
+    } @loading {
+      <p class="etat" role="status">Chargement des graphiques…</p>
+    } @error {
+      <p class="etat" role="alert">Les graphiques sont indisponibles. Les données restent consultables dans les tableaux ci-dessous.</p>
+    }
+  }
+
+  <details class="donnees">
+    <summary>Voir les données des graphiques</summary>
+    <div class="tableau">
+      <table>
+        <caption>Victoires par jeu · historique complet</caption>
+        <thead><tr><th scope="col">Jeu</th><th scope="col">Victoires</th></tr></thead>
+        <tbody>
+          @for (jeu of statistiques.victoires; track jeu.jeuId) {
+            <tr><th scope="row">{{ jeu.nom }}</th><td>{{ jeu.victoires }}</td></tr>
+          } @empty {
+            <tr><td colspan="2">Aucun jeu joué.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="tableau">
+      <table>
+        <caption>Parties jouées par mois · {{ statistiques.mois[0].libelle }} à {{ statistiques.mois[11].libelle }}</caption>
+        <thead><tr><th scope="col">Mois</th><th scope="col">Parties jouées</th></tr></thead>
+        <tbody>
+          @for (mois of statistiques.mois; track mois.cle) {
+            <tr><th scope="row">{{ mois.libelle }}</th><td>{{ mois.parties }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</section>

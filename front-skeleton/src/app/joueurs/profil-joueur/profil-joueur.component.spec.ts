@@ -1,6 +1,10 @@
+import { JoueurService } from "services/joueur.service"
+import { SuppressionComponent } from "../../suppression/suppression.component"
+import { StatistiquesJoueurComponent } from "../statistiques-joueur/statistiques-joueur.component"
 import { TypeJeu } from "models/jeu.model"
 import { Location } from "@angular/common"
 import { ComponentFixture, TestBed } from "@angular/core/testing"
+import { By } from "@angular/platform-browser"
 import { ActivatedRoute } from "@angular/router"
 import { RouterTestingModule } from "@angular/router/testing"
 import { MatDialog } from "@angular/material/dialog"
@@ -16,9 +20,10 @@ describe("Classement Elo sur le profil", () => {
   beforeEach(async () => {
     route = new Subject()
     await TestBed.configureTestingModule({
-      declarations: [ProfilJoueurComponent],
-      imports: [RouterTestingModule],
+      declarations: [ProfilJoueurComponent, SuppressionComponent],
+      imports: [RouterTestingModule, StatistiquesJoueurComponent],
       providers: [
+        { provide: JoueurService, useValue: jasmine.createSpyObj("JoueurService", ["delete"]) },
         { provide: ActivatedRoute, useValue: { data: route } },
         { provide: Location, useValue: { back: jasmine.createSpy() } },
         { provide: MatDialog, useValue: { open: jasmine.createSpy("open").and.returnValue({ afterClosed: () => of({ elo: 1007, rang: 1 }) }) } },
@@ -86,5 +91,34 @@ describe("Classement Elo sur le profil", () => {
     fixture.detectChanges()
     expect(fixture.nativeElement.querySelector("#pseudo-joueur").textContent).toBe("Léa")
     expect(fixture.nativeElement.querySelector(".elo-personnel [role=alert]").textContent).toContain("indisponible")
+  })
+
+  it("transmet tout l'historique aux graphiques et les actualise au changement de profil", () => {
+    const historique = Array.from({ length: 14 }, (_, i) => ({
+      partieId: i + 1, date: "2026-10-03T20:00:00", rang: 1, points: null,
+      jeu: { id: 8, nom: "Catan", type: TypeJeu.SOCIETE, image: null },
+    }))
+    route.next({ profilJoueurPage: { profil: { ...profil, nbParties: 14, nbVictoires: 14, historique }, classementGlobal: null, erreur: null, erreurClassements: false, classements: [] } })
+    fixture.detectChanges()
+    const stats = fixture.debugElement.query(By.directive(StatistiquesJoueurComponent)).componentInstance as StatistiquesJoueurComponent
+    expect(fixture.componentInstance.historiqueAffiche.length).toBe(10)
+    expect(stats.statistiques.victoires[0].victoires).toBe(14)
+    route.next({ profilJoueurPage: { profil: { ...profil, joueur: { ...profil.joueur, id: 99, pseudo: "Tom" }, nbParties: 0, nbVictoires: 0 }, classementGlobal: null, erreur: null, erreurClassements: false, classements: [] } })
+    fixture.detectChanges()
+    expect(stats.statistiques.victoires).toEqual([])
+    expect(fixture.nativeElement.querySelector("#pseudo-joueur").textContent).toBe("Tom")
+  })
+
+  it("conserve la modification d'avatar sur le profil avec les statistiques", () => {
+    route.next({ profilJoueurPage: { profil, classementGlobal: null, erreur: null, erreurClassements: false, classements: [] } })
+    fixture.detectChanges()
+    const nouveau = { ...profil.joueur, avatar: "/assets/avatars/avatar-03.png" }
+    const ouvrir = TestBed.inject(MatDialog).open as jasmine.Spy
+    ouvrir.and.returnValue({ afterClosed: () => of(nouveau) })
+    fixture.nativeElement.querySelector(".modifier-avatar").click()
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelector(".entete__avatar img").getAttribute("src")).toBe(nouveau.avatar)
+    expect(fixture.componentInstance.profil?.nbVictoires).toBe(3)
+    expect(fixture.debugElement.query(By.directive(StatistiquesJoueurComponent))).not.toBeNull()
   })
 })

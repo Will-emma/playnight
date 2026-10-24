@@ -1,0 +1,9 @@
+:host { display: block; }
+.graphiques { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.graphique { min-width: 0; }
+h3 { font-weight: 700; }
+p { min-height: 44px; color: var(--library-secondary); font-size: .85rem; line-height: 1.5; }
+.etat { color: var(--library-accent); }
+.canvas { position: relative; min-width: 0; width: 100%; }
+.courbe { height: 300px; }
+@media (max-width: 800px) { .graphiques { grid-template-columns: minmax(0, 1fr); } }
