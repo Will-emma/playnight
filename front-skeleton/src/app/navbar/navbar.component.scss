@@ -1,4 +1,4 @@
-@use "theme";
+@use "../../theme";
 
 nav {
   height: 80px;
@@ -41,7 +41,8 @@ mat-nav-list {
   margin-left: 36px;
   display: flex;
   flex-direction: row;
-  flex: 1;
+  flex: 0 1 auto;
+  min-width: 0;
   width: auto;
   gap: 8px;
 
@@ -64,12 +65,18 @@ mat-nav-list a.active span {
   color: #f8b83f;
 }
 
+.tirage-nav { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 44px; width: 44px; height: 44px; margin: 0 12px 0 8px; border: 1px solid #343a53; border-radius: 12px; background: #1c2032; color: #f8b83f; cursor: pointer; }
+.tirage-nav:hover { border-color: #44d5c5; background: #292d43; }
+.tirage-nav:focus-visible { outline: 2px solid #f8b83f; outline-offset: 3px; }
+.tirage-nav .material-icons { font-size: 26px; }
+
 @media (max-width: 600px) {
   nav { height: 70px; }
   nav div .brand { margin-left: 12px; }
   nav div .brand img { height: 40px; }
   nav div .brand span { display: none; }
-  mat-nav-list { margin-left: 12px; width: auto; flex: 1; overflow-x: auto; }
-  mat-nav-list a { min-width: max-content; }
+  mat-nav-list { margin-left: 8px; width: auto; gap: 0; overflow-x: auto; }
+  mat-nav-list a { min-width: max-content; padding-left: 8px; padding-right: 8px; }
   mat-nav-list span { font-size: .9rem; }
 }
+@media (prefers-reduced-motion: reduce) { nav div .brand, mat-nav-list span, mat-nav-list a { transition: none; } nav div .brand:hover, mat-nav-list a:hover, mat-nav-list span:hover { transform: none; } }
