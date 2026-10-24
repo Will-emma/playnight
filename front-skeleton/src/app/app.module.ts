@@ -2,6 +2,7 @@
 import { EloProgressionComponent } from "joueurs/elo-progression/elo-progression.component"
 import { MatDialogModule } from "@angular/material/dialog"
 import { MatTabsModule } from "@angular/material/tabs"
+import { MatTooltipModule } from "@angular/material/tooltip"
 import { AvatarDialogComponent } from "joueurs/avatar-dialog/avatar-dialog.component"
 import { NgModule } from "@angular/core"
 import { BrowserModule } from "@angular/platform-browser"
@@ -49,6 +50,7 @@ import { SuppressionComponent } from "./suppression/suppression.component"
     MatListModule,
     MatDialogModule,
     MatTabsModule,
+    MatTooltipModule,
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,

@@ -1,0 +1,108 @@
+<h2 mat-dialog-title id="tirage-jeu-titre">Quel jeu ce soir ?</h2>
+<mat-dialog-content [attr.aria-busy]="chargement">
+  <p class="introduction">Choisissez vos critères et les jeux à écarter du tirage.</p>
+  <div class="annonce-resultat" role="status" aria-live="polite" aria-atomic="true">
+    @if (resultat; as jeu) { <p>Jeu tiré au sort : {{ jeu.nom }}. Tirage {{ numeroTirage }}.</p> }
+  </div>
+  @if (tirageEnCours) {
+    <div class="suspense" aria-hidden="true">
+      <span class="de-anime">🎲</span>
+      <p>Quel sera votre prochain jeu ?</p>
+      <strong class="jeu-defilant">{{ jeuDefilant?.nom }}</strong>
+    </div>
+  }
+  @if (resultat; as jeu) {
+    <section class="resultat" aria-labelledby="tirage-resultat-titre">
+      @if (jeu.image && !imageResultatIndisponible) {
+        <img class="resultat-image" [src]="jeu.image" [alt]="'Illustration de ' + jeu.nom"
+          (error)="imageResultatIndisponible = true" />
+      } @else {
+        <div class="resultat-remplacement" role="img" [attr.aria-label]="'Illustration indisponible pour ' + jeu.nom">
+          <span aria-hidden="true">{{ jeu.nom.trim().charAt(0).toLocaleUpperCase('fr-FR') || '🎲' }}</span>
+          <small>Illustration indisponible</small>
+        </div>
+      }
+      <div class="resultat-description">
+        <p class="resultat-legende">Votre prochain jeu</p>
+        <h3 id="tirage-resultat-titre">{{ jeu.nom }}</h3>
+        <p>{{ libelleType(jeu) }}</p>
+        <dl>
+          <div><dt>Joueurs minimum</dt><dd>{{ jeu.nbJoueursMin ?? 'Non renseigné' }}</dd></div>
+          <div><dt>Joueurs maximum</dt><dd>{{ jeu.nbJoueursMax ?? 'Non renseigné' }}</dd></div>
+        </dl>
+        <a class="voir-fiche" [routerLink]="['/jeux', jeu.id]" mat-dialog-close>Voir la fiche</a>
+      </div>
+    </section>
+  }
+  @if (chargement) {
+    <p class="etat-vide">Chargement de la ludothèque…</p>
+  } @else if (erreurChargement) {
+    <div class="etat-vide" role="alert">
+      <p>La ludothèque est momentanément indisponible. Réessayez pour préparer votre tirage.</p>
+      <button type="button" class="fermer reessayer" (click)="chargerJeux()">Réessayer</button>
+    </div>
+  }
+  <div class="criteres">
+    <div class="champ">
+      <label for="tirage-type">Type de jeu</label>
+      <select id="tirage-type" [disabled]="configurationBloquee" [ngModel]="type" (ngModelChange)="changerType($event)">
+        @for (option of types; track option.valeur) {
+          <option [value]="option.valeur">{{ option.libelle }}</option>
+        }
+      </select>
+    </div>
+    <div class="champ">
+      <label for="tirage-effectif">Nombre de joueurs <span>(facultatif)</span></label>
+      <input id="tirage-effectif" type="number" min="1" step="1" [max]="effectifMaximum"
+        [disabled]="configurationBloquee"
+        inputmode="numeric" placeholder="Sans préférence" (input)="changerNombreJoueurs($event)"
+        [attr.aria-invalid]="effectifInvalide"
+        [attr.aria-describedby]="effectifInvalide ? 'tirage-effectif-aide tirage-effectif-erreur' : 'tirage-effectif-aide'" />
+      <p id="tirage-effectif-aide" class="aide">Laissez vide pour ne pas filtrer par nombre de joueurs.</p>
+      @if (effectifInvalide) {
+        <p id="tirage-effectif-erreur" class="erreur" role="alert">Saisissez un nombre entier positif valide.</p>
+      }
+    </div>
+  </div>
+
+  <p class="compteur">
+    <strong>{{ jeuxEligibles.length }}</strong> {{ jeuxEligibles.length === 1 ? 'jeu éligible' : 'jeux éligibles' }}
+  </p>
+
+  @if (!chargement && !erreurChargement && jeux.length === 0) {
+    <p class="etat-vide">La ludothèque est vide. Ajoutez des jeux avant de préparer un tirage.</p>
+  } @else if (effectifInvalide) {
+    <p class="etat-vide">Corrigez le nombre de joueurs pour afficher les jeux compatibles.</p>
+  } @else if (!chargement && !erreurChargement && jeuxCompatibles.length === 0) {
+    <p class="etat-vide">Aucun jeu ne correspond à ces critères. Essayez un autre type ou nombre de joueurs.</p>
+  } @else if (!chargement && !erreurChargement) {
+    <fieldset class="exclusions">
+      <legend>Jeux compatibles</legend>
+      <p id="tirage-exclusions-aide" class="aide">Cochez les jeux à exclure. Décochez-les pour les réintégrer.</p>
+      <div class="liste-jeux">
+        @for (jeu of jeuxCompatibles; track jeu.id) {
+          <label class="ligne-jeu" [class.ligne-jeu--exclue]="idsExclus.has(jeu.id)">
+            <input type="checkbox" [checked]="idsExclus.has(jeu.id)"
+              [disabled]="configurationBloquee"
+              [attr.data-jeu-id]="jeu.id" [attr.aria-label]="'Exclure ' + jeu.nom"
+              aria-describedby="tirage-exclusions-aide" (change)="changerExclusion(jeu.id, $event)" />
+            <span class="jeu-description">
+              <strong>{{ jeu.nom }}</strong>
+              <span>{{ libelleType(jeu) }} · {{ libelleEffectif(jeu) }}</span>
+            </span>
+            <span class="exclusion-label">{{ idsExclus.has(jeu.id) ? 'Exclu' : 'Exclure' }}</span>
+          </label>
+        }
+      </div>
+    </fieldset>
+    @if (jeuxEligibles.length === 0) {
+      <p class="etat-vide">Tous les jeux compatibles sont exclus. Décochez au moins un jeu pour le réintégrer.</p>
+    }
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="fermer" mat-dialog-close>Fermer</button>
+  <button type="button" class="tirer" [disabled]="configurationBloquee || jeuxEligibles.length === 0" (click)="tirer()">
+    {{ tirageEnCours ? 'Tirage en cours…' : resultat ? 'Relancer le tirage' : 'Tirer un jeu au sort' }}
+  </button>
+</mat-dialog-actions>
