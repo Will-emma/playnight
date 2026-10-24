@@ -1,0 +1,53 @@
+<main class="classement-complet">
+  @if (page.jeuId) {
+    <a class="retour-jeu" [routerLink]="['/jeux', page.jeuId]">← Retour au jeu</a>
+  } @else {
+    <a class="retour-jeu" routerLink="/jeux">← Ludothèque</a>
+  }
+
+  <header>
+    <p class="jeu-nom">{{ page.jeu?.nom || 'PlayNight' }}</p>
+    <h1>Classement par victoires</h1>
+  </header>
+
+  @if (page.erreur === 'introuvable') {
+    <section class="etat" role="alert">
+      <h2>Ce jeu n'existe pas</h2>
+      <p>Il a peut-être été supprimé.</p>
+      <a routerLink="/jeux">Voir la ludothèque</a>
+    </section>
+  } @else if (page.erreur === 'indisponible') {
+    <section class="etat" role="alert">
+      <h2>Le classement est momentanément indisponible</h2>
+      <p>Vérifiez que l'API PlayNight est lancée, puis rechargez la page.</p>
+    </section>
+  } @else if (lignes.length === 0) {
+    <section class="etat" aria-live="polite">
+      <h2>Aucune victoire pour l'instant</h2>
+      <p>Les joueurs apparaîtront ici après une première victoire sur ce jeu.</p>
+    </section>
+  } @else {
+    <p class="description">{{ pluriel(lignes.length, 'joueur') }} avec au moins une victoire. Les ex æquo partagent la même place.</p>
+    <div class="entete-liste" aria-hidden="true"><span>Rang</span><span>Joueur</span><span>Victoires</span></div>
+    <ol class="liste" aria-label="Classement complet par nombre de victoires décroissant">
+      @for (ligne of lignes; track ligne.joueur.id) {
+        <li>
+          <a class="joueur" [routerLink]="['/joueurs', ligne.joueur.id]">
+            <span class="rang"><span class="visually-hidden">Rang </span>{{ ligne.rang }}</span>
+            <span class="identite">
+              <span class="avatar" aria-hidden="true">
+                @if (avatarDisponible(ligne.joueur.avatar)) {
+                  <img [src]="ligne.joueur.avatar" alt="" loading="lazy" (error)="avatarsIndisponibles.add(ligne.joueur.avatar!)" />
+                } @else {
+                  <span>{{ initiale(ligne.joueur.pseudo) }}</span>
+                }
+              </span>
+              <span class="pseudo">{{ ligne.joueur.pseudo }}</span>
+            </span>
+            <span class="victoires"><strong>{{ ligne.nbVictoires }}</strong><span>{{ ligne.nbVictoires > 1 ? 'victoires' : 'victoire' }}</span></span>
+          </a>
+        </li>
+      }
+    </ol>
+  }
+</main>

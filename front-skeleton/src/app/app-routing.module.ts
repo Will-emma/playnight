@@ -7,6 +7,7 @@ import { JeuxComponent } from "jeux/jeux.component"
 import { JeuxResolver } from "jeux/jeux.resolver"
 import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
 import { FicheJeuResolver } from "jeux/fiche-jeu/fiche-jeu.resolver"
+import { ClassementVictoiresResolver } from "jeux/classement-victoires/classement-victoires.resolver"
 import { ImporterJeuComponent } from "jeux/importer-jeu/importer-jeu.component"
 import { JoueursComponent } from "joueurs/joueurs.component"
 import { JoueursResolver } from "joueurs/joueurs.resolver"
@@ -35,6 +36,12 @@ const routes: Routes = [
     // Pas de resolver : la page ne charge rien avant que l'utilisateur lance une recherche
     path: "jeux/importer",
     component: ImporterJeuComponent,
+  },
+  {
+    path: "jeux/:id/classement-victoires",
+    loadComponent: () => import("./jeux/classement-victoires/classement-victoires.component").then(m => m.ClassementVictoiresComponent),
+    resolve: { classementVictoiresPage: ClassementVictoiresResolver },
+    title: "Classement par victoires · PlayNight",
   },
   {
     path: "jeux/:id",
