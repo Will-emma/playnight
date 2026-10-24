@@ -23,7 +23,7 @@ import { MatStepperModule } from "@angular/material/stepper"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
 import { DetailSoireeComponent } from "soirees/detail-soiree/detail-soiree.component"
 import { SoireesComponent } from "soirees/soirees.component"
-import { SuppressionComponent } from "suppression/suppression.component"
+import { SuppressionComponent } from "./suppression/suppression.component"
 
 @NgModule({
   declarations: [

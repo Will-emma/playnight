@@ -222,6 +222,34 @@ class JeuControllerTest {
     }
 
     @Test
+    void classementVictoiresReturnsExistingPlayerContract() throws Exception {
+        when(jeuService.getClassementVictoires(42L)).thenReturn(List.of(
+                new MeilleurJoueurDto(new JoueurResumeDto(7L, "Léa", "/avatar.png"), 3L)));
+        mockMvc.perform(get("/jeux/42/classement-victoires"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].joueur.id").value(7))
+                .andExpect(jsonPath("$[0].joueur.pseudo").value("Léa"))
+                .andExpect(jsonPath("$[0].joueur.avatar").value("/avatar.png"))
+                .andExpect(jsonPath("$[0].nbVictoires").value(3))
+                .andExpect(jsonPath("$[0].elo").doesNotExist());
+    }
+
+    @Test
+    void classementVictoiresEmpty() throws Exception {
+        when(jeuService.getClassementVictoires(42L)).thenReturn(List.of());
+        mockMvc.perform(get("/jeux/42/classement-victoires"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void classementVictoiresMissingGame() throws Exception {
+        when(jeuService.getClassementVictoires(404L)).thenThrow(new NoSuchElementException("Le jeu 404 n'existe pas"));
+        mockMvc.perform(get("/jeux/404/classement-victoires"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Le jeu 404 n'existe pas"));
+    }
+
+    @Test
     void classementEloReturnsContract() throws Exception {
         when(classementService.getClassement(1L)).thenReturn(List.of(
                 new com.takima.backskeleton.DTO.ClassementDto(2L, "Léa", "avatar.png", 1016, 1, 1)));
