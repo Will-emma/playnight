@@ -133,6 +133,27 @@ Il conserve les images personnalisées, ne crée aucun jeu et peut être rejoué
 Il est aussi exécuté dans l'ordre habituel à l'initialisation d'une base neuve.
 
 
+### Données de démo
+
+`initdb/6_DONNEES_DEMO.sql` complète les données initiales pour que les
+classements, podiums et graphiques soient remplis dès l'installation :
+le joueur Weedy, 8 jeux vidéo avec leur image RAWG, et 5 soirées d'octobre 2026
+(les 4 soirées du ticket #41 et une soirée Discord), soit 11 parties de plus.
+Une base neuve contient alors 7 joueurs, 20 jeux, 8 soirées et 19 parties.
+
+Le script est exécuté automatiquement à l'initialisation d'une base neuve.
+Sur une base existante, l'appliquer une fois depuis `back-skeleton/`, puis
+relancer l'API, qui recalcule les classements Elo au démarrage :
+
+```sh
+docker compose exec -T database sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < initdb/6_DONNEES_DEMO.sql
+```
+
+Il peut être rejoué : un jeu ou un joueur déjà présent (même nom) est conservé,
+une soirée déjà présente (même date et même lieu) est ignorée avec ses parties.
+Les scripts de `demo/` restent des démonstrations isolées sur leurs propres bases.
+
+
 ### Démonstration du classement par victoires (ticket #16)
 
 Sur une base de démonstration neuve `playnight_demo_ticket16`, appliquer une seule

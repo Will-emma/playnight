@@ -2,6 +2,7 @@ package com.takima.backskeleton.services;
 
 import com.takima.backskeleton.DAO.JeuDao;
 import com.takima.backskeleton.DAO.JoueurDao;
+import com.takima.backskeleton.DAO.PartieDao;
 import com.takima.backskeleton.DTO.*;
 import com.takima.backskeleton.models.Joueur;
 import com.takima.backskeleton.models.TypeJeu;
@@ -37,6 +38,7 @@ class CatalogueJeuxIntegrationTest {
     @Autowired private JeuDao jeuDao;
     @Autowired private JeuService jeuService;
     @Autowired private JoueurDao joueurDao;
+    @Autowired private PartieDao partieDao;
     @Autowired private ClassementService classementService;
     @Autowired private ObjectMapper json;
     @Autowired private MockMvc mvc;
@@ -123,14 +125,16 @@ class CatalogueJeuxIntegrationTest {
         assertEquals(max, jeu.getNbJoueursMax());
         assertEquals(duree, jeu.getDureeEstimee());
         assertFalse(jeu.getDescription().isBlank());
+        // Les données de démo (initdb/6) ont peut-être déjà des parties de ce jeu.
+        int partiesAvant = partieDao.findDetailsByJeuId(jeu.getId()).size();
         mvc.perform(get("/jeux").param("type", "SOCIETE"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[*].nom", hasItem(nom)));
         mvc.perform(get("/jeux/{id}/fiche", jeu.getId())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.jeu.nom").value(nom))
                 .andExpect(jsonPath("$.jeu.description").value(jeu.getDescription()))
                 .andExpect(jsonPath("$.jeu.dureeEstimee").value(duree))
-                .andExpect(jsonPath("$.nbParties").value(0));
-        mvc.perform(get("/jeux/{id}/classement", jeu.getId())).andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.nbParties").value(partiesAvant));
+        mvc.perform(get("/jeux/{id}/classement", jeu.getId())).andExpect(status().isOk());
 
         List<Long> joueurs = new ArrayList<>();
         List<ScoreCreationDto> scores = new ArrayList<>();
@@ -151,12 +155,14 @@ class CatalogueJeuxIntegrationTest {
         soiree.setJoueurIds(joueurs); soiree.setParties(List.of(partie));
         mvc.perform(post("/soirees").contentType("application/json").content(json.writeValueAsString(soiree)))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.parties[0].jeu.nom").value(nom));
-        var classement = classementService.getClassement(jeu.getId());
+        // Seuls les joueurs créés par le test : ils partent tous de 1000 Elo.
+        var classement = classementService.getClassement(jeu.getId()).stream()
+                .filter(c -> joueurs.contains(c.joueurId())).toList();
         assertEquals(min, classement.size());
         assertEquals(1016, classement.get(0).elo());
         assertEquals(984, classement.get(classement.size() - 1).elo());
         assertTrue(classement.stream().allMatch(c -> c.nbParties() == 1));
-        mvc.perform(get("/jeux/{id}/fiche", jeu.getId())).andExpect(jsonPath("$.nbParties").value(1));
+        mvc.perform(get("/jeux/{id}/fiche", jeu.getId())).andExpect(jsonPath("$.nbParties").value(partiesAvant + 1));
         // La protection de l'historique du ticket de suppression reste effective.
         // Le test enveloppe l'API dans sa propre transaction : force la limite
         // SQL que le commit du service impose normalement sur une vraie requête.
@@ -168,7 +174,8 @@ class CatalogueJeuxIntegrationTest {
 
     @Test
     void jeuJamaisJouePeutEtreSupprimeEtNestPasRecreeAuRecalcul() throws Exception {
-        var jeu = jeuDao.findAllByOrderByNomAsc().stream().filter(j -> j.getNom().equals("UNO")).findFirst().orElseThrow();
+        // Dames n'a aucune partie, même avec les données de démo (initdb/6).
+        var jeu = jeuDao.findAllByOrderByNomAsc().stream().filter(j -> j.getNom().equals("Dames")).findFirst().orElseThrow();
         Long id = jeu.getId();
         mvc.perform(delete("/jeux/{id}", id)).andExpect(status().isNoContent());
         classementService.recalculer();
