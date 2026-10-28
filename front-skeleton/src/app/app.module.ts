@@ -19,6 +19,7 @@ import { JeuxComponent } from "jeux/jeux.component"
 import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
 import { ImporterJeuComponent } from "jeux/importer-jeu/importer-jeu.component"
 import { ProfilJoueurComponent } from "joueurs/profil-joueur/profil-joueur.component"
+import { StatistiquesJoueurComponent } from "joueurs/statistiques-joueur/statistiques-joueur.component"
 import { JoueursComponent } from "joueurs/joueurs.component"
 import { MatStepperModule } from "@angular/material/stepper"
 import { NouvelleSoireeComponent } from "soirees/nouvelle-soiree/nouvelle-soiree.component"
@@ -44,6 +45,7 @@ import { SuppressionComponent } from "./suppression/suppression.component"
     SuppressionComponent,
   ],
   imports: [
+    StatistiquesJoueurComponent,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,

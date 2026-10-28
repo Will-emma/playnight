@@ -1,0 +1,13 @@
+:host { display: block; margin-bottom: 28px; }
+.statistiques-jeu { padding: clamp(16px, 3vw, 24px); border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); }
+h2 { font-weight: 800; }
+.etat { color: var(--library-secondary); line-height: 1.6; }
+.donnees { margin-top: 20px; }
+summary { color: var(--library-accent); cursor: pointer; padding: 10px 0; }
+summary:focus-visible { outline: 2px solid var(--library-accent); outline-offset: 3px; }
+.tableau { margin-top: 12px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; color: var(--library-text); font-size: .9rem; }
+caption { caption-side: top; color: var(--library-secondary); text-align: left; padding: 12px 0; }
+th, td { padding: 10px; border-bottom: 1px solid var(--library-line); text-align: left; overflow-wrap: anywhere; }
+table tr { height: auto; }
+td:last-child, thead th:last-child { text-align: right; }

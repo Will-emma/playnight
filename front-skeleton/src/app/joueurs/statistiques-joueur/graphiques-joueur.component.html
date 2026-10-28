@@ -1,0 +1,18 @@
+<div class="graphiques">
+  <section class="graphique" aria-labelledby="titre-victoires">
+    <h3 id="titre-victoires">Victoires par jeu</h3>
+    <p>Historique complet · une victoire pour chaque rang 1, en équipe ou ex æquo.</p>
+    @if (aucuneVictoire) { <p class="etat">Aucune victoire pour l'instant. Les jeux joués sont affichés à zéro.</p> }
+    <div class="canvas" [style.height.px]="hauteurBarres">
+      <canvas baseChart type="bar" [data]="barres" [options]="optionsBarres" role="img" aria-label="Victoires par jeu. Les valeurs exactes sont disponibles dans les tableaux sous les graphiques."></canvas>
+    </div>
+  </section>
+  <section class="graphique" aria-labelledby="titre-parties-mois">
+    <h3 id="titre-parties-mois">Parties jouées par mois</h3>
+    <p>{{ statistiques.mois[0].libelle }} à {{ statistiques.mois[11].libelle }} · {{ statistiques.totalPeriode }} partie{{ statistiques.totalPeriode > 1 ? 's' : '' }}</p>
+    @if (statistiques.totalPeriode === 0) { <p class="etat">Aucune partie sur cette période.</p> }
+    <div class="canvas courbe">
+      <canvas baseChart type="line" [data]="courbe" [options]="optionsCourbe" role="img" aria-label="Parties jouées pendant les douze derniers mois calendaires, mois courant compris. Les valeurs exactes sont disponibles dans les tableaux sous les graphiques."></canvas>
+    </div>
+  </section>
+</div>
