@@ -14,7 +14,8 @@
     border-top: 1px solid var(--library-line);
   }
   &__rang { color: var(--library-secondary); font-weight: 800; }
-  &__pseudo { overflow-wrap: anywhere; font-weight: 700; }
+  &__pseudo { overflow-wrap: anywhere; color: var(--library-text); font-weight: 700; text-decoration: none; }
+  &__pseudo:hover { color: var(--library-accent); text-decoration: underline; }
   &__points { color: var(--library-accent); white-space: nowrap; }
   &__points span, &__parties { font-size: .85rem; }
   &__parties { color: var(--library-secondary); text-align: right; }
