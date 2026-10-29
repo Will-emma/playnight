@@ -147,12 +147,12 @@ Will-emma a principalement utilisé Claude Code, un assistant de programmation i
 - **Documentation** : ce README, captures d'écran comprises.
 
 
-### StarkMac22 — ChatGPT et Codex
+#### StarkMac22 — ChatGPT et Codex
 
 StarkMac22 a utilisé ChatGPT pour comprendre et résoudre les problèmes rencontrés, ainsi que Codex, intégré à VS Code, pour analyser et modifier le code du projet.
 - **Développement frontend** : utilisation pour de petites modifications comme changer la couleur d'un bouton ou déplacer une icône.
 - **Développement backend** : assistance pour comprendre et faire évoluer l'API REST Java Spring Boot, notamment les contrôleurs, services, DTO et les interactions avec PostgreSQL.
-- **Débogage**: utilisation de Codex pour analyser les fichiers, identifier les causes des erreurs et proposer des corrections.
+- **Débogage** : utilisation de Codex pour analyser les fichiers, identifier les causes des erreurs et proposer des corrections.
 - **Tests et validation** : utilisation de l'IA pour comprendre les erreurs Maven et Angular.
 - **Git et travail collaboratif** : utilisation de ChatGPT pour comprendre et résoudre les conflits Git.
 
