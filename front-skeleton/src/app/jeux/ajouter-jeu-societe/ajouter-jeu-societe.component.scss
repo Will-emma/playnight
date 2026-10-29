@@ -1,0 +1,24 @@
+:host { display: block; }
+.ajout-societe { padding: clamp(16px, 4vw, 28px); border: 1px solid var(--library-line); border-radius: 18px; background: var(--library-surface); }
+h2 { color: var(--library-text); }
+p, small { color: var(--library-muted); }
+fieldset { display: grid; gap: 20px; min-width: 0; margin: 24px 0; padding: 0; border: 0; }
+.champ { display: grid; gap: 8px; min-width: 0; }
+.effectifs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+label { color: var(--library-text); font-weight: 600; }
+input, textarea { box-sizing: border-box; width: 100%; min-width: 0; padding: 12px; border: 1px solid var(--library-line); border-radius: 10px; color: var(--library-text); background: var(--library-card); font: inherit; }
+textarea { resize: vertical; }
+small { line-height: 1.5; }
+.erreur { color: #ff9a93; }
+input[aria-invalid="true"] { border-color: #ff9a93; }
+.enregistrer { padding: 12px 18px; border: 1px solid var(--library-accent); border-radius: 10px; color: var(--library-badge-text); background: var(--library-accent); font: inherit; font-weight: 700; cursor: pointer; }
+.enregistrer:hover:not(:disabled) { filter: brightness(1.08); }
+:disabled { opacity: .65; cursor: progress; }
+input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 3px solid var(--library-accent); outline-offset: 3px; }
+.visuellement-masque { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 600px) { .effectifs { grid-template-columns: 1fr; } }
+.choix-image, .apercu-image { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.choix-image button, .apercu-image button { padding: 10px 12px; border: 1px solid var(--library-line); border-radius: 10px; color: var(--library-text); background: var(--library-card); font: inherit; cursor: pointer; }
+.choix-image button[aria-pressed="true"] { color: var(--library-accent); border-color: var(--library-accent); background: var(--library-accent-soft); }
+.apercu-image img { width: 120px; height: 100px; object-fit: contain; border-radius: 10px; }
+.apercu-image span { overflow-wrap: anywhere; max-width: 100%; }

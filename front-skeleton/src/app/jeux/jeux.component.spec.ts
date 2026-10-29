@@ -44,4 +44,20 @@ describe("Nouveaux jeux dans la ludothèque", () => {
     expect(fixture.nativeElement.querySelectorAll(".game-card").length).toBe(4)
     expect(fixture.nativeElement.querySelector(".cover-initial").textContent).toBe("U")
   })
+
+  it("affiche un jeu physique créé et sépare les adaptations numériques dans les filtres", () => {
+    const physique: Jeu = { id: 8901, nom: "Mon jeu physique", type: TypeJeu.SOCIETE, plateforme: null, nbJoueursMin: 2, nbJoueursMax: 200, image: null }
+    const adaptation: Jeu = { ...physique, id: 8902, nom: "Monopoly numérique", type: TypeJeu.JEU_VIDEO, plateforme: "PC" }
+    fixture.componentInstance.jeux = [...jeux, physique, adaptation]
+    fixture.componentInstance.choisirFiltre(TypeJeu.SOCIETE)
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain("Mon jeu physique")
+    expect(fixture.nativeElement.textContent).not.toContain("Monopoly numérique")
+    expect(fixture.nativeElement.querySelector('a[href="/jeux/8901"]')).not.toBeNull()
+    fixture.componentInstance.choisirFiltre(TypeJeu.JEU_VIDEO)
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelectorAll(".game-card").length).toBe(1)
+    expect(fixture.nativeElement.textContent).toContain("Monopoly numérique")
+    expect(fixture.nativeElement.textContent).not.toContain("Mon jeu physique")
+  })
 })

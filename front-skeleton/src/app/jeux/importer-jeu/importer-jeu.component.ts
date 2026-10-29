@@ -19,6 +19,9 @@ interface Resultat {
   styleUrls: ["./importer-jeu.component.scss"],
 })
 export class ImporterJeuComponent {
+  typeChoisi: "JEU_VIDEO" | "SOCIETE" | null = null
+  modeSociete: "RAWG" | "MANUEL" | null = null
+  enregistrementSociete = false
   recherche = ""
   // Recherche réellement envoyée : le texte du champ peut changer pendant que les résultats s'affichent
   rechercheEnvoyee: string | null = null
@@ -32,9 +35,42 @@ export class ImporterJeuComponent {
     private router: Router,
   ) {}
 
+  get changementTypeBloque(): boolean {
+    return this.enregistrementSociete || this.rechercheEnCours || this.resultats.some((resultat) => resultat.envoiEnCours)
+  }
+
+  get adaptationNumerique(): boolean {
+    return this.typeChoisi === "SOCIETE" && this.modeSociete === "RAWG"
+  }
+
+  get afficherRawg(): boolean {
+    return this.typeChoisi === "JEU_VIDEO" || this.adaptationNumerique
+  }
+
+  choisirType(type: "JEU_VIDEO" | "SOCIETE"): void {
+    if (this.changementTypeBloque || this.typeChoisi === type) return
+    this.typeChoisi = type
+    this.modeSociete = null
+    this.reinitialiserRecherche()
+  }
+
+  choisirModeSociete(mode: "RAWG" | "MANUEL"): void {
+    if (this.changementTypeBloque || this.typeChoisi !== "SOCIETE" || this.modeSociete === mode) return
+    this.modeSociete = mode
+    this.reinitialiserRecherche()
+  }
+
+  private reinitialiserRecherche(): void {
+    this.recherche = ""
+    this.rechercheEnvoyee = null
+    this.resultats = []
+    this.erreurRecherche = null
+    this.imagesIndisponibles.clear()
+  }
+
   rechercher(): void {
     const recherche = this.recherche.trim()
-    if (!recherche || this.rechercheEnCours) return
+    if (!recherche || this.changementTypeBloque) return
 
     this.rechercheEnCours = true
     this.erreurRecherche = null
@@ -55,7 +91,7 @@ export class ImporterJeuComponent {
   }
 
   ajouter(resultat: Resultat): void {
-    if (resultat.envoiEnCours) return
+    if (this.changementTypeBloque) return
     const erreurSaisie = this.verifierNbJoueurs(resultat)
     if (erreurSaisie) {
       resultat.erreur = erreurSaisie

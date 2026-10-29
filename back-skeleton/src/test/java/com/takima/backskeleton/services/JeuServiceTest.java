@@ -17,6 +17,8 @@ import com.takima.backskeleton.models.Soiree;
 import com.takima.backskeleton.models.TypeJeu;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -124,6 +127,144 @@ class JeuServiceTest {
         assertNull(captor.getValue().getId());
         assertEquals(2L, created.getId());
         assertEquals("Dixit", created.getNom());
+    }
+
+    @Test
+    void creationRefuseLesInformationsObligatoiresInvalidesSansEcriture() {
+        assertEquals("Les informations du jeu sont obligatoires.",
+                assertThrows(IllegalArgumentException.class, () -> jeuService.addJeu(null)).getMessage());
+        for (String nom : new String[]{null, "", " \t\n "}) {
+            assertEquals("Le nom du jeu est obligatoire.", assertThrows(IllegalArgumentException.class,
+                    () -> jeuService.addJeu(dto(null, nom, TypeJeu.SOCIETE))).getMessage());
+        }
+        assertTrue(assertThrows(IllegalArgumentException.class,
+                () -> jeuService.addJeu(dto(null, "Catan", null))).getMessage().contains("type"));
+        for (Integer minimum : new Integer[]{null, 0, -1}) {
+            JeuDto demande = dto(null, "Catan", TypeJeu.SOCIETE);
+            demande.setNbJoueursMin(minimum);
+            assertTrue(assertThrows(IllegalArgumentException.class,
+                    () -> jeuService.addJeu(demande)).getMessage().contains("entre 1 et 200"));
+        }
+        for (Integer maximum : new Integer[]{null, 0, -1, 1}) {
+            JeuDto demande = dto(null, "Catan", TypeJeu.SOCIETE);
+            demande.setNbJoueursMax(maximum);
+            assertEquals(maximum != null && maximum == 1
+                            ? "Le maximum doit être supérieur ou égal au minimum."
+                            : "Indiquez un nombre de joueurs compris entre 1 et 200.",
+                    assertThrows(IllegalArgumentException.class, () -> jeuService.addJeu(demande)).getMessage());
+        }
+        verifyNoInteractions(jeuDao, rawgService);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"2,4", "1,200", "200,200"})
+    void creationSocieteAccepteLesBornes(int minimum, int maximum) {
+        when(jeuDao.save(any(Jeu.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        JeuDto demande = dto(99L, "  Mon jeu physique  ", TypeJeu.SOCIETE);
+        demande.setNbJoueursMin(minimum);
+        demande.setNbJoueursMax(maximum);
+        JeuDto cree = jeuService.addJeu(demande);
+        assertEquals(TypeJeu.SOCIETE, cree.getType());
+        assertEquals(minimum, cree.getNbJoueursMin());
+        assertEquals(maximum, cree.getNbJoueursMax());
+        assertEquals("Mon jeu physique", cree.getNom());
+        assertNull(cree.getId());
+        assertNull(cree.getDescription());
+        assertNull(cree.getImage());
+        verifyNoInteractions(rawgService);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"2,201", "201,201", "201,200", "-1,4", "2,-1", "0,4", "2,0"})
+    void creationEtModificationSocieteRefusentLesEffectifsHorsBornes(int minimum, int maximum) {
+        JeuDto demande = dto(null, "Mon jeu physique", TypeJeu.SOCIETE);
+        demande.setNbJoueursMin(minimum);
+        demande.setNbJoueursMax(maximum);
+        assertEquals("Indiquez un nombre de joueurs compris entre 1 et 200.",
+                assertThrows(IllegalArgumentException.class, () -> jeuService.addJeu(demande)).getMessage());
+        verifyNoInteractions(jeuDao, rawgService);
+        when(jeuDao.findById(42L)).thenReturn(Optional.of(jeu(42L, "Existant", TypeJeu.SOCIETE)));
+        assertEquals("Indiquez un nombre de joueurs compris entre 1 et 200.",
+                assertThrows(IllegalArgumentException.class, () -> jeuService.updateJeu(demande, 42L)).getMessage());
+        verify(jeuDao, never()).save(any());
+    }
+
+    @Test
+    void modificationSocieteRefuseMaximumInferieurAuMinimum() {
+        when(jeuDao.findById(42L)).thenReturn(Optional.of(jeu(42L, "Existant", TypeJeu.SOCIETE)));
+        JeuDto demande = dto(null, "Mon jeu physique", TypeJeu.SOCIETE);
+        demande.setNbJoueursMax(1);
+        assertEquals("Le maximum doit être supérieur ou égal au minimum.",
+                assertThrows(IllegalArgumentException.class, () -> jeuService.updateJeu(demande, 42L)).getMessage());
+        verify(jeuDao, never()).save(any());
+    }
+
+    @Test
+    void jeuxVideoEtAdaptationsRawgRestentSansLimiteDe200() {
+        when(jeuDao.save(any(Jeu.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        JeuDto demande = dto(null, "Jeu vidéo", TypeJeu.JEU_VIDEO);
+        demande.setNbJoueursMin(201);
+        demande.setNbJoueursMax(250);
+        assertEquals(250, jeuService.addJeu(demande).getNbJoueursMax());
+        when(jeuDao.findById(42L)).thenReturn(Optional.of(jeu(42L, "Existant", TypeJeu.JEU_VIDEO)));
+        assertEquals(250, jeuService.updateJeu(demande, 42L).getNbJoueursMax());
+        when(rawgService.getById(20823L)).thenReturn(new RawgJeuDto(
+                20823L, "Monopoly", "https://example.com/monopoly.png", "PC, Nintendo Switch", "2008-10-20"));
+        JeuDto importe = jeuService.importerDepuisRawg(20823L, importDto(201, 250));
+        assertEquals(TypeJeu.JEU_VIDEO, importe.getType());
+        assertEquals("Monopoly", importe.getNom());
+        assertEquals(201, importe.getNbJoueursMin());
+        assertEquals(250, importe.getNbJoueursMax());
+    }
+
+    @Test
+    void lectureDUnJeuHistoriqueHorsBornesNeModifiePasSesDonnees() {
+        Jeu historique = new Jeu.Builder().id(42L).nom("Historique").type(TypeJeu.SOCIETE)
+                .nbJoueursMin(1).nbJoueursMax(300).build();
+        when(jeuDao.findAllByOrderByNomAsc()).thenReturn(List.of(historique));
+        when(jeuDao.findById(42L)).thenReturn(Optional.of(historique));
+        assertEquals(300, jeuService.findAll(null).get(0).getNbJoueursMax());
+        assertEquals(300, jeuService.getById(42L).getNbJoueursMax());
+        assertEquals(300, jeuService.getFiche(42L).getJeu().getNbJoueursMax());
+        verify(jeuDao, never()).save(any());
+    }
+
+    @Test
+    void creationConserveLesDeuxTypesLesImagesEtLesChampsFacultatifs() {
+        when(jeuDao.save(any(Jeu.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        for (TypeJeu type : TypeJeu.values()) {
+            for (String image : new String[]{null, "", "/assets/jeux/catan.png", "https://example.com/catan.png"}) {
+                JeuDto demande = dto(99L, "  Catan  ", type);
+                demande.setNbJoueursMin(1);
+                demande.setNbJoueursMax(1);
+                demande.setImage(image);
+                JeuDto resultat = jeuService.addJeu(demande);
+                assertNull(resultat.getId());
+                assertEquals("Catan", resultat.getNom());
+                assertEquals(type, resultat.getType());
+                assertEquals(1, resultat.getNbJoueursMin());
+                assertEquals(1, resultat.getNbJoueursMax());
+                assertNull(resultat.getDescription());
+                assertEquals(image, resultat.getImage());
+            }
+        }
+        JeuDto demande = dto(null, "Dixit", TypeJeu.SOCIETE);
+        demande.setDescription("Un jeu d’imagination.");
+        demande.setDureeEstimee(30);
+        JeuDto resultat = jeuService.addJeu(demande);
+        assertEquals(demande.getDescription(), resultat.getDescription());
+        assertEquals(30, resultat.getDureeEstimee());
+        verifyNoInteractions(rawgService);
+    }
+
+    @Test
+    void creationConserveLeRefusDesDureesInvalides() {
+        JeuDto demande = dto(null, "Dixit", TypeJeu.SOCIETE);
+        for (int duree : new int[]{0, -1}) {
+            demande.setDureeEstimee(duree);
+            assertThrows(IllegalArgumentException.class, () -> jeuService.addJeu(demande));
+        }
+        verifyNoInteractions(jeuDao, rawgService);
     }
 
     @Test
