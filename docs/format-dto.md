@@ -61,6 +61,32 @@ la durée réelle saisie pour une partie. Les résumés de jeux restent inchang�
 
 Filtre par type : `GET /jeux?type=SOCIETE` ou `GET /jeux?type=JEU_VIDEO`.
 
+### Création – `POST /jeux`
+
+Règles vérifiées par le backend (réponse `400` avec un message en français sinon) :
+
+- `nom` obligatoire, espaces de début et de fin retirés ;
+- `type` obligatoire : `"SOCIETE"` ou `"JEU_VIDEO"` ;
+- `nbJoueursMin` entier ≥ 1, `nbJoueursMax` entier ≥ `nbJoueursMin` ;
+- jeu de société : les deux effectifs entre 1 et 200 (aussi vérifié par `PUT /jeux/{id}`).
+
+```json
+{
+  "nom": "Carcassonne",
+  "type": "SOCIETE",
+  "nbJoueursMin": 2,
+  "nbJoueursMax": 5,
+  "description": null,
+  "image": "https://...",
+  "plateforme": null,
+  "dureeEstimee": null
+}
+```
+
+Avec une image importée, la même route reçoit un `multipart/form-data` : partie `jeu`
+(le JSON ci-dessus, en `application/json`) et partie `fichier` (JPEG, PNG ou WebP, 2 Mo maximum).
+Le champ `image` du jeu créé pointe alors vers `GET /jeux/images/{uuid}.png`.
+
 ## Soirées – `/soirees`
 
 ### Liste – `GET /soirees`
@@ -302,6 +328,7 @@ En cas d'erreur, le backend renvoie un code HTTP adapté et un message en franç
 |---|---|
 | `400 Bad Request` | Donnée invalide (champ obligatoire manquant, joueur absent de la soirée…) |
 | `404 Not Found` | Élément introuvable |
+| `413 Payload Too Large` | Photo de profil ou image de jeu de plus de 2 Mo |
 | `409 Conflict` | Opération refusée par la base (pseudo déjà pris, jeu déjà joué, joueur qui a des scores…) |
 
 Ces réponses sont produites par une classe `@RestControllerAdvice`, commune à toute l'API.

@@ -24,6 +24,7 @@ PlayNight enregistre les soirées, les parties jouées et les scores, puis en ti
 - Classement par victoires sur chaque fiche jeu, avec une page dédiée
 - Graphiques sur le profil joueur : victoires par jeu et parties jouées par mois (ng2-charts)
 - Import de jeux vidéo depuis l'API RAWG, avec leur image
+- Ajout d'un jeu de société : adaptation numérique trouvée sur RAWG, ou jeu physique saisi à la main avec une image par URL ou importée
 - Avatars : galerie de portraits PlayNight ou photo importée
 - Tirage au sort « Quel jeu ce soir ? » (icône 🎲) : filtres par type et nombre de joueurs, jeux à exclure
 
