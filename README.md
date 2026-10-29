@@ -3,8 +3,7 @@
 [![CI](https://github.com/Will-emma/playnight/actions/workflows/ci.yml/badge.svg)](https://github.com/Will-emma/playnight/actions/workflows/ci.yml)
 
 Application web de suivi de soirées jeux entre amis, pour les jeux de société comme pour les jeux vidéo.
-PlayNight enregistre les soirées, les parties jouées et les scores, puis en tire un historique et des statistiques par joueur et par jeu.
-
+PlayNight enregistre les soirées, les parties jouées et les scores, puis en tire un historique et des statistiques par joueur et par jeu. L'application permet également de tirer au sort un jeu pour la prochaine soirée.
 > Projet scolaire réalisé en binôme, rendu le 31 octobre 2026.
 
 ![Page d'accueil](docs/captures/accueil.jpg)
@@ -134,7 +133,11 @@ Les classements Elo sont calculés par le backend à son démarrage. Les images 
 
 ### Outils et usages
 
-Nous avons utilisé **Claude Code**, un assistant de code qui travaille dans le terminal et l'IDE : il lit le projet, lance des commandes et propose des modifications, que nous validons.
+Nous avons utilisé les outils suivants : **Claude Code**, **ChatGPT** et **Codex**. Ces outils nous ont accompagnés dans la compréhension du projet, le développement des fonctionnalités, la résolution de problèmes techniques, les tests et la documentation.
+
+#### Will-emma — Claude Code
+
+Will-emma a principalement utilisé Claude Code, un assistant de programmation intégré au terminal et à l'IDE. Il permet d'analyser le projet, d'exécuter des commandes et de proposer des modifications qui sont ensuite vérifiées.
 
 - **Environnement et outillage** : configuration du JDK 17 et du Maven Wrapper, base PostgreSQL de test dans Docker, intégration continue.
 - **Front** : refonte visuelle des pages (accueil, soirées, fiche jeu, profil, joueurs) à partir de maquettes, puis retouches.
@@ -142,9 +145,20 @@ Nous avons utilisé **Claude Code**, un assistant de code qui travaille dans le 
 - **Vérification** : tests lancés sur une base temporaire, contrôle des pages dans le navigateur, installation complète depuis un clone neuf du dépôt, comme le ferait un correcteur.
 - **Documentation** : ce README, captures d'écran comprises.
 
-Ces usages sont ceux de Will-emma.
 
-_À compléter par StarkMac22 : outils d'IA utilisés et pour quelles tâches._
+### StarkMac22 — ChatGPT et Codex
+
+StarkMac22 a utilisé ChatGPT pour comprendre et résoudre les problèmes rencontrés, ainsi que Codex, intégré à VS Code, pour analyser et modifier le code du projet.
+- **Développement frontend** : utilisation pour de petites modifications comme changer la couleur d'un bouton ou déplacer une icône.
+- **Développement backend** : assistance pour comprendre et faire évoluer l'API REST Java Spring Boot, notamment les contrôleurs, services, DTO et les interactions avec PostgreSQL.
+- **Débogage**: utilisation de Codex pour analyser les fichiers, identifier les causes des erreurs et proposer des corrections.
+- **Tests et validation** : utilisation de l'IA pour comprendre les erreurs Maven et Angular.
+- **Git et travail collaboratif** : utilisation de ChatGPT pour comprendre et résoudre les conflits Git.
+
+### Vérification et limites
+
+Nous n'avons pas considéré les réponses de l'IA comme systématiquement correctes.
+Les propositions ont été examinées avant leur intégration. Nous avons utilisé les tests unitaires et d'intégration, les compilations, les vérifications dans le navigateur et les Pull Requests pour contrôler les modifications de l'un et de l'autre.
 
 ### Skill du projet
 
