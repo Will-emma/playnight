@@ -142,7 +142,9 @@ Nous avons utilisé **Claude Code**, un assistant de code qui travaille dans le 
 - **Vérification** : tests lancés sur une base temporaire, contrôle des pages dans le navigateur, installation complète depuis un clone neuf du dépôt, comme le ferait un correcteur.
 - **Documentation** : ce README, captures d'écran comprises.
 
-_À compléter : usage de l'IA par chaque membre du binôme._
+Ces usages sont ceux de Will-emma.
+
+_À compléter par StarkMac22 : outils d'IA utilisés et pour quelles tâches._
 
 ### Skill du projet
 
@@ -150,16 +152,24 @@ Le dossier [`.claude/skills/ajouter-endpoint/`](.claude/skills/ajouter-endpoint/
 
 ### Justification
 
-_À compléter : pourquoi nous avons utilisé l'IA, et pour quelles parties nous avons choisi de ne pas l'utiliser._
+Nous avons utilisé l'IA pour deux raisons :
+
+- **Débloquer les problèmes techniques** qui ne relèvent pas du cœur du projet : installation du JDK, Maven Wrapper, Docker, erreurs de configuration ou de dépendances. Sans aide, ces blocages nous auraient coûté des heures, au détriment des fonctionnalités.
+- **Améliorer la qualité et la vérification** : lancer les tests sur une base isolée, contrôler chaque page dans le navigateur, rejouer l'installation complète depuis un clone neuf du dépôt pour être sûrs que le projet se lance chez le correcteur.
+
+Nous avons choisi de **ne pas l'utiliser** pour :
+
+- **La conception** : modèle de données, découpage en tickets, choix des fonctionnalités et des bonus. Ce sont nos décisions, que nous devons pouvoir défendre.
+- **La relecture des Pull Requests** : chaque PR est relue et approuvée par l'autre membre du binôme avant d'être fusionnée.
 
 ### Conclusions
 
-_À compléter. Constats relevés pendant le projet, à reformuler :_
+Notre bilan est très positif, à condition d'encadrer l'outil :
 
-- Laisser l'IA tout implémenter d'un coup nous a fait perdre la compréhension du code : début octobre, nous avons annulé l'ensemble de ses modifications. Ensuite, nous avons travaillé étape par étape, avec une explication avant chaque changement.
-- Ses affirmations doivent être vérifiées dans le code ou la base : elle s'est trompée plusieurs fois (un joueur présenté comme sans partie, un type de DTO mal identifié) et s'est corrigée après vérification.
-- Elle est très utile pour vérifier : rejouer une installation complète, lancer les tests sur une base isolée, relire une PR du binôme.
-- Les règles d'équipe restent indispensables : chaque modification passe par une PR relue par l'autre membre, avec la CI au vert.
+- **Avancer étape par étape.** Début octobre, nous avons laissé l'IA implémenter beaucoup de choses d'un coup et nous avons perdu la compréhension du code : nous avons tout annulé. Ensuite, nous lui avons demandé d'expliquer chaque problème et chaque correction avant de modifier quoi que ce soit, une étape à la fois.
+- **Tout vérifier.** L'IA se trompe parfois avec assurance : elle a présenté un joueur comme n'ayant aucune partie alors qu'il en avait, ou mal identifié un type de DTO. Ses erreurs ont été corrigées parce que nous avons vérifié dans le code et dans la base.
+- **Lui fixer nos règles.** Elle produit du code générique si on ne lui donne pas les conventions du projet. Le skill `ajouter-endpoint` répond à ce problème : il lui donne notre architecture et nos habitudes.
+- **Garder la main sur le projet.** Les décisions de conception, la relecture des PR et la CI au vert restent sous notre responsabilité ; l'IA accélère le travail, elle ne remplace pas notre compréhension.
 
 ## Structure du projet
 
