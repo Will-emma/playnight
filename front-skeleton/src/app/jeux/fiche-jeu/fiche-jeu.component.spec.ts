@@ -26,6 +26,20 @@ describe("FicheJeuComponent", () => {
     fixture.detectChanges()
   })
 
+  it("affiche la fiche d’un jeu physique nouvellement créé sans image ni description", () => {
+    route.next({ ficheJeuPage: {
+      fiche: {
+        jeu: { id: 89, nom: "Mon jeu physique", type: TypeJeu.SOCIETE, plateforme: null, nbJoueursMin: 2, nbJoueursMax: 200, image: null, description: null },
+        nbParties: 0, meilleursJoueurs: [], parties: [],
+      }, erreur: null, erreurClassement: false, classement: [],
+    } })
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelector("#nom-jeu").textContent).toBe("Mon jeu physique")
+    expect(fixture.nativeElement.querySelector(".caracteristiques").textContent).toContain("2 à 200 joueurs")
+    expect(fixture.nativeElement.querySelector(".couverture__initiale").textContent).toBe("M")
+    expect(fixture.nativeElement.textContent).toContain("Aucune partie pour l'instant")
+  })
+
   describe("Classement par victoires sur la fiche d'un jeu", () => {
     const vainqueurs: MeilleurJoueur[] = [3, 2, 2, 1, 1, 1].map((nbVictoires, index) => ({
       joueur: { id: 101 + index, pseudo: ["Alice", "Benoît", "Chloé", "Dina", "Eli", "Farah"][index], avatar: null },

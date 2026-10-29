@@ -1,0 +1,75 @@
+<section class="ajout-societe" aria-labelledby="titre-societe">
+  <h2 id="titre-societe">Ajouter un jeu de société</h2>
+  <p>Présentez votre jeu pour le retrouver dans la ludothèque. Les champs marqués * sont obligatoires.</p>
+
+  <form [formGroup]="formulaire" (ngSubmit)="enregistrer()" [attr.aria-busy]="enregistrement">
+    <fieldset [disabled]="enregistrement">
+      <legend class="visuellement-masque">Informations du jeu de société</legend>
+      <div class="champ">
+        <label for="societe-nom">Nom du jeu *</label>
+        <input id="societe-nom" type="text" formControlName="nom" required
+          [attr.aria-invalid]="aUneErreur('nom')" aria-describedby="societe-nom-aide" />
+        <small id="societe-nom-aide" [class.erreur]="aUneErreur('nom')">Indiquez un nom contenant au moins un caractère autre qu’un espace.</small>
+      </div>
+
+      <div class="effectifs">
+        <div class="champ">
+          <label for="societe-min">Nombre minimum de joueurs *</label>
+          <input id="societe-min" type="number" min="1" max="200" step="1" formControlName="nbJoueursMin" required
+            [attr.aria-invalid]="aUneErreur('nbJoueursMin')" aria-describedby="societe-min-aide" />
+          <small id="societe-min-aide" [class.erreur]="aUneErreur('nbJoueursMin')">Indiquez un nombre de joueurs compris entre 1 et 200.</small>
+        </div>
+        <div class="champ">
+          <label for="societe-max">Nombre maximum de joueurs *</label>
+          <input id="societe-max" type="number" min="1" max="200" step="1" formControlName="nbJoueursMax" required
+            [attr.aria-invalid]="aUneErreur('nbJoueursMax') || (formulaire.hasError('effectif') && formulaire.controls.nbJoueursMax.touched)"
+            aria-describedby="societe-max-aide" />
+          <small id="societe-max-aide" [class.erreur]="aUneErreur('nbJoueursMax') || (formulaire.hasError('effectif') && formulaire.controls.nbJoueursMax.touched)">
+            {{ formulaire.hasError('effectif') && !formulaire.controls.nbJoueursMax.invalid && !formulaire.controls.nbJoueursMin.invalid
+              ? "Le maximum doit être supérieur ou égal au minimum."
+              : "Indiquez un nombre de joueurs compris entre 1 et 200." }}
+          </small>
+        </div>
+      </div>
+
+      <div class="champ">
+        <label for="societe-description">Description (facultative)</label>
+        <textarea id="societe-description" formControlName="description" rows="4"></textarea>
+      </div>
+      <div class="champ">
+        <span id="societe-image-choix">Image (facultative)</span>
+        <div class="choix-image" role="group" aria-labelledby="societe-image-choix">
+          <button type="button" [attr.aria-pressed]="sourceImage === 'URL'" (click)="choisirSourceImage('URL')">URL d’image</button>
+          <button type="button" [attr.aria-pressed]="sourceImage === 'FICHIER'" (click)="choisirSourceImage('FICHIER')">Importer une image</button>
+        </div>
+        @if (sourceImage === "URL") {
+        <label for="societe-image">URL d’image (facultative)</label>
+        <input id="societe-image" type="url" formControlName="image" placeholder="https://…"
+          [attr.aria-invalid]="aUneErreur('image')" aria-describedby="societe-image-aide" />
+        <small id="societe-image-aide" [class.erreur]="aUneErreur('image')">
+          Utilisez une adresse http:// ou https://, ou laissez vide pour une couverture avec l’initiale du jeu.
+        </small>
+        } @else {
+          <label for="societe-fichier">Choisir une image sur cet appareil</label>
+          <input id="societe-fichier" type="file" accept="image/jpeg,image/png,image/webp" (change)="importerImage($event)"
+            aria-describedby="societe-fichier-aide" [attr.aria-invalid]="!!erreurImage" />
+          <small id="societe-fichier-aide">JPEG, PNG ou WebP · 2 Mo maximum · 4096 pixels par côté maximum.</small>
+          @if (validationImage) { <p role="status">Vérification de l’image…</p> }
+          @if (apercuImage) {
+            <div class="apercu-image">
+              <img [src]="apercuImage" alt="Aperçu de l’image choisie pour le jeu" />
+              <span>{{ fichier?.name }}</span>
+              <button type="button" (click)="retirerImage()">Retirer l’image</button>
+            </div>
+          }
+          @if (erreurImage) { <p class="erreur" role="alert">{{ erreurImage }}</p> }
+        }
+      </div>
+    </fieldset>
+
+    @if (erreur) { <p class="erreur" role="alert">{{ erreur }}</p> }
+    <button type="submit" class="enregistrer" [disabled]="enregistrement || validationImage">
+      {{ enregistrement ? "Enregistrement…" : "Ajouter le jeu de société" }}
+    </button>
+  </form>
+</section>

@@ -1,13 +1,17 @@
 package com.takima.backskeleton.DTO;
 
 import com.takima.backskeleton.models.TypeJeu;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 public class JeuDto {
     private Long id;
     private String nom;
+    @JsonDeserialize(using = JeuDtoDeserializers.Type.class)
     private TypeJeu type;
     private String plateforme;
+    @JsonDeserialize(using = JeuDtoDeserializers.Entier.class)
     private Integer nbJoueursMin;
+    @JsonDeserialize(using = JeuDtoDeserializers.Entier.class)
     private Integer nbJoueursMax;
     private String image;
     private String description;

@@ -1,9 +1,50 @@
 <main class="importer-jeu">
   <a class="retour" routerLink="/jeux">← Ludothèque</a>
 
+  <section class="entete" aria-labelledby="titre-ajout">
+    <p class="eyebrow"><span class="eyebrow__dot"></span> PLAYNIGHT · VOTRE COLLECTION</p>
+    <h1 id="titre-ajout">Ajouter un jeu</h1>
+    <p class="entete__texte">Quel type de jeu souhaitez-vous ajouter à votre ludothèque ?</p>
+    <div class="choix-types" role="group" aria-label="Type de jeu à ajouter">
+      <button type="button" class="choix-type" [class.choix-type--actif]="typeChoisi === 'JEU_VIDEO'"
+        [attr.aria-pressed]="typeChoisi === 'JEU_VIDEO'" [disabled]="changementTypeBloque"
+        (click)="choisirType('JEU_VIDEO')">
+        <strong>Jeu vidéo</strong>
+        <span>Rechercher et importer un jeu depuis RAWG.</span>
+      </button>
+      <button type="button" class="choix-type" [class.choix-type--actif]="typeChoisi === 'SOCIETE'"
+        [attr.aria-pressed]="typeChoisi === 'SOCIETE'" [disabled]="changementTypeBloque"
+        (click)="choisirType('SOCIETE')">
+        <strong>Jeu de société</strong>
+        <span>Importer une adaptation numérique ou ajouter un jeu physique.</span>
+      </button>
+    </div>
+  </section>
+
+  @if (typeChoisi === "SOCIETE") {
+    <section class="entete" aria-labelledby="titre-mode-societe">
+      <h2 id="titre-mode-societe">Quel jeu de société souhaitez-vous ajouter ?</h2>
+      <div class="choix-types choix-societe" role="group" aria-label="Mode d’ajout du jeu de société">
+        <button type="button" class="choix-type" [class.choix-type--actif]="modeSociete === 'RAWG'"
+          [attr.aria-pressed]="modeSociete === 'RAWG'" [disabled]="changementTypeBloque"
+          (click)="choisirModeSociete('RAWG')">
+          <strong>Adaptation numérique du jeu de société</strong>
+          <span>Rechercher une version sur PC, console ou mobile. Elle sera classée comme jeu vidéo.</span>
+        </button>
+        <button type="button" class="choix-type" [class.choix-type--actif]="modeSociete === 'MANUEL'"
+          [attr.aria-pressed]="modeSociete === 'MANUEL'" [disabled]="changementTypeBloque"
+          (click)="choisirModeSociete('MANUEL')">
+          <strong>Jeu physique — Ajout manuel</strong>
+          <span>Renseigner les informations de votre jeu de société physique.</span>
+        </button>
+      </div>
+    </section>
+  }
+
+  @if (afficherRawg) {
   <section class="entete" aria-labelledby="titre-import">
     <p class="eyebrow"><span class="eyebrow__dot"></span> PLAYNIGHT · IMPORT RAWG</p>
-    <h1 id="titre-import">Importer un jeu vidéo</h1>
+    <h2 id="titre-import">{{ adaptationNumerique ? "Adaptation numérique du jeu de société" : "Importer un jeu vidéo" }}</h2>
     <p class="entete__texte">
       Recherchez un jeu dans la base RAWG : son nom, son image et ses plateformes sont repris automatiquement.
       Il ne reste qu'à indiquer le nombre de joueurs.
@@ -17,10 +58,10 @@
       type="search"
       name="recherche"
       [(ngModel)]="recherche"
-      placeholder="Zelda, Mario Kart, FIFA…"
+      [placeholder]="adaptationNumerique ? 'Monopoly, UNO, Catan, Carcassonne, Risk, Scrabble, Ticket to Ride…' : 'Zelda, Mario Kart, FIFA…'"
       autocomplete="off"
     />
-    <button type="submit" class="bouton bouton--principal" [disabled]="rechercheEnCours || !recherche.trim()">
+    <button type="submit" class="bouton bouton--principal" [disabled]="changementTypeBloque || !recherche.trim()">
       {{ rechercheEnCours ? "Recherche…" : "Rechercher" }}
     </button>
   </form>
@@ -49,6 +90,9 @@
 
           <div class="resultat__infos">
             <h2>{{ resultat.jeu.nom }}</h2>
+            @if (adaptationNumerique) {
+              <p class="mention-adaptation">Adaptation numérique — Jeu vidéo</p>
+            }
             <p class="resultat__details">
               @if (annee(resultat.jeu); as annee) {
                 <span>{{ annee }}</span> ·
@@ -68,7 +112,7 @@
                 <input type="number" min="1" step="1" [name]="'max-' + resultat.jeu.idRawg" [(ngModel)]="resultat.nbJoueursMax" />
               </label>
             </div>
-            <button type="button" class="bouton bouton--principal" [disabled]="resultat.envoiEnCours" (click)="ajouter(resultat)">
+            <button type="button" class="bouton bouton--principal" [disabled]="changementTypeBloque" (click)="ajouter(resultat)">
               {{ resultat.envoiEnCours ? "Ajout…" : "Ajouter" }}
             </button>
           </div>
@@ -83,4 +127,7 @@
 
   <!-- Mention demandée par les conditions d'utilisation de l'API RAWG -->
   <p class="source">Données des jeux fournies par <a href="https://rawg.io" target="_blank" rel="noopener">RAWG</a></p>
+  } @else if (typeChoisi === "SOCIETE" && modeSociete === "MANUEL") {
+    <app-ajouter-jeu-societe (enregistrementChange)="enregistrementSociete = $event" />
+  }
 </main>

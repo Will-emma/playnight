@@ -17,6 +17,18 @@ export interface Jeu {
   dureeEstimee?: number | null // minutes indicatives, distinctes de la durée d’une partie
 }
 
+// Données de POST /jeux : l'identifiant est attribué par le serveur.
+export interface JeuCreation {
+  nom: string
+  type: TypeJeu
+  nbJoueursMin: number
+  nbJoueursMax: number
+  description: string | null
+  image: string | null
+  plateforme: string | null
+  dureeEstimee: number | null
+}
+
 // Un jeu vidéo trouvé sur RAWG, pas encore dans la ludothèque : GET /jeux/rawg?recherche=...
 export interface RawgJeu {
   idRawg: number

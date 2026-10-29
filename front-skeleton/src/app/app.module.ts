@@ -18,6 +18,7 @@ import { HttpClientModule } from "@angular/common/http"
 import { JeuxComponent } from "jeux/jeux.component"
 import { FicheJeuComponent } from "jeux/fiche-jeu/fiche-jeu.component"
 import { ImporterJeuComponent } from "jeux/importer-jeu/importer-jeu.component"
+import { AjouterJeuSocieteComponent } from "jeux/ajouter-jeu-societe/ajouter-jeu-societe.component"
 import { ProfilJoueurComponent } from "joueurs/profil-joueur/profil-joueur.component"
 import { StatistiquesJoueurComponent } from "joueurs/statistiques-joueur/statistiques-joueur.component"
 import { JoueursComponent } from "joueurs/joueurs.component"
@@ -45,6 +46,7 @@ import { SuppressionComponent } from "./suppression/suppression.component"
     SuppressionComponent,
   ],
   imports: [
+    AjouterJeuSocieteComponent,
     StatistiquesJoueurComponent,
     BrowserModule,
     AppRoutingModule,

@@ -61,7 +61,9 @@ public class JeuService {
 
     @Transactional
     public JeuDto addJeu(JeuDto jeuDto) {
+        verifierCreation(jeuDto);
         verifierDureeEstimee(jeuDto);
+        jeuDto.setNom(jeuDto.getNom().trim());
         Jeu jeu = JeuMapper.fromDto(jeuDto, null);
         return JeuMapper.toDto(jeuDao.save(jeu));
     }
@@ -69,6 +71,7 @@ public class JeuService {
     @Transactional
     public JeuDto updateJeu(JeuDto jeuDto, Long id) {
         findJeuById(id);
+        verifierEffectifsSociete(jeuDto);
         verifierDureeEstimee(jeuDto);
         Jeu jeu = JeuMapper.fromDto(jeuDto, id);
         return JeuMapper.toDto(jeuDao.save(jeu));
@@ -108,6 +111,40 @@ public class JeuService {
     public void deleteById(Long id) {
         findJeuById(id);
         jeuDao.deleteById(id);
+    }
+
+    private void verifierCreation(JeuDto jeuDto) {
+        if (jeuDto == null) {
+            throw new IllegalArgumentException("Les informations du jeu sont obligatoires.");
+        }
+        if (jeuDto.getNom() == null || jeuDto.getNom().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom du jeu est obligatoire.");
+        }
+        if (jeuDto.getType() == null) {
+            throw new IllegalArgumentException("Le type du jeu est obligatoire : SOCIETE ou JEU_VIDEO.");
+        }
+        Integer minimum = jeuDto.getNbJoueursMin();
+        Integer maximum = jeuDto.getNbJoueursMax();
+        verifierEffectifsSociete(jeuDto);
+        if (minimum == null || minimum < 1) {
+            throw new IllegalArgumentException("Le nombre minimum de joueurs doit être un entier supérieur ou égal à 1.");
+        }
+        if (maximum == null || maximum < minimum) {
+            throw new IllegalArgumentException("Le nombre maximum de joueurs est obligatoire et doit être supérieur ou égal au minimum.");
+        }
+    }
+
+    private void verifierEffectifsSociete(JeuDto jeuDto) {
+        if (jeuDto.getType() != TypeJeu.SOCIETE) return;
+        Integer minimum = jeuDto.getNbJoueursMin();
+        Integer maximum = jeuDto.getNbJoueursMax();
+        if (minimum == null || maximum == null || minimum < 1 || maximum < 1
+                || minimum > 200 || maximum > 200) {
+            throw new IllegalArgumentException("Indiquez un nombre de joueurs compris entre 1 et 200.");
+        }
+        if (maximum < minimum) {
+            throw new IllegalArgumentException("Le maximum doit être supérieur ou égal au minimum.");
+        }
     }
 
     private void verifierDureeEstimee(JeuDto jeuDto) {

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 import { Observable } from "rxjs"
-import { ClassementElo, FicheJeu, Jeu, MeilleurJoueur, RawgImport, RawgJeu, TypeJeu } from "models/jeu.model"
+import { ClassementElo, FicheJeu, Jeu, JeuCreation, MeilleurJoueur, RawgImport, RawgJeu, TypeJeu } from "models/jeu.model"
 
 @Injectable({
   providedIn: "root",
@@ -10,6 +10,17 @@ export class JeuService {
   private readonly jeuxUrl = "http://localhost:8080/jeux"
 
   constructor(private http: HttpClient) {}
+
+  create(jeu: JeuCreation): Observable<Jeu> {
+    return this.http.post<Jeu>(this.jeuxUrl, jeu)
+  }
+
+  createAvecImage(jeu: JeuCreation, fichier: File): Observable<Jeu> {
+    const donnees = new FormData()
+    donnees.append("jeu", new Blob([JSON.stringify(jeu)], { type: "application/json" }))
+    donnees.append("fichier", fichier)
+    return this.http.post<Jeu>(this.jeuxUrl, donnees)
+  }
 
   findAll(type?: TypeJeu): Observable<Jeu[]> {
     const params = type ? new HttpParams().set("type", type) : undefined

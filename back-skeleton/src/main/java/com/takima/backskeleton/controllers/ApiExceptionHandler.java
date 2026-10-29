@@ -1,5 +1,8 @@
 package com.takima.backskeleton.controllers;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.takima.backskeleton.DTO.JeuDto;
+import com.takima.backskeleton.models.TypeJeu;
 import com.takima.backskeleton.services.RawgIndisponibleException;
 import com.takima.backskeleton.services.AvatarTropVolumineuxException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -29,13 +32,31 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler({
-            HttpMessageNotReadableException.class,
             MethodArgumentTypeMismatchException.class,
             MissingServletRequestParameterException.class,
             MissingServletRequestPartException.class,
             MethodArgumentNotValidException.class
     })
     public ResponseEntity<Map<String, String>> handleBadRequest(Exception exception) {
+        return error(HttpStatus.BAD_REQUEST, "La requête est invalide.");
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleJsonInvalide(HttpMessageNotReadableException exception) {
+        if (exception.getCause() instanceof JsonMappingException mapping) {
+            for (JsonMappingException.Reference champ : mapping.getPath()) {
+                if (champ.getFrom() instanceof JeuDto jeu) {
+                    if ("nbJoueursMin".equals(champ.getFieldName()) || "nbJoueursMax".equals(champ.getFieldName())) {
+                        return error(HttpStatus.BAD_REQUEST, jeu.getType() == TypeJeu.SOCIETE
+                                ? "Indiquez un nombre de joueurs compris entre 1 et 200."
+                                : "Le nombre de joueurs doit être un entier.");
+                    }
+                    if ("type".equals(champ.getFieldName())) {
+                        return error(HttpStatus.BAD_REQUEST, "Le type du jeu doit être SOCIETE ou JEU_VIDEO.");
+                    }
+                }
+            }
+        }
         return error(HttpStatus.BAD_REQUEST, "La requête est invalide.");
     }
 
