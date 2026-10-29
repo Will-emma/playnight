@@ -130,6 +130,37 @@ Les classements Elo sont calculés par le backend à son démarrage. Les images 
 - La liste des soirées et le podium de l'accueil font une requête par soirée ou par joueur : suffisant pour une bande d'amis, à regrouper pour de gros volumes.
 - Les classements Elo sont recalculés au démarrage du backend et après chaque modification de soirée, à partir de tout l'historique.
 
+## Utilisation de l'IA
+
+### Outils et usages
+
+Nous avons utilisé **Claude Code**, un assistant de code qui travaille dans le terminal et l'IDE : il lit le projet, lance des commandes et propose des modifications, que nous validons.
+
+- **Environnement et outillage** : configuration du JDK 17 et du Maven Wrapper, base PostgreSQL de test dans Docker, intégration continue.
+- **Front** : refonte visuelle des pages (accueil, soirées, fiche jeu, profil, joueurs) à partir de maquettes, puis retouches.
+- **Données** : script `initdb/6_DONNEES_DEMO.sql`, construit à partir des données de démo du ticket #41.
+- **Vérification** : tests lancés sur une base temporaire, contrôle des pages dans le navigateur, installation complète depuis un clone neuf du dépôt, comme le ferait un correcteur.
+- **Documentation** : ce README, captures d'écran comprises.
+
+_À compléter : usage de l'IA par chaque membre du binôme._
+
+### Skill du projet
+
+Le dossier [`.claude/skills/ajouter-endpoint/`](.claude/skills/ajouter-endpoint/SKILL.md) contient un **skill** : une fiche que Claude Code charge quand on lui demande d'ajouter une route à l'API. Elle décrit nos conventions (architecture controller → service → DAO, DTO et mappers écrits à la main sans Lombok, codes HTTP et gestion des erreurs, tests unitaires et d'intégration, documentation à mettre à jour), pour que le code produit ressemble au reste du projet au lieu de suivre des habitudes génériques.
+
+### Justification
+
+_À compléter : pourquoi nous avons utilisé l'IA, et pour quelles parties nous avons choisi de ne pas l'utiliser._
+
+### Conclusions
+
+_À compléter. Constats relevés pendant le projet, à reformuler :_
+
+- Laisser l'IA tout implémenter d'un coup nous a fait perdre la compréhension du code : début octobre, nous avons annulé l'ensemble de ses modifications. Ensuite, nous avons travaillé étape par étape, avec une explication avant chaque changement.
+- Ses affirmations doivent être vérifiées dans le code ou la base : elle s'est trompée plusieurs fois (un joueur présenté comme sans partie, un type de DTO mal identifié) et s'est corrigée après vérification.
+- Elle est très utile pour vérifier : rejouer une installation complète, lancer les tests sur une base isolée, relire une PR du binôme.
+- Les règles d'équipe restent indispensables : chaque modification passe par une PR relue par l'autre membre, avec la CI au vert.
+
 ## Structure du projet
 
 ```
@@ -137,7 +168,8 @@ Les classements Elo sont calculés par le backend à son démarrage. Les images 
 │   ├── initdb/          scripts SQL exécutés à la création de la base
 │   └── src/main/java/   controllers → services → DAO → models, DTO
 ├── front-skeleton/      application Angular
-├── docs/                documentation de conception
+├── docs/                documentation de conception, captures d'écran
+├── .claude/skills/      skill pour l'assistant de code (voir Utilisation de l'IA)
 └── .github/workflows/   intégration continue (GitHub Actions)
 ```
 
