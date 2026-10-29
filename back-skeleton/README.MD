@@ -40,6 +40,15 @@ les resolvers Angular rechargent les données en naviguant, et le profil affich�
 est actualisé dès que l'enregistrement réussit. La prévisualisation reste locale
 jusqu'à l'appui sur « Enregistrer » ; « Annuler » n'envoie aucune modification.
 
+### Images des jeux de société
+
+Un jeu de société physique peut être créé avec une image importée :
+`POST /jeux` en multipart reçoit la partie `jeu` (JSON du `JeuDto`) et la partie `fichier`.
+L'image suit les mêmes contrôles et le même réencodage PNG que les photos de profil,
+dans un dossier séparé : `back-skeleton/uploads/jeux/`, ignoré par Git.
+Elle est servie par `GET /jeux/images/{uuid}.png`. Si l'enregistrement du jeu échoue,
+le fichier est supprimé.
+
 
 ### API à jour et démarrage local
 
