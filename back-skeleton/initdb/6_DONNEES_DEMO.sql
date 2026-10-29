@@ -36,10 +36,10 @@ BEGIN
          'https://media.rawg.io/media/games/082/082365507ff04d456c700157072d35db.jpg', NULL),
         ('Overcooked! 2', 'PC, PlayStation 4, Xbox One, Nintendo Switch', 1, 4,
          'https://media.rawg.io/media/games/d11/d11470677a829e34562e95a4002c2c7f.jpg',
-         'Cuisine coopérative ou versus, de un à quatre joueurs. La démonstration utilise le versus en deux équipes de deux.'),
+         'Cuisine coopérative ou versus, de un à quatre joueurs.'),
         ('It Takes Two', 'PC, PlayStation 4/5, Xbox One/Series, Nintendo Switch', 2, 2,
          'https://media.rawg.io/media/games/d47/d479582ed0a46496ad34f65c7099d7e5.jpg',
-         'Aventure exclusivement coopérative à deux joueurs, en local ou en ligne. Aucun résultat compétitif fictif dans la démonstration.')
+         'Aventure exclusivement coopérative à deux joueurs, en local ou en ligne.')
     ) AS v(nom, plateforme, minimum, maximum, image, description) LOOP
         INSERT INTO jeux (nom, type, plateforme, nb_joueurs_min, nb_joueurs_max, image, description)
         SELECT jeu.nom, 'JEU_VIDEO', jeu.plateforme, jeu.minimum, jeu.maximum, jeu.image, jeu.description
